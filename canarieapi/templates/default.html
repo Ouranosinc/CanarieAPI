@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h2>{{ Title }}</h2>
+    <table>
+    {% for key in Tags %}
+        <tr>
+        <td class=flash>{{ key }} : </td>
+        <td class=flash>{{ Tags[key] }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endblock %}
