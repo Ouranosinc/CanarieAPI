@@ -170,7 +170,8 @@ def make_error_response(html_status=None,
                                                             resp=html_status_response))
 
         template = render_template('error.html',
-                                   Main_Title='Canarie API Error',
+                                   Main_Title='Canarie API',
+                                   Title='Error',
                                    html_response=html_response_header)
         return template, html_status
 

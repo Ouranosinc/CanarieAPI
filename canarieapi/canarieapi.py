@@ -35,6 +35,7 @@ from utility_rest import request_wants_json
 from utility_rest import AnyIntConverter
 from app_object import APP
 
+logger = APP.logger
 
 START_UTC_TIME = datetime.datetime.utcnow()
 
@@ -111,8 +112,8 @@ def home():
         return collections.OrderedDict(content)
 
     config = APP.config
-    content = dict(platforms={name: parse_config(name, 'platform', p) for name, p in config['PLATFORMS'].items()},
-                   services={name: parse_config(name, 'service', s) for name, s in config['SERVICES'].items()})
+    content = dict(Platforms={name.capitalize(): parse_config(name, 'platform', p) for name, p in config['PLATFORMS'].items()},
+                   Services={name.capitalize(): parse_config(name, 'service', s) for name, s in config['SERVICES'].items()})
     return render_template('home.html', Main_Title='Canarie API', Title="Home", Content=content)
 
 @APP.route("/<any_int(" + HANDLED_HTML_ERRORS_STR + "):status_code_str>")

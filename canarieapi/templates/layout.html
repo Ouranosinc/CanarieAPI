@@ -4,11 +4,18 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Ouranos - {{ Main_Title }}</title>
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
     <div class=page>
-        <h1>Ouranos - {{ Main_Title }}</h1>
-        {% block body %}{% endblock %}
+        <div class="title">
+            <h1>Ouranos - {{ Main_Title }}</h1>
+            <div class="title_gradient"></div>
+            <div><h2>{{ Title }}</h2></div>
+        </div>
+        <div class="content">
+            {% block body %}{% endblock %}
+        </div>
     </div>
 </body>
 </html>

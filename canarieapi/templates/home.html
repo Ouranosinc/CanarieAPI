@@ -1,15 +1,11 @@
 {% extends "layout.html" %}
 {% block body %}
-    <h2>{{ Title }}</h2>
-
     {% for api_type in Content %}
         <h3>{{ api_type }}</h3>
         {% for name in Content[api_type] %}
             <table>
-                <tr>
-                    <th class=flash>{{ name }}</th>
-                </tr>
                 <tr><td class=flash>
+                    <span class="col_header">{{ name }}</span>
                 {% for request in Content[api_type][name] %}
                     <a class=home_link href="{{ Content[api_type][name][request] }}">{{ request }}</a>
                 {% endfor %}

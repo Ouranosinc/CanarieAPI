@@ -7,7 +7,7 @@ try:
 except ImportError:
     from distutils.core import setup
 
-from magpie import __version__, __author__, __email__
+from canarieapi import __version__, __author__, __email__
 
 with open('README.rst') as readme_file:
     README = readme_file.read()
