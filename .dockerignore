@@ -1,0 +1,7 @@
+*.log
+*.db
+nginx/*
+*/.idea/*
+Dockerfile
+docker_configuration.py
+custom_configuration.py

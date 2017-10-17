@@ -12,6 +12,8 @@ possible.
 import ConfigParser
 import httplib
 import re
+from os import remove
+from os import path
 
 # -- 3rd party ---------------------------------------------------------------
 from werkzeug.datastructures import MIMEAccept
@@ -20,6 +22,9 @@ from flask import render_template
 from flask import redirect
 from flask import request
 from flask import jsonify
+from flask import g
+from flask import current_app
+import sqlite3
 
 # -- Project specific --------------------------------------------------------
 from app_object import APP
@@ -174,6 +179,54 @@ def make_error_response(html_status=None,
                                    Title='Error',
                                    html_response=html_response_header)
         return template, html_status
+
+
+def get_db():
+    """
+    Get a connection to an existing database. If it does not exist, create a
+    connection to local sqlite3 file.
+
+    If the local sqlite3 file doesn't exist, initialize it using a schema.
+    """
+    database = getattr(g, '_stats_database', None)
+    if database is None:
+        d_fn = APP.config['DATABASE']['filename']
+        if path.isabs(d_fn):
+            database_fn = d_fn
+        else:
+            database_fn = path.join(APP.root_path, d_fn)
+
+        APP.logger.debug(u"Using db filename : {0}".format(database_fn))
+        if not path.exists(database_fn):
+            database = g._database = sqlite3.connect(database_fn)
+            try:
+                init_db(database)
+            except:
+                database.close()
+                remove(database_fn)
+                raise
+        else:
+            database = g._database = sqlite3.connect(database_fn)
+
+    return database
+
+
+def init_db(database):
+    """
+    Initialize a database from a schema
+    """
+    APP.logger.info(u"Initializing database")
+    with current_app.app_context():
+        dbs_fn = APP.config['DATABASE']['schema_filename']
+        if path.isabs(dbs_fn):
+            schema_fn = dbs_fn
+        else:
+            schema_fn = path.join(APP.root_path, dbs_fn)
+
+        APP.logger.debug(u"Using schema filename : {0}".format(schema_fn))
+        with current_app.open_resource(schema_fn, mode='r') as schema_f:
+            database.cursor().executescript(schema_f.read())
+        database.commit()
 
 
 class AnyIntConverter(BaseConverter):

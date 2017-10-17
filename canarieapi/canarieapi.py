@@ -32,8 +32,14 @@ from utility_rest import get_config
 from utility_rest import get_api_title
 from utility_rest import make_error_response
 from utility_rest import request_wants_json
+from utility_rest import get_db
 from utility_rest import AnyIntConverter
 from app_object import APP
+
+# Creates the database if it doesn't exist, connects to it and keeps it in
+# cache for hassle free runtime access
+with APP.app_context():
+    get_db()
 
 logger = APP.logger
 
@@ -178,9 +184,23 @@ def stats(route_name, api_type):
 
     validate_route(route_name, api_type)
 
+    invocations = 0
+    last_access = 'Never'
+    query = 'select invocations, last_access from stats where route = ?'
+    try:
+        cur = get_db().execute(query, [route_name])
+        rv = cur.fetchall()
+        if rv:
+            invocations = rv[0][0]
+            last_access = rv[0][1]
+        cur.close()
+    except:
+        pass
+
     service_stats = {
-        'lastReset': START_UTC_TIME.strftime('%Y-%m-%dT%H:%M:%SZ'),
-        'invocations': 0}
+        'lastReset': '.'.join(START_UTC_TIME.isoformat().split('.')[:-1]),
+        'invocations': invocations,
+        'lastAccess': last_access}
 
     if request_wants_json():
         return jsonify(service_stats)
@@ -201,6 +221,16 @@ def simple_requests_handler(route_name, api_type, api_request='home'):
 
     return get_canarie_api_response(route_name, api_type, api_request)
 
+
+@APP.teardown_appcontext
+def close_connection(dummy_exception):
+    """
+    Disconnect database.
+
+    :param dummy_exception: Exception handled elsewhere, nothing to do with it
+    """
+    APP.logger.info(u"Disconnecting from database")
+    get_db().close()
 
 
 if __name__ == "__main__":

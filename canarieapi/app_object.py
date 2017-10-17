@@ -2,18 +2,16 @@
 This module serves the purpose of centralizing the state object of Flask in a single place.
 """
 
+import logging
 # -- Standard lib ------------------------------------------------------------
 import sys
-import logging
-from os import environ
-
 # -- 3rd party modules -------------------------------------------------------
 from flask import Flask
+from os import environ
 
 # -- Project specific --------------------------------------------------------
 import default_configuration
 from reverse_proxied import ReverseProxied
-
 
 APP = Flask(__name__)
 formatter = logging.Formatter('[%(asctime)s] [%(process)d] [%(levelname)s] %(name)s : %(message)s')

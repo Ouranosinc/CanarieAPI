@@ -10,6 +10,13 @@ found in this file, you need to set the environment variable named
 
 MY_SERVER_NAME = 'http://localhost:5000'
 
+DATABASE = {
+    'filename': '/opt/local/src/CanarieAPI/stats.db',
+    'schema_filename': 'database_schema.sql',
+    'access_log': '/var/log/nginx/access_file.log',
+    'log_pid': '/var/run/nginx.pid'
+}
+
 SERVICES = {
     'node': {
         'info': {
@@ -24,7 +31,8 @@ SERVICES = {
             'tags': 'Climatology,Cloud'
         },
         'stats': {
-
+            'method': '(GET|POST|PUT|DELETE)',
+            'route': '/node/service/.*'
         },
         'redirect': {
             'doc': 'https://ouranosinc.github.io/pavics-sdi',
@@ -49,7 +57,8 @@ SERVICES = {
             'tags': 'Climatology,Cloud'
         },
         'stats': {
-
+            'method': 'GET',
+            'route': '/bias/service/.*'
         },
         'redirect': {
             'doc': 'https://ouranosinc.github.io/pavics-sdi',
@@ -74,7 +83,8 @@ SERVICES = {
             'tags': 'Climatology,Cloud'
         },
         'stats': {
-
+            'method': 'GET',
+            'route': '/indices/service/.*'
         },
         'redirect': {
             'doc': 'https://ouranosinc.github.io/pavics-sdi',
@@ -99,7 +109,8 @@ SERVICES = {
             'tags': 'Climatology,Cloud'
         },
         'stats': {
-
+            'method': '.*',
+            'route': '/renderer/service/.*'
         },
         'redirect': {
             'doc': 'https://ouranosinc.github.io/pavics-sdi',
@@ -124,7 +135,8 @@ SERVICES = {
             'tags': 'Climatology,Cloud'
         },
         'stats': {
-
+            'method': '.*',
+            'route': '/slicer/service/.*'
         },
         'redirect': {
             'doc': 'https://ouranosinc.github.io/pavics-sdi',
@@ -151,7 +163,8 @@ PLATFORMS = {
             'tags': 'Climatology,Cloud'
         },
         'stats': {
-
+            'method': '.*',
+            'route': '/pavics/platform/.*'
         },
         'redirect': {
             'doc': 'https://ouranosinc.github.io/pavics-sdi',
