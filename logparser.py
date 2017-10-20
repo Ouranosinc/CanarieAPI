@@ -78,6 +78,8 @@ def parse_log(filename):
     logger.info('Updating databse')
     with APP.app_context():
         db = get_db()
+        cur = db.cursor()
+
         for route, value in route_stats.items():
             if not value['count']:
                 continue
@@ -90,13 +92,15 @@ def parse_log(filename):
                     '?)'
 
             # sqlite can take the date as a string as long as it is formatted using ISO-8601
-            cur = db.execute(query, [route, route, value['count'], value['last_access']])
-            cur.close()
-            db.commit()
+            cur.execute(query, [route, route, value['count'], value['last_access']])
+
+        cur.execute('insert or replace into cron (job, last_execution) values (\'log\', CURRENT_TIMESTAMP)')
+        db.commit()
         db.close()
 
 
 if __name__ == '__main__':
+    logger.info('Cron job for parsing server log')
     access_log_fn = APP.config['DATABASE']['access_log']
     rotate_log(access_log_fn)
     parse_log(access_log_fn + '.1')

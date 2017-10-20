@@ -42,7 +42,8 @@ SERVICES = {
             'tryme': 'https://ouranosinc.github.io/pavics-sdi',
             'license': 'https://ouranosinc.github.io/pavics-sdi/license/index.html',
             'provenance': 'https://ouranosinc.github.io/pavics-sdi/provenance/index.html'
-        }
+        },
+        'monitoring': {}
     },
     'bias': {
         'info': {
@@ -68,7 +69,8 @@ SERVICES = {
             'tryme': 'https://ouranosinc.github.io/pavics-sdi',
             'license': 'https://ouranosinc.github.io/pavics-sdi/license/index.html',
             'provenance': 'https://ouranosinc.github.io/pavics-sdi/provenance/index.html'
-        }
+        },
+        'monitoring': {}
     },
     'indices': {
         'info': {
@@ -94,7 +96,8 @@ SERVICES = {
             'tryme': 'https://ouranosinc.github.io/pavics-sdi',
             'license': 'https://ouranosinc.github.io/pavics-sdi/license/index.html',
             'provenance': 'https://ouranosinc.github.io/pavics-sdi/provenance/index.html'
-        }
+        },
+        'monitoring': {}
     },
     'renderer': {
         'info': {
@@ -120,7 +123,8 @@ SERVICES = {
             'tryme': 'https://ouranosinc.github.io/pavics-sdi',
             'license': 'https://ouranosinc.github.io/pavics-sdi/license/index.html',
             'provenance': 'https://ouranosinc.github.io/pavics-sdi/provenance/index.html'
-        }
+        },
+        'monitoring': {}
     },
     'slicer': {
         'info': {
@@ -146,7 +150,8 @@ SERVICES = {
             'tryme': 'https://ouranosinc.github.io/pavics-sdi',
             'license': 'https://ouranosinc.github.io/pavics-sdi/license/index.html',
             'provenance': 'https://ouranosinc.github.io/pavics-sdi/provenance/index.html'
-        }
+        },
+        'monitoring': {}
     }
 }
 
@@ -175,6 +180,7 @@ PLATFORMS = {
             'license': 'https://ouranosinc.github.io/pavics-sdi/license/index.html',
             'provenance': 'https://ouranosinc.github.io/pavics-sdi/provenance/index.html',
             'factsheet': 'https://ouranosinc.github.io/pavics-sdi'
-        }
+        },
+        'monitoring': {}
     }
 }

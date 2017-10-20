@@ -19,6 +19,7 @@ https://collaboration.canarie.ca/elgg/discussion/view/3664/research-software-api
 import collections
 import datetime
 import logging
+from dateutil.parser import *
 
 # -- 3rd party ---------------------------------------------------------------
 from flask import render_template
@@ -35,6 +36,7 @@ from utility_rest import request_wants_json
 from utility_rest import get_db
 from utility_rest import AnyIntConverter
 from app_object import APP
+from status import Status
 
 # Creates the database if it doesn't exist, connects to it and keeps it in
 # cache for hassle free runtime access
@@ -43,7 +45,7 @@ with APP.app_context():
 
 logger = APP.logger
 
-START_UTC_TIME = datetime.datetime.utcnow()
+START_UTC_TIME = datetime.datetime.utcnow().replace(microsecond=0)
 
 # REST requests required by CANARIE
 CANARIE_API_VALID_REQUESTS = ['doc',
@@ -184,23 +186,75 @@ def stats(route_name, api_type):
 
     validate_route(route_name, api_type)
 
+    db = get_db()
+    cur = db.cursor()
+
+    # Gather service(s) status
+    query = 'select service, status from status where route = ?'
+    try:
+        cur.execute(query, [route_name])
+        rv = cur.fetchall()
+        all_status = {}
+        for record in rv:
+            all_status[record[0]] = record[1]
+
+        # Status can be 'ok', 'bad' or 'down'
+        if not all(all_status[service] == Status.ok for service in all_status):
+            message = ', '.join(['{0} : {1}'.format(service, Status.pretty_msg(all_status[service]))
+                       for service in all_status])
+            return make_error_response(html_status=503,
+                                       html_status_response=message)
+    except Exception as e:
+        logger.error(str(e))
+        pass
+
+    # Gather route stats
     invocations = 0
     last_access = 'Never'
     query = 'select invocations, last_access from stats where route = ?'
     try:
-        cur = get_db().execute(query, [route_name])
+        cur.execute(query, [route_name])
         rv = cur.fetchall()
         if rv:
             invocations = rv[0][0]
-            last_access = rv[0][1]
-        cur.close()
-    except:
+            last_access = parse(rv[0][1]).replace(tzinfo=None).isoformat()
+    except Exception as e:
+        logger.error(str(e))
         pass
 
-    service_stats = {
-        'lastReset': '.'.join(START_UTC_TIME.isoformat().split('.')[:-1]),
-        'invocations': invocations,
-        'lastAccess': last_access}
+    # Check last time cron job have run (help to diagnose cron problem)
+    last_log_update = 'Never'
+    last_status_update = 'Never'
+    query = 'select job, last_execution from cron'
+    try:
+        cur.execute(query)
+        rv = cur.fetchall()
+        if rv:
+            for record in rv:
+                if record[0] == 'log':
+                    last_log_update = parse(record[1]).isoformat()
+                elif record[0] == 'status':
+                    last_status_update = parse(record[1]).isoformat()
+
+    except Exception as e:
+        logger.error(str(e))
+        pass
+
+    cur.close()
+
+    monitor_info = [
+        ('lastAccess', last_access),
+        ('lastInvocationsUpdate', last_log_update),
+        ('lastStatusUpdate', last_status_update)
+    ]
+    monitor_info = collections.OrderedDict(monitor_info)
+
+    service_stats = [
+        ('lastReset', START_UTC_TIME.isoformat()),
+        ('invocations', invocations),
+        ('monitoring', monitor_info)
+    ]
+    service_stats = collections.OrderedDict(service_stats)
 
     if request_wants_json():
         return jsonify(service_stats)

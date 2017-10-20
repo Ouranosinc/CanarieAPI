@@ -3,8 +3,20 @@
     <table>
     {% for key in Tags %}
         <tr>
+
+        {% if Tags[key] is mapping %}
+        <td class=flash>{{ key }}</td>
+        <td class=flash></td>
+            {% for subkey in Tags[key] %}
+            <tr>
+            <td class=flash><ul><li>{{ subkey }} : </li></ul></td>
+            <td class=flash>{{ Tags[key][subkey] }}</td>
+            </tr>
+            {% endfor %}
+        {% else %}
         <td class=flash>{{ key }} : </td>
         <td class=flash>{{ Tags[key] }}</td>
+        {% endif %}
         </tr>
     {% endfor %}
     </table>

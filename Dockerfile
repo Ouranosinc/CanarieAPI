@@ -13,8 +13,8 @@ RUN pip install --upgrade pip setuptools
 RUN pip install gunicorn gevent
 
 # Add logparser cron job in the cron directory
-ADD logparser-cron /etc/cron.d/logparser-cron
-RUN chmod 0644 /etc/cron.d/logparser-cron
+ADD canarieapi-cron /etc/cron.d/canarieapi-cron
+RUN chmod 0644 /etc/cron.d/canarieapi-cron
 
 # Install the canarie api package
 COPY requirements.txt /opt/local/src/CanarieAPI/requirements.txt

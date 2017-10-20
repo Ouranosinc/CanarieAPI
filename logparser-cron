@@ -1,1 +1,0 @@
-*/10 * * * * root python /opt/local/src/CanarieAPI/logparser.py >> /var/log/cron.log 2>&1

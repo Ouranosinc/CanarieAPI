@@ -1,0 +1,2 @@
+*/10 * * * * root python /opt/local/src/CanarieAPI/logparser.py >> /var/log/logparser_cron.log 2>&1
+*/10 * * * * root python /opt/local/src/CanarieAPI/monitoring.py >> /var/log/monitoring_cron.log 2>&1
