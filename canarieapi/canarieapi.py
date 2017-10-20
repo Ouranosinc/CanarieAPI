@@ -190,11 +190,12 @@ def stats(route_name, api_type):
     cur = db.cursor()
 
     # Gather service(s) status
+    all_status = {}
     query = 'select service, status from status where route = ?'
     try:
         cur.execute(query, [route_name])
         rv = cur.fetchall()
-        all_status = {}
+
         for record in rv:
             all_status[record[0]] = record[1]
 
@@ -247,6 +248,9 @@ def stats(route_name, api_type):
         ('lastInvocationsUpdate', last_log_update),
         ('lastStatusUpdate', last_status_update)
     ]
+    for service in all_status:
+        monitor_info.append((service, Status.pretty_msg(all_status[service])))
+
     monitor_info = collections.OrderedDict(monitor_info)
 
     service_stats = [
