@@ -217,7 +217,7 @@ def init_db(database):
     """
     APP.logger.info(u"Initializing database")
     with current_app.app_context():
-        dbs_fn = APP.config['DATABASE']['schema_filename']
+        dbs_fn = 'database_schema.sql'
         if path.isabs(dbs_fn):
             schema_fn = dbs_fn
         else:

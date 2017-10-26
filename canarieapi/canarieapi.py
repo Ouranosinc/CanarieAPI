@@ -53,7 +53,7 @@ CANARIE_API_VALID_REQUESTS = ['doc',
                               'support',
                               'source',
                               'tryme',
-                              'license',
+                              'licence',
                               'provenance',
                               'factsheet']
 
@@ -218,7 +218,7 @@ def stats(route_name, api_type):
         rv = cur.fetchall()
         if rv:
             invocations = rv[0][0]
-            last_access = parse(rv[0][1]).replace(tzinfo=None).isoformat()
+            last_access = parse(rv[0][1]).replace(tzinfo=None).isoformat() + 'Z'
     except Exception as e:
         logger.error(str(e))
         pass
@@ -233,9 +233,9 @@ def stats(route_name, api_type):
         if rv:
             for record in rv:
                 if record[0] == 'log':
-                    last_log_update = parse(record[1]).isoformat()
+                    last_log_update = parse(record[1]).isoformat() + 'Z'
                 elif record[0] == 'status':
-                    last_status_update = parse(record[1]).isoformat()
+                    last_status_update = parse(record[1]).isoformat() + 'Z'
 
     except Exception as e:
         logger.error(str(e))
@@ -254,7 +254,7 @@ def stats(route_name, api_type):
     monitor_info = collections.OrderedDict(monitor_info)
 
     service_stats = [
-        ('lastReset', START_UTC_TIME.isoformat()),
+        ('lastReset', START_UTC_TIME.isoformat() + 'Z'),
         ('invocations', invocations),
         ('monitoring', monitor_info)
     ]
