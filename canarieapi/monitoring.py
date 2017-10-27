@@ -1,48 +1,48 @@
 # -- Standard lib ------------------------------------------------------------
-import os
 import re
-import time
-import signal
-import datetime
-import logging
-import logging.handlers
 import requests
 from requests.exceptions import ConnectionError
 
-
-# -- 3rd party ---------------------------------------------------------------
-import sqlite3
-
 # -- Project specific --------------------------------------------------------
-from canarieapi.utility_rest import get_db
-from canarieapi.app_object import APP
-from canarieapi.status import Status
-logger = APP.logger
+from utility_rest import get_db
+from status import Status
+from app_object import APP
 
 
-def monitor():
+def monitor(update_db=True):
     # Load config
+    logger = APP.logger
+    config = APP.config
     logger.info('Loading configuration')
-    routes = APP.config['SERVICES']
-    routes.update(APP.config['PLATFORMS'])
+    srv_mon = {route : config['SERVICES'][route]['monitoring'] for route in config['SERVICES']}
+    pf_mon = {route: config['PLATFORMS'][route]['monitoring'] for route in config['PLATFORMS']}
+    all_mon = srv_mon
+    all_mon.update(pf_mon)
 
     logger.info('Checking status of routes...')
     with APP.app_context():
-        db = get_db()
-        cur = db.cursor()
-        query = 'insert or replace into status (route, service, status) values (?, ?, ?)'
+        if update_db:
+            db = get_db()
+            cur = db.cursor()
+            query = 'insert or replace into status (route, service, status) values (?, ?, ?)'
 
-        for route in routes:
-            for service, test_dic in routes[route]['monitoring'].items():
-                status = check_service(request=test_dic['request'],
-                                       response=test_dic.get('response', {}))
+        for route in all_mon:
+            for service, test_dic in all_mon[route].items():
+                try:
+                    status = check_service(request=test_dic['request'],
+                                           response=test_dic.get('response', {}))
+                except:
+                    logger.error('Exception occurs while trying to check status of {0}.{1}'.format(route, service))
+                    raise
                 logger.info('{0}.{1} : {2}'.format(route, service, Status.pretty_msg(status)))
 
-                cur.execute(query, [route, service, status])
+                if update_db:
+                    cur.execute(query, [route, service, status])
 
-        cur.execute('insert or replace into cron (job, last_execution) values (\'status\', CURRENT_TIMESTAMP)')
-        db.commit()
-        db.close()
+        if update_db:
+            cur.execute('insert or replace into cron (job, last_execution) values (\'status\', CURRENT_TIMESTAMP)')
+            db.commit()
+            db.close()
 
 
 def check_service(request, response):
@@ -61,6 +61,8 @@ def check_service(request, response):
         'text': None
     }
     default_response.update(response)
+
+    logger = APP.logger
     try:
         r = requests.request(**default_request)
     except ConnectionError as e:
@@ -85,7 +87,12 @@ def check_service(request, response):
     return Status.ok
 
 
-if __name__ == '__main__':
+def cron_job():
+    logger = APP.logger
     logger.info('Cron job for monitoring routes status')
     monitor()
     logger.info('Done')
+
+
+if __name__ == '__main__':
+    cron_job()

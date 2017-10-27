@@ -24,6 +24,7 @@ from dateutil.parser import *
 # -- 3rd party ---------------------------------------------------------------
 from flask import render_template
 from flask import jsonify
+from flask import redirect
 
 # -- Project specific --------------------------------------------------------
 from utility_rest import set_html_as_default_response
@@ -35,8 +36,12 @@ from utility_rest import make_error_response
 from utility_rest import request_wants_json
 from utility_rest import get_db
 from utility_rest import AnyIntConverter
-from app_object import APP
 from status import Status
+from test import test_config
+from app_object import APP
+
+# Make sure to test the config on launch to raise exception as soon as possible
+test_config()
 
 # Creates the database if it doesn't exist, connects to it and keeps it in
 # cache for hassle free runtime access
@@ -124,6 +129,12 @@ def home():
                    Services={name.capitalize(): parse_config(name, 'service', s) for name, s in config['SERVICES'].items()})
     return render_template('home.html', Main_Title='Canarie API', Title="Home", Content=content)
 
+@APP.route("/test")
+def manual_test():
+    test_config()
+    return redirect("/")
+
+
 @APP.route("/<any_int(" + HANDLED_HTML_ERRORS_STR + "):status_code_str>")
 def extern_html_error_handler(status_code_str):
     """
@@ -155,7 +166,8 @@ def information(route_name, api_type):
                        'institution',
                        'releaseTime',
                        'researchSubject',
-                       'supportEmail']
+                       'supportEmail',
+                       'tags']
 
     if api_type == 'service':
         info_categories.append('category')
@@ -165,8 +177,6 @@ def information(route_name, api_type):
     for category in info_categories:
         cat = config.get(category, '')
         info.append((category, cat))
-    tags = config.get('tags', '')
-    info.append(('tags', tags.split(',')))
 
     info = collections.OrderedDict(info)
 

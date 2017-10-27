@@ -10,3 +10,4 @@ authomatic==0.1.0.post1
 requests==2.8.1
 flask
 python-dateutil
+jsonschema

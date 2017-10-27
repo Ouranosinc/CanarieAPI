@@ -13,6 +13,7 @@ from os import environ
 import default_configuration
 from reverse_proxied import ReverseProxied
 
+
 APP = Flask(__name__)
 formatter = logging.Formatter('[%(asctime)s] [%(process)d] [%(levelname)s] %(name)s : %(message)s')
 ch = logging.StreamHandler(sys.stdout)

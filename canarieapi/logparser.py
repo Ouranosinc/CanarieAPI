@@ -3,23 +3,24 @@ import os
 import re
 import time
 import signal
-import datetime
 import logging
 import logging.handlers
 
-# -- 3rd party ---------------------------------------------------------------
-import sqlite3
 
 # -- Project specific --------------------------------------------------------
-from canarieapi.utility_rest import get_db
-from canarieapi.app_object import APP
-logger = APP.logger
+from utility_rest import get_db
+from app_object import APP
+
+
+LOG_BACKUP_COUNT = 150
+
 
 def rotate_log(filename):
+    logger = APP.logger
     logger.info('Rotating {0}'.format(filename))
 
     # Base on a rotation every 10 minutes, if we want to keep 1 day worth of logs we have to keep about 150 of them
-    rfh = logging.handlers.RotatingFileHandler(filename, backupCount=150)
+    rfh = logging.handlers.RotatingFileHandler(filename, backupCount=LOG_BACKUP_COUNT)
     rfh.doRollover()
 
     pid_file = APP.config['DATABASE']['log_pid']
@@ -41,17 +42,25 @@ def rotate_log(filename):
 
 def parse_log(filename):
     # Load config
+    logger = APP.logger
     logger.info('Loading configuration')
-    routes = APP.config['SERVICES']
-    routes.update(APP.config['PLATFORMS'])
-    route_stats = {}
-    for route in routes:
-        route_regex = routes[route]['stats']
-        route_stats[route] = dict(method_regex=re.compile(route_regex['method']),
-                                  route_regex=re.compile(route_regex['route']),
-                                  count=0,
-                                  last_access=None)
+    config = APP.config
+    srv_stats = {route : config['SERVICES'][route]['stats'] for route in config['SERVICES']}
+    pf_stats = {route: config['PLATFORMS'][route]['stats'] for route in config['PLATFORMS']}
+    all_stats = srv_stats
+    all_stats.update(pf_stats)
 
+    route_stats = {}
+    for route in all_stats:
+        route_regex = all_stats[route]
+        try:
+            route_stats[route] = dict(method_regex=re.compile(route_regex['method']),
+                                      route_regex=re.compile(route_regex['route']),
+                                      count=0,
+                                      last_access=None)
+        except:
+            logger.error('Exception occurs while trying to compile regex of {0}'.format(route))
+            raise
 
     # Load access log
     logger.info('Loading log file : {0}'.format(filename))
@@ -73,8 +82,12 @@ def parse_log(filename):
                 value['count'] = value['count'] + 1
                 value['last_access'] = record['datetime']
                 break
+    return route_stats
 
+
+def update_db(route_stats):
     # Update stats in database
+    logger = APP.logger
     logger.info('Updating databse')
     with APP.app_context():
         db = get_db()
@@ -99,9 +112,14 @@ def parse_log(filename):
         db.close()
 
 
-if __name__ == '__main__':
+def cron_job():
+    logger = APP.logger
     logger.info('Cron job for parsing server log')
     access_log_fn = APP.config['DATABASE']['access_log']
     rotate_log(access_log_fn)
-    parse_log(access_log_fn + '.1')
+    update_db(parse_log(access_log_fn + '.1'))
     logger.info('Done')
+
+
+if __name__ == '__main__':
+    cron_job()
