@@ -1,12 +1,12 @@
 {% extends "layout.html" %}
 {% block body %}
-    <table>
+    <table class="key_value">
     {% for key in Tags %}
         <tr>
 
         {% if Tags[key] is mapping %}
-        <td class=flash>{{ key }}</td>
-        <td class=flash></td>
+        <td class="flash col-key">{{ key }}</td>
+        <td class="flash col-value"></td>
             {% for subkey in Tags[key] %}
             <tr>
             <td class=flash><ul><li>{{ subkey }} : </li></ul></td>
@@ -14,8 +14,8 @@
             </tr>
             {% endfor %}
         {% else %}
-        <td class=flash>{{ key }} : </td>
-        <td class=flash>{{ Tags[key] }}</td>
+        <td class="flash col-key">{{ key }} : </td>
+        <td class="flash col-value">{{ Tags[key] }}</td>
         {% endif %}
         </tr>
     {% endfor %}

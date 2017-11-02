@@ -118,7 +118,7 @@ APP.url_map.converters['any_int'] = AnyIntConverter
 def home():
     def parse_config(name, api_type, conf):
         hostname = APP.config['MY_SERVER_NAME']
-        requests = sorted(['info', 'stats'] + conf.get('redirect', {}).keys())
+        requests = sorted(['info', 'stats', 'status'] + conf.get('redirect', {}).keys())
         content = [(request, '{hostname}/{name}/{api_type}/{request}'
             .format(hostname=hostname, name=name, api_type=api_type, request=request))
                    for request in requests]
@@ -129,10 +129,11 @@ def home():
                    Services={name.capitalize(): parse_config(name, 'service', s) for name, s in config['SERVICES'].items()})
     return render_template('home.html', Main_Title='Canarie API', Title="Home", Content=content)
 
+
 @APP.route("/test")
 def manual_test():
     test_config()
-    return redirect("/")
+    return redirect(APP.config['MY_SERVER_NAME'])
 
 
 @APP.route("/<any_int(" + HANDLED_HTML_ERRORS_STR + "):status_code_str>")
@@ -185,6 +186,27 @@ def information(route_name, api_type):
     return render_template('default.html', Main_Title=get_api_title(route_name, api_type), Title="Info", Tags=info)
 
 
+def get_status(route_name):
+    db = get_db()
+    cur = db.cursor()
+
+    # Gather service(s) status
+    all_status = {}
+    query = 'select service, status from status where route = ?'
+    try:
+        cur.execute(query, [route_name])
+        rv = cur.fetchall()
+
+        for record in rv:
+            all_status[record[0]] = record[1]
+    except Exception as e:
+        logger.error(str(e))
+        pass
+    cur.close()
+
+    return all_status
+
+
 @APP.route("/<route_name>/<any(" + ",".join(CANARIE_API_TYPE) + "):api_type>/stats")
 def stats(route_name, api_type):
     """
@@ -200,24 +222,14 @@ def stats(route_name, api_type):
     cur = db.cursor()
 
     # Gather service(s) status
-    all_status = {}
-    query = 'select service, status from status where route = ?'
-    try:
-        cur.execute(query, [route_name])
-        rv = cur.fetchall()
+    all_status = get_status(route_name)
 
-        for record in rv:
-            all_status[record[0]] = record[1]
-
-        # Status can be 'ok', 'bad' or 'down'
-        if not all(all_status[service] == Status.ok for service in all_status):
-            message = ', '.join(['{0} : {1}'.format(service, Status.pretty_msg(all_status[service]))
-                       for service in all_status])
-            return make_error_response(html_status=503,
-                                       html_status_response=message)
-    except Exception as e:
-        logger.error(str(e))
-        pass
+    # Status can be 'ok', 'bad' or 'down'
+    if not all(all_status[service] == Status.ok for service in all_status):
+        message = ', '.join(['{0} : {1}'.format(service, Status.pretty_msg(all_status[service]))
+                             for service in all_status])
+        return make_error_response(html_status=503,
+                                   html_status_response=message)
 
     # Gather route stats
     invocations = 0
@@ -275,6 +287,51 @@ def stats(route_name, api_type):
 
     return render_template('default.html', Main_Title=get_api_title(route_name, api_type), Title="Stats", Tags=service_stats)
 
+
+@APP.route("/<route_name>/<any(" + ",".join(CANARIE_API_TYPE) + "):api_type>/status")
+def status(route_name, api_type):
+    """
+    Extra route to know service status
+    """
+
+    # JSON is used by default but the Canarie API requires html as default
+    set_html_as_default_response()
+
+    validate_route(route_name, api_type)
+
+    db = get_db()
+    cur = db.cursor()
+
+    # Gather service(s) status
+    all_status = get_status(route_name)
+
+    # Check last time cron job have run (help to diagnose cron problem)
+    last_status_update = 'Never'
+    query = "select last_execution from cron where job == 'status'"
+    try:
+        cur.execute(query)
+        rv = cur.fetchall()
+        if rv:
+            last_status_update = parse(rv[0][0]).isoformat() + 'Z'
+    except Exception as e:
+        logger.error(str(e))
+        pass
+
+    cur.close()
+
+    monitor_info = [
+        ('lastStatusUpdate', last_status_update)
+    ]
+    for service in all_status:
+        monitor_info.append((service, Status.pretty_msg(all_status[service])))
+
+    monitor_info = collections.OrderedDict(monitor_info)
+
+    if request_wants_json():
+        return jsonify(monitor_info)
+
+    return render_template('default.html', Main_Title=get_api_title(route_name, api_type), Title="Status",
+                           Tags=monitor_info)
 
 
 @APP.route("/<route_name>/<any(" + ",".join(CANARIE_API_TYPE) + "):api_type>/<any(" +

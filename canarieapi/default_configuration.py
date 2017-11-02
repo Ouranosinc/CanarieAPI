@@ -27,7 +27,7 @@ SERVICES = {
             'researchSubject': 'subject',
             'supportEmail': 'support@institution.com',
             'category': 'category',
-            'tags': 'tag1,tag2'
+            'tags': ['tag1', 'tag2']
         },
         'stats': {
             'method': '.*',
@@ -62,7 +62,7 @@ PLATFORMS = {
             'releaseTime': '2017-01-01T00:00:00Z',
             'researchSubject': 'subject',
             'supportEmail': 'support@institution.com',
-            'tags': 'tag1,tag2'
+            'tags': ['tag1', 'tag2']
         },
         'stats': {
             'method': '.*',

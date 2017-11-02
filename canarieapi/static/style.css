@@ -46,3 +46,19 @@ th              { text-align: left; background: #ffffff; padding: 0.5em; borderc
                   box-shadow:inset 0 0 .3em #ccc;
                   border-radius:2px;
                 }
+.key_value {
+  table-layout: fixed;
+  width: 100%;
+  white-space: initial;
+}
+.key_value td {
+  white-space: initial;
+}
+
+/* Column widths are based on these cells */
+.col-key {
+  width: 25%;
+}
+.col-value {
+  width: 75%;
+}
