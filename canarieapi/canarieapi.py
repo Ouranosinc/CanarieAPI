@@ -272,7 +272,7 @@ def stats(route_name, api_type):
         ('lastStatusUpdate', last_status_update)
     ]
     for service in all_status:
-        monitor_info.append((service, Status.pretty_msg(all_status[service])))
+        monitor_info.append((service, Status.pretty_msg(all_status[service]['status'])))
 
     monitor_info = collections.OrderedDict(monitor_info)
 
