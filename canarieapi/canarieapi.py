@@ -41,7 +41,7 @@ from test import test_config
 from app_object import APP
 
 # Make sure to test the config on launch to raise exception as soon as possible
-test_config()
+test_config(False)
 
 # Creates the database if it doesn't exist, connects to it and keeps it in
 # cache for hassle free runtime access
@@ -132,7 +132,7 @@ def home():
 
 @APP.route("/test")
 def manual_test():
-    test_config()
+    test_config(True)
     return redirect(APP.config['MY_SERVER_NAME'])
 
 
@@ -192,13 +192,14 @@ def get_status(route_name):
 
     # Gather service(s) status
     all_status = {}
-    query = 'select service, status from status where route = ?'
+    query = 'select service, status, message from status where route = ?'
     try:
         cur.execute(query, [route_name])
         rv = cur.fetchall()
 
         for record in rv:
-            all_status[record[0]] = record[1]
+            all_status[record[0]] = dict(status=record[1],
+                                         message=record[2])
     except Exception as e:
         logger.error(str(e))
         pass
@@ -225,8 +226,8 @@ def stats(route_name, api_type):
     all_status = get_status(route_name)
 
     # Status can be 'ok', 'bad' or 'down'
-    if not all(all_status[service] == Status.ok for service in all_status):
-        message = ', '.join(['{0} : {1}'.format(service, Status.pretty_msg(all_status[service]))
+    if not all(all_status[service]['status'] == Status.ok for service in all_status):
+        message = ', '.join(['{0} : {1}'.format(service, Status.pretty_msg(all_status[service]['status']))
                              for service in all_status])
         return make_error_response(html_status=503,
                                    html_status_response=message)
@@ -323,7 +324,10 @@ def status(route_name, api_type):
         ('lastStatusUpdate', last_status_update)
     ]
     for service in all_status:
-        monitor_info.append((service, Status.pretty_msg(all_status[service])))
+        status_msg = Status.pretty_msg(all_status[service]['status'])
+        if all_status[service]['status'] != Status.ok:
+            status_msg += ' : {0}'.format(all_status[service]['message'])
+        monitor_info.append((service, status_msg))
 
     monitor_info = collections.OrderedDict(monitor_info)
 

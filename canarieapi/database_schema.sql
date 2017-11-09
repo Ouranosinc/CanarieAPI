@@ -8,7 +8,8 @@ CREATE UNIQUE INDEX [stats_id] ON [stats] ([route]);
 CREATE TABLE [status] (
   [route] VARCHAR(32),
   [service] VARCHAR(32),
-  [status] VARCHAR(8));
+  [status] VARCHAR(8),
+  [message] VARCHAR(256));
 
 CREATE UNIQUE INDEX [status_id] ON [status] ([route], [service]);
 

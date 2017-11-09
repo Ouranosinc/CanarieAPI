@@ -196,7 +196,7 @@ CONFIGURATION_SCHEMA = {
 }
 
 
-def test_config():
+def test_config(update_db):
     config = APP.config
     logger = APP.logger
 
@@ -206,7 +206,7 @@ def test_config():
     except jsonschema.ValidationError as e:
         raise Exception('The configuration is invalid : {0}'.format(str(e)))
 
-    monitoring.monitor(update_db=False)
+    monitoring.monitor(update_db=update_db)
 
     access_log_fn = config['DATABASE']['access_log']
     route_invocations = {}
