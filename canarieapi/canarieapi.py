@@ -39,6 +39,7 @@ from utility_rest import AnyIntConverter
 from status import Status
 from test import test_config
 from app_object import APP
+import __meta__
 
 # Make sure to test the config on launch to raise exception as soon as possible
 test_config(False)
@@ -124,7 +125,7 @@ def home():
         return collections.OrderedDict(content)
 
     config = APP.config
-    main_title = APP.config.get('SERVER_MAIN_TITLE', 'Canarie API')
+    main_title = APP.config.get('SERVER_MAIN_TITLE', __meta__.__title__)
     content = dict(Platforms={name.capitalize(): parse_config(name, 'platform', p)
                               for name, p in config['PLATFORMS'].items()},
                    Services={name.capitalize(): parse_config(name, 'service', s)
