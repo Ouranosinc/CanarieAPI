@@ -124,11 +124,12 @@ def home():
         return collections.OrderedDict(content)
 
     config = APP.config
+    main_title = APP.config.get('SERVER_MAIN_TITLE', 'Canarie API')
     content = dict(Platforms={name.capitalize(): parse_config(name, 'platform', p)
                               for name, p in config['PLATFORMS'].items()},
                    Services={name.capitalize(): parse_config(name, 'service', s)
                              for name, s in config['SERVICES'].items()})
-    return render_template('home.html', Main_Title='Canarie API', Title="Home", Content=content)
+    return render_template('home.html', Main_Title=main_title, Title="Home", Content=content)
 
 
 @APP.route("/test")

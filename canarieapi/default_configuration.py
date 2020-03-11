@@ -9,6 +9,7 @@ found in this file, you need to set the environment variable named
 """
 
 MY_SERVER_NAME = 'http://localhost:5000'
+SERVER_MAIN_TITLE = 'Canarie API'
 
 DATABASE = {
     'filename': '/opt/local/src/CanarieAPI/stats.db',
