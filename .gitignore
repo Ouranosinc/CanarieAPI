@@ -1,7 +1,8 @@
 *.pyc
 .idea
-*.egg
+*.egg[s]
 *egg-info
+.coverage
 build/
 dist/
 env/
