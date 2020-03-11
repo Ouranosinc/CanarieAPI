@@ -7,7 +7,7 @@ try:
 except ImportError:
     from distutils.core import setup
 
-from canarieapi import __version__, __author__, __email__
+import __meta__
 
 with open('README.rst') as readme_file:
     README = readme_file.read()
@@ -27,11 +27,11 @@ TEST_REQUIREMENTS = [
 setup(
     # -- meta information --------------------------------------------------
     name='CanarieAPI',
-    version=__version__,
-    description="CanarieAPI is a REST service for self-describing Canarie services and platforms",
+    version=__meta__.__version__,
+    description=__meta__.__description__,
     long_description=README + '\n\n' + HISTORY,
-    author=__author__,
-    author_email=__email__,
+    author=__meta__.__author__,
+    author_email=__meta__.__email__,
     url='https://github.com/Ouranosinc/CanarieAPI',
     platforms=['linux_x86_64'],
     license="ISCL",

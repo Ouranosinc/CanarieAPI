@@ -10,7 +10,7 @@ possible.
 
 # -- Standard lib ------------------------------------------------------------
 import configparser
-import http
+import http.client
 import re
 from os import remove
 from os import path
@@ -150,13 +150,13 @@ def make_error_response(html_status=None,
 
     :param html_status: HTML status
     :param html_status_response: Standard message associated with a status
-                code. Obtained via :py:data:`httplib.responses` if not
+                code. Obtained via :py:data:`http.client.responses` if not
                 provided.
     """
 
-    # If the status response is None use the one provide by httplib
+    # If the status response is None use the one provide by http.client
     if html_status_response is None:
-        html_status_response = httplib.responses[html_status]
+        html_status_response = http.client.responses[html_status]
     # Else, check if html_status_response already contains the HTML status code
     else:
         match = re.search("^([0-9]*):? *(.*)$", html_status_response)
