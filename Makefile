@@ -80,5 +80,8 @@ dist: clean
 	python setup.py bdist_wheel
 	ls -l dist
 
-install: clean
+install-dependencies:
+	pip install -r requirements.txt
+
+install: clean install-dependencies
 	python setup.py install
