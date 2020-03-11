@@ -1,6 +1,6 @@
-======================================
+============================================================================
 CanarieAPI: Self describing REST service for Canarie registry
-======================================
+============================================================================
 
 Provides documentation details, status monitoring and statistics reporting of services and platforms within the
 registered configuration.
