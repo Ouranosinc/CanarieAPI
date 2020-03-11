@@ -9,8 +9,8 @@ possible.
 
 
 # -- Standard lib ------------------------------------------------------------
-import ConfigParser
-import httplib
+import configparser
+import http
 import re
 from os import remove
 from os import path
@@ -140,7 +140,7 @@ def get_canarie_api_response(route_name, api_type, api_request):
 
     msg = ("The {0} does not provide in it's configuration file a "
            "valid source for the CANARIE request {1}".format(api_type, api_request))
-    raise ConfigParser.Error(msg)
+    raise configparser.Error(msg)
 
 
 def make_error_response(html_status=None,

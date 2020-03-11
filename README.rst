@@ -2,12 +2,15 @@
 CanarieAPI: Self describing REST service for Canarie registry
 ======================================
 
-The service covers the platform PAVICS and the following services:
-Node	
-Bias correction 
-Climate indices 	
-High-resolution spatial gridded data renderer	
-Spatial and temporal data slicer
+Provides documentation details, status monitoring and statistics reporting of services and platforms within the
+registered configuration.
+
+Docker image available on DockerHub at ``pavics/canarieapi``.
+
+Refer to `installation`_ and `usage`_ to run the application locally.
+
+.. _installation: ./docs/installation.rst
+.. _usage: ./docs/usage.rst
 
 .. https://collaboration.canarie.ca/elgg/discussion/view/3664/research-software-api-documentation
 .. https://science.canarie.ca/researchsoftware/services/list/main.html

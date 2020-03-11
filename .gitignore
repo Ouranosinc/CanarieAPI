@@ -5,3 +5,7 @@
 build/
 dist/
 env/
+
+# project files
+configuration.py
+stats.db
