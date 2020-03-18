@@ -1,13 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
+import sys
 from setuptools import find_packages
 try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
 
-import __meta__
+ROOT_DIR = os.path.dirname(__file__)
+PKG_NAME = 'canarieapi'
+PKG_DIR = os.path.join(ROOT_DIR, PKG_NAME)
+sys.path.insert(0, ROOT_DIR)
+sys.path.insert(0, PKG_DIR)
+import __meta__  # noqa
 
 with open('README.rst') as readme_file:
     README = readme_file.read()
@@ -50,8 +57,7 @@ setup(
 
     # -- Package structure -------------------------------------------------
     packages=find_packages(),
-    package_dir={'canarieapi':
-                 'canarieapi'},
+    package_dir={PKG_NAME: PKG_NAME},
     include_package_data=True,
     install_requires=REQUIREMENTS,
     zip_safe=False,

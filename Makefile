@@ -20,7 +20,7 @@ MAKEFILE_NAME := $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
 APP_ROOT := $(abspath $(lastword $(MAKEFILE_NAME))/..)
 APP_NAME := canarieapi
 # NOTE: don't change this manually, use the make bump command to update everywhere
-APP_VERSION ?= 0.3.5
+APP_VERSION ?= 0.4.0
 
 # docker
 APP_DOCKER_REPO := pavics/canarieapi
@@ -109,19 +109,19 @@ clean-test:  ## remove test and coverage artifacts
 ## --- Testing targets --- ##
 
 .PHONY: lint
-lint: install-deps install-test  ## check code style
+lint: install-req install-dev  ## check code style
 	flake8 "$(APP_NAME)" tests
 
 .PHONY: test
-test: install-deps install-test  ## run tests quickly with the default Python
+test: install-req install-dev  ## run tests quickly with the default Python
 	python setup.py test
 
 .PHONY: test-all
-test-all: install-deps install-test  ## run tests on every Python version with tox
+test-all: install-req install-dev  ## run tests on every Python version with tox
 	tox
 
 .PHONY: coverage
-coverage: install-deps install-test  ## check code coverage quickly with the default Python
+coverage: install-req install-dev  ## check code coverage quickly with the default Python
 	coverage run --source "$(APP_NAME)" setup.py test
 	coverage report -m
 	coverage html
@@ -157,16 +157,16 @@ dist: clean  ## package
 
 ## --- Installation targets --- ##
 
-.PHONY: install-deps
-install-deps:  ## install package requirements allowing to run the code
+.PHONY: install-req
+install-req:  ## install package requirements allowing to run the code
 	pip install -r requirements.txt
 
-.PHONY: install-test
-install-test:  ## install package requirements allowing to run tests
+.PHONY: install-dev
+install-dev:  ## install package requirements allowing to run tests
 	pip install -r requirements-dev.txt
 
 .PHONY: install
-install: clean install-pkg  ## install the package to the active Python's site-packages
+install: clean install-req  ## install the package to the active Python's site-packages
 	python setup.py install
 
 ## --- Docker targets --- ##

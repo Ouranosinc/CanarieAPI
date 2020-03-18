@@ -6,6 +6,9 @@ History
 Unreleased
 ---------------------
 
+0.4.0 (2020-03-18)
+---------------------
+
 * Provide parameter to update server title.
 * Update configurations mismatching with existing tag versions.
 * Update documentation for setup, installation and execution of the application.

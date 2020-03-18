@@ -27,18 +27,18 @@ from flask import jsonify
 from flask import redirect
 
 # -- Project specific --------------------------------------------------------
-from utility_rest import set_html_as_default_response
-from utility_rest import get_canarie_api_response
-from utility_rest import validate_route
-from utility_rest import get_config
-from utility_rest import get_api_title
-from utility_rest import make_error_response
-from utility_rest import request_wants_json
-from utility_rest import get_db
-from utility_rest import AnyIntConverter
-from status import Status
-from test import test_config
-from app_object import APP
+from canarieapi.app_object import APP
+from canarieapi.status import Status
+from canarieapi.test import test_config
+from canarieapi.utility_rest import set_html_as_default_response
+from canarieapi.utility_rest import get_canarie_api_response
+from canarieapi.utility_rest import validate_route
+from canarieapi.utility_rest import get_config
+from canarieapi.utility_rest import get_api_title
+from canarieapi.utility_rest import make_error_response
+from canarieapi.utility_rest import request_wants_json
+from canarieapi.utility_rest import get_db
+from canarieapi.utility_rest import AnyIntConverter
 import __meta__
 
 # Make sure to test the config on launch to raise exception as soon as possible

@@ -27,7 +27,7 @@ from flask import current_app
 import sqlite3
 
 # -- Project specific --------------------------------------------------------
-from app_object import APP
+from canarieapi.app_object import APP
 
 
 def request_wants_json():

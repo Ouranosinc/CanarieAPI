@@ -5,9 +5,9 @@ import os.path
 import jsonschema
 
 # -- Project specific --------------------------------------------------------
-import logparser
-import monitoring
-from app_object import APP
+from canarieapi.app_object import APP
+from canarieapi.logparser import parse_log, LOG_BACKUP_COUNT
+from canarieapi.monitoring import monitor
 
 # The schema that must be respected by the config
 CONFIGURATION_SCHEMA = {
@@ -206,15 +206,15 @@ def test_config(update_db):
     except jsonschema.ValidationError as e:
         raise Exception('The configuration is invalid : {0}'.format(str(e)))
 
-    monitoring.monitor(update_db=update_db)
+    monitor(update_db=update_db)
 
     access_log_fn = config['DATABASE']['access_log']
     route_invocations = {}
     file_checked = 0
-    for i in range(0, min(10, logparser.LOG_BACKUP_COUNT)):
+    for i in range(0, min(10, LOG_BACKUP_COUNT)):
         fn = access_log_fn + ('.{0}'.format(i) if i > 0 else '')
         try:
-            route_stats = logparser.parse_log(fn)
+            route_stats = parse_log(fn)
             for route, value in route_stats.items():
                 route_invocations[route] = route_invocations.get(route, 0) + value['count']
             file_checked += 1

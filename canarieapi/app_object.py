@@ -11,7 +11,7 @@ from os import environ
 
 # -- Project specific --------------------------------------------------------
 import default_configuration
-from reverse_proxied import ReverseProxied
+from canarieapi.reverse_proxied import ReverseProxied
 
 
 APP = Flask(__name__)

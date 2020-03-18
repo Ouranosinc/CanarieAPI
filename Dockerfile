@@ -1,13 +1,18 @@
 FROM nginx
-MAINTAINER David Byrns
+LABEL description="CanarieAPI: Self describing REST service for Canarie registry."
+LABEL maintainer="David Byrns <david.byrns@crim.ca>, Francis Charette-Migneault <francis.charette-migneault@crim.ca>"
+LABEL vendor="Ouranosinc, CRIM"
+LABEL version="0.4.0"
 
-RUN apt-get update && apt-get install -y \
-	build-essential \
-	python-dev \
-	python-pip \
-	cron \
-	vim \
-	sqlite3
+RUN apt-get update \
+    && apt-get install -y \
+        build-essential \
+        python3-dev \
+        python3-pip \
+        cron \
+        vim \
+        sqlite3 \
+	&& ln -s $(which pip3) /usr/local/bin/pip
 
 RUN pip install --upgrade pip setuptools
 RUN pip install gunicorn gevent
@@ -32,4 +37,4 @@ WORKDIR /opt/local/src/CanarieAPI/canarieapi
 CMD env >> /etc/environment && \
     cron && \
     nginx && \
-    gunicorn -b 0.0.0.0:2000 --workers 1 --log-level=DEBUG --timeout 30 -k gevent wsgi
+    gunicorn -b 0.0.0.0:2000 --workers 1 --log-level=DEBUG --timeout 30 -k gevent canarieapi.wsgi
