@@ -4,9 +4,6 @@ Installation
 
 At the command line::
 
-    $ easy_install magpie
+    conda activate canarieapi     # or any other means of environment activation of your choice
+    make install
 
-Or, if you have virtualenvwrapper installed::
-
-    $ mkvirtualenv magpie
-    $ pip install magpie

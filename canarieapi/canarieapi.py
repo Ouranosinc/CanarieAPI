@@ -39,6 +39,7 @@ from utility_rest import AnyIntConverter
 from status import Status
 from test import test_config
 from app_object import APP
+import __meta__
 
 # Make sure to test the config on launch to raise exception as soon as possible
 test_config(False)
@@ -82,6 +83,7 @@ HANDLED_HTML_ERRORS_STR = ", ".join(map(str, HANDLED_HTML_ERRORS))
 # http://stackoverflow.com/questions/938429/scope-of-python-lambda-functions-
 # and-their-parameters/938493#938493
 for status_code in HANDLED_HTML_ERRORS:
+    APP.error_handler_spec.setdefault(None, {})
     APP.error_handler_spec[None][status_code] = \
         lambda more_info, status_code_copy = status_code: \
         make_error_response(html_status=status_code_copy,
@@ -112,22 +114,23 @@ def handle_exceptions(exception_instance):
 APP.url_map.converters['any_int'] = AnyIntConverter
 
 
-
-
 @APP.route("/")
 def home():
     def parse_config(name, api_type, conf):
         hostname = APP.config['MY_SERVER_NAME']
-        requests = sorted(['info', 'stats', 'status'] + conf.get('redirect', {}).keys())
+        requests = sorted(['info', 'stats', 'status'] + list(conf.get('redirect', {}).keys()))
         content = [(request, '{hostname}/{name}/{api_type}/{request}'
-            .format(hostname=hostname, name=name, api_type=api_type, request=request))
+                    .format(hostname=hostname, name=name, api_type=api_type, request=request))
                    for request in requests]
         return collections.OrderedDict(content)
 
     config = APP.config
-    content = dict(Platforms={name.capitalize(): parse_config(name, 'platform', p) for name, p in config['PLATFORMS'].items()},
-                   Services={name.capitalize(): parse_config(name, 'service', s) for name, s in config['SERVICES'].items()})
-    return render_template('home.html', Main_Title='Canarie API', Title="Home", Content=content)
+    main_title = APP.config.get('SERVER_MAIN_TITLE', __meta__.__title__)
+    content = dict(Platforms={name.capitalize(): parse_config(name, 'platform', p)
+                              for name, p in config['PLATFORMS'].items()},
+                   Services={name.capitalize(): parse_config(name, 'service', s)
+                             for name, s in config['SERVICES'].items()})
+    return render_template('home.html', Main_Title=main_title, Title="Home", Content=content)
 
 
 @APP.route("/test")

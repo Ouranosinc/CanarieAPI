@@ -1,5 +1,12 @@
 *.pyc
 .idea
+*.egg[s]
+*egg-info
+.coverage
 build/
 dist/
 env/
+
+# project files
+configuration.py
+stats.db
