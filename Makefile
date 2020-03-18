@@ -75,6 +75,10 @@ bump:	## bump version using VERSION specified as user input
 	@-bash -c '$(CONDA_CMD) test -f "$(CONDA_ENV_PATH)/bin/bump2version || pip install bump2version'
 	@-bash -c '$(CONDA_CMD) bump2version $(BUMP_XARGS) --new-version "${VERSION}" patch;'
 
+.PHONY: version
+version:	## display current version
+	@-echo "$(APP_NAME) version: $(APP_VERSION)"
+
 
 ## --- Cleanup targets --- ##
 
