@@ -9,6 +9,7 @@ Unreleased
 * Provide parameter to update server title.
 * Update configurations mismatching with existing tag versions.
 * Update documentation for setup, installation and execution of the application.
+* Add DevOps utilities using ``Makefile``.
 * Drop Python 2 support.
 
 0.3.5
