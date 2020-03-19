@@ -4,6 +4,16 @@ LABEL maintainer="David Byrns <david.byrns@crim.ca>, Francis Charette-Migneault 
 LABEL vendor="Ouranosinc, CRIM"
 LABEL version="0.4.0"
 
+ENV PKG_DIR=/opt/local/src/CanarieAPI
+WORKDIR ${PKG_DIR}
+
+# Add logparser cron job in the cron directory
+ADD canarieapi-cron /etc/cron.d/canarieapi-cron
+RUN chmod 0644 /etc/cron.d/canarieapi-cron
+
+# Install dependencies
+COPY canarieapi/__init__.py canarieapi/__meta__.py ${PKG_DIR}/canarieapi/
+COPY requirements.txt setup.* README.rst HISTORY.rst ${PKG_DIR}/
 RUN apt-get update \
     && apt-get install -y \
         build-essential \
@@ -12,23 +22,14 @@ RUN apt-get update \
         cron \
         vim \
         sqlite3 \
-	&& ln -s $(which pip3) /usr/local/bin/pip
+	&& ln -s $(which pip3) /usr/local/bin/pip \
+    && pip install --no-cache-dir --upgrade pip setuptools gunicorn gevent \
+    && pip install --no-cache-dir --upgrade -r ${PKG_DIR}/requirements.txt \
+    && pip install --no-cache-dir -e ${PKG_DIR}
 
-RUN pip install --upgrade pip setuptools
-RUN pip install gunicorn gevent
-
-# Add logparser cron job in the cron directory
-ADD canarieapi-cron /etc/cron.d/canarieapi-cron
-RUN chmod 0644 /etc/cron.d/canarieapi-cron
-
-# Install the canarie api package
-COPY requirements.txt /opt/local/src/CanarieAPI/requirements.txt
-RUN pip install -r /opt/local/src/CanarieAPI/requirements.txt
-COPY ./ /opt/local/src/CanarieAPI/
-RUN pip install /opt/local/src/CanarieAPI/
-
-
-WORKDIR /opt/local/src/CanarieAPI/canarieapi
+# Install package
+COPY ./ ${PKG_DIR}/
+RUN pip install --no-dependencies -e ${PKG_DIR}
 
 # cron job will inherit the current user environment
 # start cron service

@@ -1,7 +1,47 @@
-*.log
-*.db
-nginx/*
-*/.idea/*
+# Docker
 Dockerfile
+.dockerignore
+
+# Git
+.git
+.github
+
+# Environment
+env/*.env
+venv
+
+# Makefile
+downloads
+
+# Unit test / Coverage reports
+**/.cache
+**/.coverage
+**/.pytest_cache
+.coverage
+reports
+share
+
+# PyCharm
+.idea
+
+# vscode
+.vscode
+
+# Build artifacts
+**/__pycache__
+**/*.py[cod]
+*.egg-info
+*.egg[s]
+build
+dist
+pip-selfcheck.json
+
+# Project
+*.log
+**/custom.ini
+docs/
+nginx/
+src/
+gunicorn.app.wsgiapp
 docker_configuration.py
 custom_configuration.py
