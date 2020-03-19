@@ -37,8 +37,6 @@ RUN pip install --no-dependencies -e ${PKG_DIR}
 # start gunicorn
 CMD env >> /etc/environment \
     && cron \
-    && nginx \
-        -g "daemon off;" \
     && gunicorn \
         -b 0.0.0.0:2000 \
         --workers 1 \
@@ -46,4 +44,6 @@ CMD env >> /etc/environment \
         --timeout 30 \
         --daemon \
         -k gevent \
-        canarieapi.wsgi
+        canarieapi.wsgi \
+    && nginx \
+        -g "daemon off;"
