@@ -6,6 +6,9 @@ History
 Unreleased
 ---------------------
 
+0.4.1 (2020-03-20)
+---------------------
+
 * Fix ``Dockerfile`` setup with Python 3.
 * Fix imports to use the package ``canarieapi`` module.
 
