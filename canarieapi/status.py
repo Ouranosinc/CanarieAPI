@@ -1,3 +1,4 @@
+
 class Status:
     ok = 'ok'
     bad = 'bad'

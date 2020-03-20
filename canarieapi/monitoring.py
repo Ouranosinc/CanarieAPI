@@ -4,9 +4,9 @@ import requests
 from requests.exceptions import ConnectionError
 
 # -- Project specific --------------------------------------------------------
-from utility_rest import get_db
-from status import Status
-from app_object import APP
+from canarieapi.app_object import APP
+from canarieapi.status import Status
+from canarieapi.utility_rest import get_db
 
 
 def monitor(update_db=True):
@@ -14,7 +14,7 @@ def monitor(update_db=True):
     logger = APP.logger
     config = APP.config
     logger.info('Loading configuration')
-    srv_mon = {route : config['SERVICES'][route]['monitoring'] for route in config['SERVICES']}
+    srv_mon = {route: config['SERVICES'][route]['monitoring'] for route in config['SERVICES']}
     pf_mon = {route: config['PLATFORMS'][route]['monitoring'] for route in config['PLATFORMS']}
     all_mon = srv_mon
     all_mon.update(pf_mon)
@@ -31,7 +31,7 @@ def monitor(update_db=True):
                 try:
                     status, message = check_service(request=test_dic['request'],
                                                     response=test_dic.get('response', {}))
-                except:
+                except Exception:
                     logger.error('Exception occurs while trying to check status of {0}.{1}'.format(route, service))
                     raise
                 logger.info('{0}.{1} : {2}'.format(route, service, Status.pretty_msg(status)))

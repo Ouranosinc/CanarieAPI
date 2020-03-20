@@ -8,8 +8,8 @@ import logging.handlers
 
 
 # -- Project specific --------------------------------------------------------
-from utility_rest import get_db
-from app_object import APP
+from canarieapi.app_object import APP
+from canarieapi.utility_rest import get_db
 
 
 LOG_BACKUP_COUNT = 150
