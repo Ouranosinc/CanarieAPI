@@ -6,6 +6,9 @@ History
 Unreleased
 ---------------------
 
+* Fix missed header title in ``0.4.0`` that also had an hardcoded ``Ouranosinc`` mention.
+  The browser tab will now also use the ``SERVER_MAIN_TITLE`` value if provided in configuration.
+
 0.4.1 (2020-03-20)
 ---------------------
 
