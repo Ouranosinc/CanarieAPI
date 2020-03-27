@@ -6,6 +6,9 @@ History
 `Unreleased <https://github.com/Ouranosinc/CanarieAPI/tree/master>`_ (latest)
 ------------------------------------------------------------------------------------
 
+`0.4.2 <https://github.com/Ouranosinc/CanarieAPI/tree/0.4.2>`_ (2020-03-27)
+------------------------------------------------------------------------------------
+
 * Fix missed header title in ``0.4.0`` that also had an hardcoded ``Ouranosinc`` mention.
   The browser tab will now also use the ``SERVER_MAIN_TITLE`` value if provided in configuration.
 * Use full URL reference to issues in this changelog for easier access in documentation and on GitHub.
