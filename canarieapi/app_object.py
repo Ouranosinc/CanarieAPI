@@ -10,7 +10,7 @@ from flask import Flask
 from os import environ
 
 # -- Project specific --------------------------------------------------------
-import default_configuration
+from . import default_configuration
 from canarieapi.reverse_proxied import ReverseProxied
 
 
