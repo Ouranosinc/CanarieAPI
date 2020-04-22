@@ -23,6 +23,7 @@ RUN apt-get update \
         vim \
         sqlite3 \
 	&& ln -s $(which pip3) /usr/local/bin/pip \
+    && ln -s $(which python3) /usr/bin/python \
     && pip install --no-cache-dir --upgrade pip setuptools gunicorn gevent \
     && pip install --no-cache-dir --upgrade -r ${PKG_DIR}/requirements.txt \
     && pip install --no-cache-dir -e ${PKG_DIR}
