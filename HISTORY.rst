@@ -5,6 +5,8 @@ History
 
 `Unreleased <https://github.com/Ouranosinc/CanarieAPI/tree/master>`_ (latest)
 ------------------------------------------------------------------------------------
+* Fix ``Dockerfile`` with symlink python => python3
+* Add canarieapi path to cron command
 
 `0.4.2 <https://github.com/Ouranosinc/CanarieAPI/tree/0.4.2>`_ (2020-03-27)
 ------------------------------------------------------------------------------------
