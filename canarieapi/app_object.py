@@ -10,7 +10,11 @@ from flask import Flask
 from os import environ
 
 # -- Project specific --------------------------------------------------------
-from . import default_configuration
+# 'default_configuration' is imported like so instead of 'from canarieapi ...' 
+# to allow override on the local configurations by the docker image
+# Make sure to add the local path with sys.path.insert(0, SOURCE) when calling the process
+# (like in canariaapi-cron command)
+import default_configuration
 from canarieapi.reverse_proxied import ReverseProxied
 
 
