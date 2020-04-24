@@ -10,11 +10,6 @@ from flask import Flask
 from os import environ
 
 # -- Project specific --------------------------------------------------------
-# 'default_configuration' is imported like so instead of 'from canarieapi ...' 
-# to allow override on the local configurations by the docker image
-# Make sure to add the local path with sys.path.insert(0, SOURCE) when calling the process if necessary
-# (like in canarieapi-cron command)
-import default_configuration
 from canarieapi.reverse_proxied import ReverseProxied
 
 
@@ -29,9 +24,10 @@ APP.logger.setLevel(logging.DEBUG)
 APP.wsgi_app = ReverseProxied(APP.wsgi_app)
 
 # Config
-APP.config.from_object(default_configuration)
 if 'CANARIE_API_CONFIG_FN' in environ:
     APP.config.from_envvar('CANARIE_API_CONFIG_FN')
     APP.logger.info('Loading custom configuration from "{0}"'.format(environ['CANARIE_API_CONFIG_FN']))
 else:
+    from canarieapi import default_configuration
+    APP.config.from_object(default_configuration)
     APP.logger.info('Using default configuration')
