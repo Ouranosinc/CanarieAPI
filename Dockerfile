@@ -19,6 +19,7 @@ RUN apt-get update \
         build-essential \
         python3-dev \
         python3-pip \
+        curl \
         cron \
         vim \
         sqlite3 \
