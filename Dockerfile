@@ -2,7 +2,7 @@ FROM nginx
 LABEL description="CanarieAPI: Self describing REST service for Canarie registry."
 LABEL maintainer="David Byrns <david.byrns@crim.ca>, Francis Charette-Migneault <francis.charette-migneault@crim.ca>"
 LABEL vendor="Ouranosinc, CRIM"
-LABEL version="0.4.3"
+LABEL version="0.4.4"
 
 ENV PKG_DIR=/opt/local/src/CanarieAPI
 WORKDIR ${PKG_DIR}
@@ -25,7 +25,8 @@ RUN apt-get update \
         sqlite3 \
     && ln -s $(which pip3) /usr/local/bin/pip \
     && ln -s $(which python3) /usr/bin/python \
-    && pip install --no-cache-dir --upgrade pip setuptools gunicorn gevent \
+
+RUN pip install --no-cache-dir --upgrade pip setuptools gunicorn gevent \
     && pip install --no-cache-dir --upgrade -r ${PKG_DIR}/requirements.txt \
     && pip install --no-cache-dir -e ${PKG_DIR}
 

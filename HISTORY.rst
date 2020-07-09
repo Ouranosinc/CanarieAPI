@@ -6,6 +6,9 @@ History
 `Unreleased <https://github.com/Ouranosinc/CanarieAPI/tree/master>`_ (latest)
 ------------------------------------------------------------------------------------
 
+`0.4.4 <https://github.com/Ouranosinc/CanarieAPI/tree/0.4.4>`_ (2020-07-09)
+------------------------------------------------------------------------------------
+
 `0.4.3 <https://github.com/Ouranosinc/CanarieAPI/tree/0.4.3>`_ (2020-05-01)
 ------------------------------------------------------------------------------------
 * Fix ``Dockerfile`` with symlink python => python3
