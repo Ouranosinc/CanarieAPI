@@ -24,7 +24,9 @@ def monitor(update_db=True):
         if update_db:
             db = get_db()
             cur = db.cursor()
-            query = 'insert or replace into status (route, service, status, message) values (?, ?, ?, ?)'
+            query = 'insert into status (route, service, status, message) values (%s, %s, %s, %s) ' \
+                    'ON CONFLICT (route,service) DO UPDATE ' \
+                    'SET status = EXCLUDED.status,message = EXCLUDED.message '
 
         for route in all_mon:
             for service, test_dic in all_mon[route].items():
@@ -37,14 +39,14 @@ def monitor(update_db=True):
                 logger.info('{0}.{1} : {2}'.format(route, service, Status.pretty_msg(status)))
 
                 if update_db:
+                    message = (message[0:253] + '...') if len(message) > 256 else message
                     cur.execute(query,
-                                [route, service, status, (message[0:253] + '...') if len(message) > 256 else message])
+                                [route, service, status, message] )
 
         if update_db:
-            cur.execute('insert or replace into cron (job, last_execution) values (\'status\', CURRENT_TIMESTAMP)')
-            db.commit()
+            cur.execute(
+                'insert into cron (job, last_execution) values (\'log\', CURRENT_TIMESTAMP) ON CONFLICT(job) DO UPDATE SET last_execution = CURRENT_TIMESTAMP')
             db.close()
-
 
 def check_service(request, response):
     default_request = {

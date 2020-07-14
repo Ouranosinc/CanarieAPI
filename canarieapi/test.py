@@ -24,7 +24,7 @@ CONFIGURATION_SCHEMA = {
         "DATABASE": {
             "description": "Parameters about database and its data source",
             "type": "object",
-            "required": ["filename", "access_log", "log_pid"],
+            "required": ["access_log", "log_pid"],
             "additionalProperties": False,
             "properties": {
                 "filename": {
@@ -38,7 +38,19 @@ CONFIGURATION_SCHEMA = {
                 "log_pid": {
                     "description": "NGINX pid file location",
                     "type": "string"
-                }
+                },
+                "pg_conn_str": {
+                    "description": "Connection to posgress database",
+                    "type": "string"
+                },
+                "additional_stats": {
+                    "description": " If True, will collect stats for each ip calling every route. Calls are aggregated by hour.",
+                    "type": "boolean"
+                },
+                "ip_information": {
+                    "description": " If True, will collect additional information on all callers ips.",
+                    "type": "boolean"
+                },
             }
         },
         "SERVICES": {
@@ -214,7 +226,7 @@ def test_config(update_db):
     for i in range(0, min(10, LOG_BACKUP_COUNT)):
         fn = access_log_fn + ('.{0}'.format(i) if i > 0 else '')
         try:
-            route_stats = parse_log(fn)
+            route_stats,raw_stats = parse_log(fn)
             for route, value in route_stats.items():
                 route_invocations[route] = route_invocations.get(route, 0) + value['count']
             file_checked += 1

@@ -14,8 +14,10 @@ import http.client
 import re
 from os import remove
 from os import path
+from os import environ
 
 # -- 3rd party ---------------------------------------------------------------
+import psycopg2
 from werkzeug.datastructures import MIMEAccept
 from werkzeug.routing import BaseConverter
 from flask import render_template
@@ -184,32 +186,41 @@ def make_error_response(html_status=None,
 def get_db():
     """
     Get a connection to an existing database. If it does not exist, create a
-    connection to local sqlite3 file.
+    connection to local postgres database.
 
-    If the local sqlite3 file doesn't exist, initialize it using a schema.
+    If the local postgres dabase is empty, create required tables.
     """
     database = getattr(g, '_stats_database', None)
     if database is None:
-        d_fn = APP.config['DATABASE']['filename']
-        if path.isabs(d_fn):
-            database_fn = d_fn
-        else:
-            database_fn = path.join(APP.root_path, d_fn)
-
-        APP.logger.debug(u"Using db filename : {0}".format(database_fn))
-        if not path.exists(database_fn):
-            database = g._database = sqlite3.connect(database_fn)
+        database = g._database = psycopg2.connect(APP.config['DATABASE']['pg_conn_str'])
+        database.autocommit = True
+        pg_cursor = database.cursor()
+        pg_cursor.execute("SELECT * FROM information_schema.tables where table_name = 'cron'")
+        if not pg_cursor.fetchall():
             try:
                 init_db(database)
             except:
                 database.close()
-                remove(database_fn)
                 raise
-        else:
-            database = g._database = sqlite3.connect(database_fn)
+            init_db(database)
 
     return database
 
+def is_additional_stats():
+    """
+    Determines if stats calculation is activated in the configuration.
+    Additional stats contains calls by user ip (aggregated by hour) for each route.
+    Default is false.
+    """
+    return APP.config['DATABASE']['additional_stats']
+
+def is_ip_information():
+    """
+    Determines if ip information is activated in configuration.
+    Ip information provides additional information on callers IP.
+    Default is False.
+    """
+    return APP.config['DATABASE']['additional_stats']
 
 def init_db(database):
     """
@@ -225,9 +236,8 @@ def init_db(database):
 
         APP.logger.debug(u"Using schema filename : {0}".format(schema_fn))
         with current_app.open_resource(schema_fn, mode='r') as schema_f:
-            database.cursor().executescript(schema_f.read())
+            database.cursor().execute(schema_f.read())
         database.commit()
-
 
 class AnyIntConverter(BaseConverter):
     """

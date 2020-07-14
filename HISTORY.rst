@@ -8,6 +8,8 @@ History
 
 `0.4.4 <https://github.com/Ouranosinc/CanarieAPI/tree/0.4.4>`_ (2020-07-09)
 ------------------------------------------------------------------------------------
+* Changed database to postgres which is running locally
+* Added the possibility to collect additional call stats , aggregated hourly.
 
 `0.4.3 <https://github.com/Ouranosinc/CanarieAPI/tree/0.4.3>`_ (2020-05-01)
 ------------------------------------------------------------------------------------

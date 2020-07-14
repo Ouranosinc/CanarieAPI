@@ -8,13 +8,21 @@ found in this file, you need to set the environment variable named
 "CANARIE_API_CONFIG_FN" to the path of your own copy before launching the program.
 """
 
-MY_SERVER_NAME = 'http://localhost:5000'
+MY_SERVER_NAME = 'http://localhost:2000'
 SERVER_MAIN_TITLE = 'Canarie API'
 
+# additional_stats: If True, will collect stats for each ip calling every route. Calls are aggregated by hour.
+# ip_information: If True, will collect additional information on all callers ips.
+from os import environ
+POSTGRES_PASSWORD = environ.get("POSTGRES_PASSWORD","simplepass1")
+
+
 DATABASE = {
-    'filename': '/opt/local/src/CanarieAPI/stats.db',
-    'access_log': '/var/log/nginx/access_file.log',
-    'log_pid': '/var/run/nginx.pid'
+    'access_log': '/var/log/nginx/access.log',
+    'log_pid': '/var/run/nginx.pid',
+    'pg_conn_str': f'dbname=postgres user=postgres password={POSTGRES_PASSWORD} host=127.0.0.1 port=5432',
+    'additional_stats' : False,
+    'ip_information': False
 }
 
 SERVICES = {

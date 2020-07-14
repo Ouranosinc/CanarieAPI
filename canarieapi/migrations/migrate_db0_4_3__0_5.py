@@ -35,14 +35,10 @@ def copytable(pg_conn,sqllite_conn,tablename,fields: str):
     res = sqllite_cur.execute(sqllite_query)
     pg_query=f'INSERT INTO {tablename} ({fields}) VALUES (' + ("%s,"*len(fields.split(","))).strip(',') + ');'
     pg_cursor= pg_conn.cursor()
-    print(sqllite_query)
     for item in res:
         pg_cursor.execute(pg_query,item)
     pg_conn.commit()
     sqllite_cur.close()
-    pg_cursor.execute(sqllite_query)
-    print(pg_cursor.fetchall())
-    pg_cursor.close()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Script to migrate SQLlite to Posgres. From v 0.4.3 to v 0.5.0")

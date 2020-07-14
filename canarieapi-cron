@@ -1,2 +1,3 @@
-* * * * * root python -c 'from canarieapi import logparser; logparser.cron_job()' >> /var/log/logparser_cron.log 2>&1
-* * * * * root python -c 'from canarieapi import monitoring; monitoring.cron_job()' >> /var/log/monitoring_cron.log 2>&1
+*/10 * * * * root python -c 'from canarieapi import logparser; logparser.cron_job()' >> /var/log/logparser_cron.log 2>&1
+*/10 * * * * root python -c 'from canarieapi import monitoring; monitoring.cron_job()' >> /var/log/monitoring_cron.log 2>&1
+*/10 * * * * root python -c 'from canarieapi import ip_info_collection; ip_info_collection.cron_job()' >> /var/log/ip_info_collection.log 2>&1

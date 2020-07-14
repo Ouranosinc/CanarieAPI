@@ -39,15 +39,12 @@ from canarieapi.utility_rest import make_error_response
 from canarieapi.utility_rest import request_wants_json
 from canarieapi.utility_rest import get_db
 from canarieapi.utility_rest import AnyIntConverter
-import __meta__
+import canarieapi.__meta__
 
 # Make sure to test the config on launch to raise exception as soon as possible
 test_config(False)
 
-# Creates the database if it doesn't exist, connects to it and keeps it in
-# cache for hassle free runtime access
-with APP.app_context():
-    get_db()
+
 
 logger = APP.logger
 
@@ -195,7 +192,7 @@ def get_status(route_name):
 
     # Gather service(s) status
     all_status = {}
-    query = 'select service, status, message from status where route = ?'
+    query = 'select service, status, message from status where route = %s'
     try:
         cur.execute(query, [route_name])
         rv = cur.fetchall()
@@ -238,7 +235,7 @@ def stats(route_name, api_type):
     # Gather route stats
     invocations = 0
     last_access = 'Never'
-    query = 'select invocations, last_access from stats where route = ?'
+    query = 'select invocations, last_access from stats where route = %s'
     try:
         cur.execute(query, [route_name])
         rv = cur.fetchall()
@@ -311,7 +308,7 @@ def status(route_name, api_type):
 
     # Check last time cron job have run (help to diagnose cron problem)
     last_status_update = 'Never'
-    query = "select last_execution from cron where job == 'status'"
+    query = "select last_execution from cron where job = 'status'"
     try:
         cur.execute(query)
         rv = cur.fetchall()
@@ -366,6 +363,11 @@ def close_connection(dummy_exception):
 
 
 if __name__ == "__main__":
-    port = 5000
+    # Creates the database if it doesn't exist, connects to it and keeps it in
+    # cache for hassle free runtime access
+    with APP.app_context():
+        get_db()
+
+    port = 2000
     APP.debug = False
     APP.run(port=port)
