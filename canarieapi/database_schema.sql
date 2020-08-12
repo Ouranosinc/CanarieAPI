@@ -18,8 +18,9 @@ CREATE TABLE IF NOT EXISTS cron (
 CREATE TABLE IF NOT EXISTS raw_stats(
     call_date TIMESTAMP,
     ip VARCHAR(15),
+    route VARCHAR(32),
     call_count INTEGER,
-    primary key (call_date,ip)
+    primary key (call_date,ip,route)
 );
 
 CREATE TABLE IF NOT EXISTS ip_details(

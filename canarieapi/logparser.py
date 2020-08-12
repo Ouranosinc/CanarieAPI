@@ -68,7 +68,6 @@ def parse_log(filename):
     log_regex = re.compile(log_fmt)
     log_records = []
     raw_stats = dict()
-    print(route_stats)
     with open(filename, 'r') as f:
         for line in f:
             m = log_regex.match(line)
@@ -140,9 +139,9 @@ def update_db(route_stats,raw_stats=None):
         if is_additional_stats() and raw_stats:
             is_new_ip_query = "select * from ip_details where ip = %s"
             insert_new_ip = "insert into unprocessed_ips (ip) values (%s) ON CONFLICT (ip) DO NOTHING"
-            insert_new_raw_stats = "insert into raw_stats (call_date,ip,call_count) " \
-                                   "values (%s,%s,%s) ON CONFLICT (call_date,ip) " \
-                                   "DO UPDATE SET call_count=(SELECT call_count from raw_stats where call_date= %s AND ip =%s)" \
+            insert_new_raw_stats = "insert into raw_stats (call_date,ip,route,call_count) " \
+                                   "values (%s,%s,%s,%s) ON CONFLICT (call_date,ip,route) " \
+                                   "DO UPDATE SET call_count=(SELECT call_count from raw_stats where call_date= %s AND ip =%s AND route = %s)" \
                                    " + EXCLUDED.call_count"
             db = get_db()
             unique_ips = set()
@@ -156,10 +155,11 @@ def update_db(route_stats,raw_stats=None):
                             cur.execute(insert_new_ip,[ip])
                             unique_ips.add(ip)
 
-                        route = info["route"]
-                        for date in info.keys():
-                            if date != "route":
-                                cur.execute(insert_new_raw_stats,[date,ip,info[date],date,ip])
+                    # Add ip raw stats
+                    route = info["route"]
+                    for date in info.keys():
+                        if date != "route":
+                            cur.execute(insert_new_raw_stats,[date,ip,route,info[date],date,ip,route])
 
         # update specific call stats:
         cur.execute('insert into cron (job, last_execution) values (\'log\', CURRENT_TIMESTAMP) ON CONFLICT(job) DO UPDATE SET last_execution = CURRENT_TIMESTAMP')
