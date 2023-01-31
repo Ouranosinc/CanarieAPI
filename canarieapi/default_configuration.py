@@ -35,18 +35,18 @@ SERVICES = {
             'route': '/name/service/.*'
         },
         'redirect': {
-            'doc': 'https://science.canarie.ca/researchsoftware/home/main.html',
-            'releasenotes': 'https://science.canarie.ca/researchsoftware/home/main.html',
-            'support': 'https://science.canarie.ca/researchsoftware/home/main.html',
-            'source': 'https://science.canarie.ca/researchsoftware/home/main.html',
-            'tryme': 'https://science.canarie.ca/researchsoftware/home/main.html',
-            'licence': 'https://science.canarie.ca/researchsoftware/home/main.html',
-            'provenance': 'https://science.canarie.ca/researchsoftware/home/main.html'
+            'doc': 'https://www.canarie.ca/software/',
+            'releasenotes': 'https://www.canarie.ca/software/',
+            'support': 'https://www.canarie.ca/software/',
+            'source': 'https://www.canarie.ca/software/',
+            'tryme': 'https://www.canarie.ca/software/',
+            'licence': 'https://www.canarie.ca/software/',
+            'provenance': 'https://www.canarie.ca/software/'
         },
         'monitoring': {
             'Component': {
                 'request': {
-                    'url': 'https://science.canarie.ca/researchsoftware/home/main.html'
+                    'url': 'https://www.canarie.ca/software/'
                 }
             }
         }
@@ -70,19 +70,19 @@ PLATFORMS = {
             'route': '/pf_name/platform/.*'
         },
         'redirect': {
-            'doc': 'https://science.canarie.ca/researchsoftware/home/main.html',
-            'releasenotes': 'https://science.canarie.ca/researchsoftware/home/main.html',
-            'support': 'https://science.canarie.ca/researchsoftware/home/main.html',
-            'source': 'https://science.canarie.ca/researchsoftware/home/main.html',
-            'tryme': 'https://science.canarie.ca/researchsoftware/home/main.html',
-            'licence': 'https://science.canarie.ca/researchsoftware/home/main.html',
-            'provenance': 'https://science.canarie.ca/researchsoftware/home/main.html',
-            'factsheet': 'https://science.canarie.ca/researchsoftware/home/main.html'
+            'doc': 'https://www.canarie.ca/software/',
+            'releasenotes': 'https://www.canarie.ca/software/',
+            'support': 'https://www.canarie.ca/software/',
+            'source': 'https://www.canarie.ca/software/',
+            'tryme': 'https://www.canarie.ca/software/',
+            'licence': 'https://www.canarie.ca/software/',
+            'provenance': 'https://www.canarie.ca/software/',
+            'factsheet': 'https://www.canarie.ca/software/'
         },
         'monitoring': {
             'Component': {
                 'request': {
-                    'url': 'https://science.canarie.ca/researchsoftware/home/main.html'
+                    'url': 'https://www.canarie.ca/software/'
                 }
             }
         }
