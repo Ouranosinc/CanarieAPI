@@ -18,7 +18,6 @@ https://collaboration.canarie.ca/elgg/discussion/view/3664/research-software-api
 # -- Standard lib ------------------------------------------------------------
 import collections
 import datetime
-import logging
 from dateutil.parser import *
 
 # -- 3rd party ---------------------------------------------------------------
@@ -45,11 +44,10 @@ import __meta__
 test_config(False)
 
 # Creates the database if it doesn't exist, connects to it and keeps it in
-# cache for hassle free runtime access
+# cache for hassle-free runtime access
 with APP.app_context():
     get_db()
 
-logger = APP.logger
 
 START_UTC_TIME = datetime.datetime.utcnow().replace(microsecond=0)
 
@@ -82,12 +80,17 @@ HANDLED_HTML_ERRORS_STR = ", ".join(map(str, HANDLED_HTML_ERRORS))
 # status_code_copy=status_code
 # http://stackoverflow.com/questions/938429/scope-of-python-lambda-functions-
 # and-their-parameters/938493#938493
+APP.error_handler_spec.setdefault(None, {})
 for status_code in HANDLED_HTML_ERRORS:
-    APP.error_handler_spec.setdefault(None, {})
-    APP.error_handler_spec[None][status_code] = \
+    APP.error_handler_spec[None].setdefault(status_code, {})
+    APP.error_handler_spec[None][status_code][Exception] = \
         lambda more_info, status_code_copy = status_code: \
         make_error_response(html_status=status_code_copy,
                             html_status_response=str(more_info))
+
+
+# avoid error on missing None key for Exception in Flask>2
+APP.error_handler_spec[None].setdefault(None, {})
 
 
 @APP.errorhandler(Exception)
@@ -97,12 +100,10 @@ def handle_exceptions(exception_instance):
 
     :param exception_instance: Exception instance.
     """
-    logger = logging.getLogger(__name__)
-    logger.debug(u"Generating error response for the exception {e}".
-                 format(e=repr(exception_instance)))
-    logger.exception(exception_instance)
+    APP.logger.debug(u"Generating error response for the exception {e}". format(e=repr(exception_instance)))
+    APP.logger.exception(exception_instance)
     if APP.debug:
-        logger.info(u"In debug mode, re-raising exception")
+        APP.logger.info(u"In debug mode, re-raising exception")
         raise
     template = "An exception of type {0} occurred. Arguments:\n{1!r}"
     message = template.format(type(exception_instance).__name__, exception_instance.args)
@@ -119,10 +120,16 @@ def home():
     def parse_config(name, api_type, conf):
         hostname = APP.config['MY_SERVER_NAME']
         requests = sorted(['info', 'stats', 'status'] + list(conf.get('redirect', {}).keys()))
-        content = [(request, '{hostname}/{name}/{api_type}/{request}'
-                    .format(hostname=hostname, name=name, api_type=api_type, request=request))
-                   for request in requests]
-        return collections.OrderedDict(content)
+        _content = [
+            (
+                request,
+                '{hostname}/{name}/{api_type}/{request}'.format(
+                    hostname=hostname, name=name, api_type=api_type, request=request
+                )
+            )
+            for request in requests
+        ]
+        return collections.OrderedDict(_content)
 
     config = APP.config
     main_title = APP.config.get('SERVER_MAIN_TITLE', __meta__.__title__)
@@ -204,7 +211,7 @@ def get_status(route_name):
             all_status[record[0]] = dict(status=record[1],
                                          message=record[2])
     except Exception as e:
-        logger.error(str(e))
+        APP.logger.error(str(e))
         pass
     cur.close()
 
@@ -246,7 +253,7 @@ def stats(route_name, api_type):
             invocations = rv[0][0]
             last_access = parse(rv[0][1]).replace(tzinfo=None).isoformat() + 'Z'
     except Exception as e:
-        logger.error(str(e))
+        APP.logger.error(str(e))
         pass
 
     # Check last time cron job have run (help to diagnose cron problem)
@@ -264,7 +271,7 @@ def stats(route_name, api_type):
                     last_status_update = parse(record[1]).isoformat() + 'Z'
 
     except Exception as e:
-        logger.error(str(e))
+        APP.logger.error(str(e))
         pass
 
     cur.close()
@@ -289,7 +296,12 @@ def stats(route_name, api_type):
     if request_wants_json():
         return jsonify(service_stats)
 
-    return render_template('default.html', Main_Title=get_api_title(route_name, api_type), Title="Stats", Tags=service_stats)
+    return render_template(
+        'default.html',
+        Main_Title=get_api_title(route_name, api_type),
+        Title="Stats",
+        Tags=service_stats,
+    )
 
 
 @APP.route("/<route_name>/<any(" + ",".join(CANARIE_API_TYPE) + "):api_type>/status")
@@ -318,7 +330,7 @@ def status(route_name, api_type):
         if rv:
             last_status_update = parse(rv[0][0]).isoformat() + 'Z'
     except Exception as e:
-        logger.error(str(e))
+        APP.logger.error(str(e))
         pass
 
     cur.close()
@@ -355,7 +367,7 @@ def simple_requests_handler(route_name, api_type, api_request='home'):
 
 
 @APP.teardown_appcontext
-def close_connection(dummy_exception):
+def close_connection(dummy_exception):  # noqa
     """
     Disconnect database.
 

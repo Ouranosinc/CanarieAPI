@@ -1,5 +1,5 @@
 bumpversion==0.5.3
-flask
+flask>=2.2
 gevent
 gunicorn
 jsonschema
