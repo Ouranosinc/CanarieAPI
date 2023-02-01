@@ -47,7 +47,7 @@ def request_wants_json():
 
 def set_html_as_default_response():
     """
-    By default if the accepted mimetypes contains */*, JSON format will be
+    By default, if the accepted mimetypes contains */*, JSON format will be
     used.
 
     By calling this function, the */* mimetype will be changed explicitly into

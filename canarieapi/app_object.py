@@ -2,12 +2,13 @@
 This module serves the purpose of centralizing the state object of Flask in a single place.
 """
 
-import logging
 # -- Standard lib ------------------------------------------------------------
+import logging
 import sys
+from os import environ
+
 # -- 3rd party modules -------------------------------------------------------
 from flask import Flask
-from os import environ
 
 # -- Project specific --------------------------------------------------------
 from canarieapi import default_configuration
