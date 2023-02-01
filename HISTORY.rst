@@ -6,6 +6,9 @@ History
 `Unreleased <https://github.com/Ouranosinc/CanarieAPI/tree/master>`_ (latest)
 ------------------------------------------------------------------------------------
 
+`0.4.4 <https://github.com/Ouranosinc/CanarieAPI/tree/0.4.4>`_ (2023-02-01)
+------------------------------------------------------------------------------------
+
 * Fix ``Flask`` requirements and expected configurations to setup the web application.
 * Fix broken example URL in ``canarieapi/default_configuration.py``.
 * Fix linting and variable name shadowing within scoped or built-in context.
