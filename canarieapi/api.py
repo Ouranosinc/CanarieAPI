@@ -9,6 +9,8 @@
 # will depend.
 
 """
+API definition.
+
 This module defines the generic REST API for platforms and services as defined by
 the CANARIE API specification. See :
 https://collaboration.canarie.ca/elgg/discussion/view/3664/research-software-api-documentation
@@ -18,7 +20,7 @@ https://collaboration.canarie.ca/elgg/discussion/view/3664/research-software-api
 # -- Standard lib ------------------------------------------------------------
 import collections
 import datetime
-from dateutil.parser import *
+from dateutil.parser import parse as dt_parse
 
 # -- 3rd party ---------------------------------------------------------------
 from flask import render_template
@@ -149,6 +151,8 @@ def manual_test():
 @APP.route("/<any_int(" + HANDLED_HTML_ERRORS_STR + "):status_code_str>")
 def extern_html_error_handler(status_code_str):
     """
+    Handle HTML errors from an external response.
+
     Handle errors that occur externally provided that Apache is configured so
     that it uses this route for handling errors.
 
@@ -163,7 +167,7 @@ def extern_html_error_handler(status_code_str):
 @APP.route("/<route_name>/<any(" + ",".join(CANARIE_API_TYPE) + "):api_type>/info")
 def information(route_name, api_type):
     """
-    Info route required by CANARIE
+    Info route required by CANARIE.
     """
 
     # JSON is used by default but the Canarie API requires html as default
@@ -221,7 +225,7 @@ def get_status(route_name):
 @APP.route("/<route_name>/<any(" + ",".join(CANARIE_API_TYPE) + "):api_type>/stats")
 def stats(route_name, api_type):
     """
-    Stats route required by CANARIE
+    Stats route required by CANARIE.
     """
 
     # JSON is used by default but the Canarie API requires html as default
@@ -251,7 +255,7 @@ def stats(route_name, api_type):
         rv = cur.fetchall()
         if rv:
             invocations = rv[0][0]
-            last_access = parse(rv[0][1]).replace(tzinfo=None).isoformat() + 'Z'
+            last_access = dt_parse(rv[0][1]).replace(tzinfo=None).isoformat() + 'Z'
     except Exception as e:
         APP.logger.error(str(e))
         pass
@@ -266,9 +270,9 @@ def stats(route_name, api_type):
         if rv:
             for record in rv:
                 if record[0] == 'log':
-                    last_log_update = parse(record[1]).isoformat() + 'Z'
+                    last_log_update = dt_parse(record[1]).isoformat() + 'Z'
                 elif record[0] == 'status':
-                    last_status_update = parse(record[1]).isoformat() + 'Z'
+                    last_status_update = dt_parse(record[1]).isoformat() + 'Z'
 
     except Exception as e:
         APP.logger.error(str(e))
@@ -307,7 +311,7 @@ def stats(route_name, api_type):
 @APP.route("/<route_name>/<any(" + ",".join(CANARIE_API_TYPE) + "):api_type>/status")
 def status(route_name, api_type):
     """
-    Extra route to know service status
+    Extra route to know service status.
     """
 
     # JSON is used by default but the Canarie API requires html as default
@@ -328,7 +332,7 @@ def status(route_name, api_type):
         cur.execute(query)
         rv = cur.fetchall()
         if rv:
-            last_status_update = parse(rv[0][0]).isoformat() + 'Z'
+            last_status_update = dt_parse(rv[0][0]).isoformat() + 'Z'
     except Exception as e:
         APP.logger.error(str(e))
         pass
@@ -357,7 +361,7 @@ def status(route_name, api_type):
            ",".join(CANARIE_API_VALID_REQUESTS) + "):api_request>")
 def simple_requests_handler(route_name, api_type, api_request='home'):
     """
-    #Handle simple requests required by CANARIE
+    #Handle simple requests required by CANARIE.
     """
 
     # JSON is used by default but the Canarie API requires html as default

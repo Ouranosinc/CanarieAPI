@@ -2,9 +2,6 @@
 # -*- coding: utf-8 -*-
 
 """
-test_canarieapi
-----------------------------------
-
 Tests for `canarieapi` module.
 """
 import os

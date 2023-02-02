@@ -30,7 +30,7 @@ PROJECT_ROOT = os.path.dirname(os.getcwd())
 # version is used.
 sys.path.insert(0, PROJECT_ROOT)
 
-from CanarieAPI import __version__
+from canarieapi import __version__  # noqa
 
 # -- General configuration ---------------------------------------------
 

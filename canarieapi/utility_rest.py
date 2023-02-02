@@ -2,9 +2,10 @@
 # coding:utf-8
 
 """
+REST API utilities.
+
 This module is a collection of utility functions used mainly by the rest_route
-module and which are placed here to keep the rest_route module as clean as
-possible.
+module and which are placed here to keep the rest_route module as clean as possible.
 """
 
 
@@ -47,11 +48,13 @@ def request_wants_json():
 
 def set_html_as_default_response():
     """
-    By default, if the accepted mimetypes contains */*, JSON format will be
-    used.
+    Set the default response Media-Type, with fallback to JSON.
 
+    By default, if the accepted mimetypes contains */*, JSON format will be used.
     By calling this function, the */* mimetype will be changed explicitly into
     text/html so that it becomes the mimetype used by default.
+    This is useful for automatically rendering HTML by web browsers that do not
+    provide explicitly the desired mimetype.
     """
 
     # Best will be HTML if it's in accept mimetypes and
@@ -68,12 +71,12 @@ def set_html_as_default_response():
 
 def get_config(route_name, api_type):
     """
-        Return the config for the particular service/platform associated with the given route name.
+    Return the config for the particular service/platform associated with the given route name.
 
-        :param route_name: Route name of the service/platform coming from the URL e.g. :
-                              ['pavics', 'node', 'bias', etc.]
-        :param api_type: Api type of the route which must be one of platform or service
-        :raises: Exception if the route is unknown
+    :param route_name: Route name of the service/platform coming from the URL e.g. :
+                          ['pavics', 'node', 'bias', etc.]
+    :param api_type: Api type of the route which must be one of platform or service
+    :raises: Exception if the route is unknown
     """
     try:
         return APP.config[api_type.upper() + 'S'][route_name]
@@ -85,8 +88,7 @@ def get_config(route_name, api_type):
 
 def validate_route(route_name, api_type):
     """
-    Check if the route name is a value amongst known services/platforms in the
-    configuration.
+    Check if the route name is a value amongst known services/platforms in the configuration.
 
     :param route_name: Route name of the service/platform coming from the URL e.g. :
                           ['pavics', 'node', 'bias', etc.]
@@ -110,15 +112,14 @@ def get_api_title(route_name, api_type):
     try:
         name = get_config(route_name, api_type)['info']['name']
         title = name + ' ' + title
-    except:
+    except Exception:
         pass
     return title
 
 
 def get_canarie_api_response(route_name, api_type, api_request):
     """
-    Provide a valid HTML response for the CANARIE API request based on the
-    service_route.
+    Provide a valid HTML response for the CANARIE API request based on the service route.
 
     :param route_name: Route name of the service/platform coming from the URL e.g. :
                           ['pavics', 'node', 'bias', etc.]
@@ -183,9 +184,9 @@ def make_error_response(html_status=None,
 
 def get_db():
     """
-    Get a connection to an existing database. If it does not exist, create a
-    connection to local sqlite3 file.
+    Get a connection to an existing database.
 
+    If the database does not exist, create a connection to local sqlite3 file.
     If the local sqlite3 file doesn't exist, initialize it using a schema.
     """
     database = getattr(g, '_stats_database', None)
@@ -201,7 +202,7 @@ def get_db():
             database = g._database = sqlite3.connect(database_fn)
             try:
                 init_db(database)
-            except:
+            except Exception:
                 database.close()
                 remove(database_fn)
                 raise
@@ -213,7 +214,7 @@ def get_db():
 
 def init_db(database):
     """
-    Initialize a database from a schema
+    Initialize a database from a schema.
     """
     APP.logger.info(u"Initializing database")
     with current_app.app_context():

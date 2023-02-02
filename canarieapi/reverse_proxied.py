@@ -2,6 +2,8 @@
 # coding:utf-8
 
 """
+Middleware for reverse proxy.
+
 This module implements a middleware that makes the Flask application work
 seamlessly behind a reverse proxy.
 """
@@ -9,9 +11,9 @@ seamlessly behind a reverse proxy.
 
 class ReverseProxied(object):
     """
-    Class which implements a middleware so flask can be used behind a reverse
-    proxy.
+    Class which implements a middleware so flask can be used behind a reverse proxy.
     """
+
     def __init__(self, app):
         self.app = app
 

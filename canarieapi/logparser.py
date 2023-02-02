@@ -45,7 +45,7 @@ def parse_log(filename):
     logger = APP.logger
     logger.info('Loading configuration')
     config = APP.config
-    srv_stats = {route : config['SERVICES'][route]['stats'] for route in config['SERVICES']}
+    srv_stats = {route: config['SERVICES'][route]['stats'] for route in config['SERVICES']}
     pf_stats = {route: config['PLATFORMS'][route]['stats'] for route in config['PLATFORMS']}
     all_stats = srv_stats
     all_stats.update(pf_stats)
@@ -58,13 +58,13 @@ def parse_log(filename):
                                       route_regex=re.compile(route_regex['route']),
                                       count=0,
                                       last_access=None)
-        except:
+        except Exception:
             logger.error('Exception occurs while trying to compile regex of {0}'.format(route))
             raise
 
     # Load access log
     logger.info('Loading log file : {0}'.format(filename))
-    log_fmt = '.*\[(?P<datetime>.*)\] "(?P<method>[A-Z]+) (?P<route>/.*) .*'
+    log_fmt = r'.*\[(?P<datetime>.*)\] "(?P<method>[A-Z]+) (?P<route>/.*) .*'
     log_regex = re.compile(log_fmt)
     log_records = []
     with open(filename, 'r') as f:
