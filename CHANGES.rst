@@ -1,10 +1,15 @@
 .. :changelog:
 
-History
+CHANGES
 =======
 
 `Unreleased <https://github.com/Ouranosinc/CanarieAPI/tree/master>`_ (latest)
 ------------------------------------------------------------------------------------
+
+* Refactor ``canarieapi.test`` into ``canarieapi.schema`` and rename ``test_config`` to ``validate_config_schema``
+  to better represent their intended use.
+* Add multiple linting validations with Makefile targets.
+* Add minimal tests with GitHub Actions CI integration.
 
 `0.4.4 <https://github.com/Ouranosinc/CanarieAPI/tree/0.4.4>`_ (2023-02-01)
 ------------------------------------------------------------------------------------

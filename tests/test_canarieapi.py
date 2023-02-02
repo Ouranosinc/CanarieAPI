@@ -13,7 +13,6 @@ import unittest
 
 from flask_webtest import TestApp
 
-from canarieapi.api import APP
 from tests import config as test_config
 
 
@@ -21,6 +20,11 @@ class TestCanarieAPI(unittest.TestCase):
 
     def setUp(self):
         self.config = test_config
+
+        # important not to import APP at the top nor before config/env were applied
+        # otherwise, configuration is loaded immediately and raises an error due to missing directory to store DB file
+        from canarieapi.api import APP  # isort: skip  # noqa
+
         APP.config.from_object(self.config)
         self.app = APP
         self.web = TestApp(self.app)

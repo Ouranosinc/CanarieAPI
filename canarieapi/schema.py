@@ -1,5 +1,4 @@
 # -- Standard lib ------------------------------------------------------------
-import os.path
 
 # -- 3rd party ---------------------------------------------------------------
 import jsonschema
@@ -46,7 +45,7 @@ CONFIGURATION_SCHEMA = {
             "type": "object",
             "minItems": 0,
             "patternProperties": {
-                ".*": { "$ref": "#/definitions/service_description_schema" }
+                ".*": {"$ref": "#/definitions/service_description_schema"}
             }
         },
         "PLATFORMS": {
@@ -54,7 +53,7 @@ CONFIGURATION_SCHEMA = {
             "type": "object",
             "minItems": 0,
             "patternProperties": {
-                ".*": { "$ref": "#/definitions/platform_description_schema" }
+                ".*": {"$ref": "#/definitions/platform_description_schema"}
             }
         }
     },
@@ -65,10 +64,10 @@ CONFIGURATION_SCHEMA = {
             "required": ["info", "stats", "redirect", "monitoring"],
             "additionalProperties": False,
             "properties": {
-                "info": { "$ref": "#/definitions/service_info_schema" },
-                "stats": { "$ref": "#/definitions/stats_schema" },
-                "redirect": { "$ref": "#/definitions/service_redirect_schema" },
-                "monitoring": { "$ref": "#/definitions/monitoring_schema" }
+                "info": {"$ref": "#/definitions/service_info_schema"},
+                "stats": {"$ref": "#/definitions/stats_schema"},
+                "redirect": {"$ref": "#/definitions/service_redirect_schema"},
+                "monitoring": {"$ref": "#/definitions/monitoring_schema"}
             }
         },
         "platform_description_schema": {
@@ -77,16 +76,26 @@ CONFIGURATION_SCHEMA = {
             "required": ["info", "stats", "redirect", "monitoring"],
             "additionalProperties": False,
             "properties": {
-                "info": { "$ref": "#/definitions/platform_info_schema" },
-                "stats": { "$ref": "#/definitions/stats_schema" },
-                "redirect": { "$ref": "#/definitions/platform_redirect_schema" },
-                "monitoring": { "$ref": "#/definitions/monitoring_schema" }
+                "info": {"$ref": "#/definitions/platform_info_schema"},
+                "stats": {"$ref": "#/definitions/stats_schema"},
+                "redirect": {"$ref": "#/definitions/platform_redirect_schema"},
+                "monitoring": {"$ref": "#/definitions/monitoring_schema"}
             }
         },
-        "service_info_schema" : {
+        "service_info_schema": {
             "description": "Parameters required by the route /info of the Canarie API",
             "type": "object",
-            "required": ["name", "synopsis", "version", "institution", "releaseTime", "researchSubject", "supportEmail", "tags", "category"],
+            "required": [
+                "name",
+                "synopsis",
+                "version",
+                "institution",
+                "releaseTime",
+                "researchSubject",
+                "supportEmail",
+                "tags",
+                "category"
+            ],
             "maxProperties": 9,
             "properties": {
                 "tags": {
@@ -101,10 +110,19 @@ CONFIGURATION_SCHEMA = {
                 "type": "string"
             }
         },
-        "platform_info_schema" : {
+        "platform_info_schema": {
             "description": "Parameters required by the route /info of the Canarie API",
             "type": "object",
-            "required": ["name", "synopsis", "version", "institution", "releaseTime", "researchSubject", "supportEmail", "tags"],
+            "required": [
+                "name",
+                "synopsis",
+                "version",
+                "institution",
+                "releaseTime",
+                "researchSubject",
+                "supportEmail",
+                "tags"
+            ],
             "maxProperties": 8,
             "properties": {
                 "tags": {
@@ -119,7 +137,7 @@ CONFIGURATION_SCHEMA = {
                 "type": "string"
             }
         },
-        "stats_schema" : {
+        "stats_schema": {
             "description": "Parameters used to count service invocations",
             "type": "object",
             "required": ["method", "route"],
@@ -135,7 +153,7 @@ CONFIGURATION_SCHEMA = {
                 }
             }
         },
-        "service_redirect_schema" : {
+        "service_redirect_schema": {
             "description": "List of redirection for most of the Canarie API requests",
             "type": "object",
             "required": ["doc", "releasenotes", "support", "source", "tryme", "licence", "provenance"],
@@ -144,7 +162,7 @@ CONFIGURATION_SCHEMA = {
                 "type": "string"
             }
         },
-        "platform_redirect_schema" : {
+        "platform_redirect_schema": {
             "description": "List of redirection for most of the Canarie API requests",
             "type": "object",
             "required": ["doc", "releasenotes", "support", "source", "tryme", "licence", "provenance", "factsheet"],
@@ -153,15 +171,15 @@ CONFIGURATION_SCHEMA = {
                 "type": "string"
             }
         },
-        "monitoring_schema" : {
+        "monitoring_schema": {
             "description": "List of components needing to be monitored to consider a service / platform functional",
             "type": "object",
             "minItems": 0,
             "patternProperties": {
-                ".*": { "$ref": "#/definitions/monitoring_component_schema" }
+                ".*": {"$ref": "#/definitions/monitoring_component_schema"}
             }
         },
-        "monitoring_component_schema" : {
+        "monitoring_component_schema": {
             "description": "Component needing to be monitored to consider a service / platform functional",
             "type": "object",
             "required": ["request"],
@@ -196,7 +214,8 @@ CONFIGURATION_SCHEMA = {
 }
 
 
-def test_config(update_db):
+def validate_config_schema(update_db):
+    # type: (bool) -> None
     config = APP.config
     logger = APP.logger
 

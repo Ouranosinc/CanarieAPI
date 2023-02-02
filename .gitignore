@@ -3,6 +3,7 @@
 *.egg[s]
 *egg-info
 .coverage
+reports/
 build/
 dist/
 env/

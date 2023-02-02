@@ -1,0 +1,44 @@
+# label rules used by .github/workflows/label.yml
+
+api:
+  - canarieapi/api.py
+  - canarieapi/app_object.py
+  - canarieapi/reverse_proxied.py
+  - canarieapi/status.py
+  - canarieapi/utility_rest.py
+  - canarieapi/wsgi.py
+
+config:
+  - canarieapi/default_configuration.py
+  - canarieapi/schema.py
+
+monitor:
+  - canarieapi/logparser.py
+  - canarieapi/monitor.py
+
+# label 'ci' all automation-related steps and files
+ci:
+  - .*  # all '.<>' files
+  - .github/**/*
+  - ci/**/*
+  - hooks/**/*
+  - Makefile
+  - Dockerfile*
+  - setup.cfg
+
+doc:
+  - "*.rst"
+  - "*.example"
+  - doc/**/*
+  - requirements-doc.txt
+
+db:
+  - canarieapi/database_schema.sql
+
+tests:
+  - tests/**/*
+  - requirements-dev.txt
+
+ui:
+  - canarieapi/static/*
+  - canarieapi/templates/*

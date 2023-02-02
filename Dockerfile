@@ -13,7 +13,7 @@ RUN chmod 0644 /etc/cron.d/canarieapi-cron
 
 # Install dependencies
 COPY canarieapi/__init__.py canarieapi/__meta__.py ${PKG_DIR}/canarieapi/
-COPY requirements.txt setup.* README.rst HISTORY.rst ${PKG_DIR}/
+COPY requirements.txt setup.* README.rst CHANGES.rst ${PKG_DIR}/
 RUN apt-get update \
     && apt-get install -y \
         build-essential \

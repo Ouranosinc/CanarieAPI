@@ -27,8 +27,8 @@ from flask import redirect
 
 # -- Project specific --------------------------------------------------------
 from canarieapi.app_object import APP
+from canarieapi.schema import validate_config_schema
 from canarieapi.status import Status
-from canarieapi.test import test_config
 from canarieapi.utility_rest import set_html_as_default_response
 from canarieapi.utility_rest import get_canarie_api_response
 from canarieapi.utility_rest import validate_route
@@ -41,7 +41,7 @@ from canarieapi.utility_rest import AnyIntConverter
 import __meta__
 
 # Make sure to test the config on launch to raise exception as soon as possible
-test_config(False)
+validate_config_schema(False)
 
 # Creates the database if it doesn't exist, connects to it and keeps it in
 # cache for hassle-free runtime access
@@ -142,7 +142,7 @@ def home():
 
 @APP.route("/test")
 def manual_test():
-    test_config(True)
+    validate_config_schema(True)
     return redirect(APP.config['MY_SERVER_NAME'])
 
 
