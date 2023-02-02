@@ -115,7 +115,7 @@ mkdir-reports:
 	@mkdir -p "$(REPORTS_DIR)"
 
 # autogen check variants with pre-install of dependencies using the '-only' target references
-CHECKS := pep8 lint security security-code security-deps doc8 links imports css
+CHECKS := pep8 lint security security-code security-deps doc8 docf links imports css
 CHECKS := $(addprefix check-, $(CHECKS))
 
 $(CHECKS): check-%: install-dev check-%-only
@@ -208,6 +208,15 @@ check-docf-only: mkdir-reports	## run PEP8 code documentation format checks
 			"$(APP_ROOT)" \
 		1>&2 2> >(tee "$(REPORTS_DIR)/check-docf.txt")'
 
+# FIXME: no configuration file support
+define FLYNT_FLAGS
+--line-length 120 \
+--verbose
+endef
+ifeq ($(shell test $(PYTHON_VERSION_MAJOR) -eq 3 && test $(PYTHON_VERSION_MINOR) -ge 8; echo $$?),0)
+  FLYNT_FLAGS := $(FLYNT_FLAGS) --transform-concats
+endif
+
 .PHONY: check-links-only
 check-links-only: mkdir-reports		## run check of external links in documentation for integrity
 	@echo "Running link checks on docs..."
@@ -243,7 +252,7 @@ fix: fix-all    ## run all fixes (alias for 'fix-all' target)
 fix-only: $(addsuffix -only, $(FIXES))
 
 .PHONY: fix-all-only
-fix-all-only: $(FIXES)  ## fix all code check problems automatically
+fix-all-only: fix-only  ## fix all code check problems automatically
 	@echo "All fixes applied!"
 
 .PHONY: fix-imports-only
@@ -342,6 +351,18 @@ install-req:  ## install package requirements allowing to run the code
 .PHONY: install-dev
 install-dev:  ## install package requirements allowing to run tests
 	pip install -r requirements-dev.txt
+
+# install locally to ensure they can be found by config extending them
+.PHONY: install-npm
+install-npm:    		## install npm package manager if it cannot be found
+	@[ -f "$(shell which npm)" ] || ( \
+		echo "Binary package manager npm not found. Attempting to install it."; \
+		apt-get install npm \
+	)
+	@[ `npm ls -only dev -depth 0 2>/dev/null | grep -V "UNMET" | grep stylelint-config-standard | wc -l` = 1 ] || ( \
+		echo "Install required libraries for style checks." && \
+		npm install stylelint@13.13.1 stylelint-config-standard@22.0.0 --save-dev \
+	)
 
 .PHONY: install
 install: clean install-req  ## install the package to the active Python's site-packages

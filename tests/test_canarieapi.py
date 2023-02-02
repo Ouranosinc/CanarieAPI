@@ -14,7 +14,6 @@ from tests import config as test_config
 
 
 class TestCanarieAPI(unittest.TestCase):
-
     def setUp(self):
         self.config = test_config
 

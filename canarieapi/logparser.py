@@ -1,16 +1,14 @@
 # -- Standard lib ------------------------------------------------------------
-import os
-import re
-import time
-import signal
 import logging
 import logging.handlers
-
+import os
+import re
+import signal
+import time
 
 # -- Project specific --------------------------------------------------------
 from canarieapi.app_object import APP
 from canarieapi.utility_rest import get_db
-
 
 LOG_BACKUP_COUNT = 150
 

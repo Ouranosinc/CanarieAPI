@@ -97,6 +97,7 @@ disable=C0111,missing-docstring,
         W0703,broad-except,
         W0706,try-except-raise,
         W0707,raise-missing-from,
+        W1406,redundant-u-string-prefix,
         W1508,invalid-envvar-default,
         E0012,bad-option-value,
         E0015,unrecognized-option

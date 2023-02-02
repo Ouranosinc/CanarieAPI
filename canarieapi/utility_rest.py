@@ -13,19 +13,13 @@ module and which are placed here to keep the rest_route module as clean as possi
 import configparser
 import http.client
 import re
-from os import remove
-from os import path
+import sqlite3
+from os import path, remove
 
+from flask import current_app, g, jsonify, redirect, render_template, request
 # -- 3rd party ---------------------------------------------------------------
 from werkzeug.datastructures import MIMEAccept
 from werkzeug.routing import BaseConverter
-from flask import render_template
-from flask import redirect
-from flask import request
-from flask import jsonify
-from flask import g
-from flask import current_app
-import sqlite3
 
 # -- Project specific --------------------------------------------------------
 from canarieapi.app_object import APP

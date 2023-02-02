@@ -20,27 +20,27 @@ https://collaboration.canarie.ca/elgg/discussion/view/3664/research-software-api
 # -- Standard lib ------------------------------------------------------------
 import collections
 import datetime
-from dateutil.parser import parse as dt_parse
 
+from dateutil.parser import parse as dt_parse
 # -- 3rd party ---------------------------------------------------------------
-from flask import render_template
-from flask import jsonify
-from flask import redirect
+from flask import jsonify, redirect, render_template
 
 # -- Project specific --------------------------------------------------------
+from canarieapi import __meta__
 from canarieapi.app_object import APP
 from canarieapi.schema import validate_config_schema
 from canarieapi.status import Status
-from canarieapi.utility_rest import set_html_as_default_response
-from canarieapi.utility_rest import get_canarie_api_response
-from canarieapi.utility_rest import validate_route
-from canarieapi.utility_rest import get_config
-from canarieapi.utility_rest import get_api_title
-from canarieapi.utility_rest import make_error_response
-from canarieapi.utility_rest import request_wants_json
-from canarieapi.utility_rest import get_db
-from canarieapi.utility_rest import AnyIntConverter
-import __meta__
+from canarieapi.utility_rest import (
+    AnyIntConverter,
+    get_api_title,
+    get_canarie_api_response,
+    get_config,
+    get_db,
+    make_error_response,
+    request_wants_json,
+    set_html_as_default_response,
+    validate_route
+)
 
 # Make sure to test the config on launch to raise exception as soon as possible
 validate_config_schema(False)

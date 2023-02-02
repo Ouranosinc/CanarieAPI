@@ -5,7 +5,7 @@ import jsonschema
 
 # -- Project specific --------------------------------------------------------
 from canarieapi.app_object import APP
-from canarieapi.logparser import parse_log, LOG_BACKUP_COUNT
+from canarieapi.logparser import LOG_BACKUP_COUNT, parse_log
 from canarieapi.monitoring import monitor
 
 # The schema that must be respected by the config

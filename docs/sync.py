@@ -4,11 +4,10 @@
 Send contents to server.
 """
 
+import argparse
+from shlex import split
 from subprocess import check_call
 from urllib.parse import urljoin
-from shlex import split
-import argparse
-
 
 from conf import __version__ as VERSION
 

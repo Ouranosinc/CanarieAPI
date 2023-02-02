@@ -1,7 +1,7 @@
 import os
 import tempfile
 
-from canarieapi.default_configuration import *  # noqa  # purposely import everything to mimic the configuration
+from canarieapi.default_configuration import *  # noqa  # pylint: ignore=W0401,W0614  # import all to mimic config
 
 # flake8: noqa
 
