@@ -105,7 +105,7 @@ def get_api_title(route_name, api_type):
     title = api_type.capitalize()
     try:
         name = get_config(route_name, api_type)['info']['name']
-        title = name + ' ' + title
+        title = "{}: {}".format(title, name)
     except Exception:
         pass
     return title
@@ -122,7 +122,7 @@ def get_canarie_api_response(route_name, api_type, api_request):
     :returns: A valid HTML response
     """
 
-    # Factsheet is not part of the service API so it's expected that the config will not be found
+    # Factsheet is not part of the service API, so it's expected that the config will not be found
     if api_type == 'service' and api_request == 'factsheet':
         return make_error_response(html_status=404)
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding:utf-8
 
-# N.B. : Some of these docstrings are written in reSTructured format so that
+# N.B. : Some of these docstrings are written in reSTructuredText format so that
 # Sphinx can use them directly with fancy formatting.
 
 # In the context of a REST application, this module must be loaded first as it
@@ -120,6 +120,7 @@ APP.url_map.converters['any_int'] = AnyIntConverter
 @APP.route("/")
 def home():
     def parse_config(name, api_type, conf):
+        # type: (str, str, dict) -> dict
         hostname = APP.config['MY_SERVER_NAME']
         requests = sorted(['info', 'stats', 'status'] + list(conf.get('redirect', {}).keys()))
         _content = [
@@ -135,9 +136,9 @@ def home():
 
     config = APP.config
     main_title = APP.config.get('SERVER_MAIN_TITLE', __meta__.__title__)
-    content = dict(Platforms={name.capitalize(): parse_config(name, 'platform', p)
+    content = dict(Platforms={p["info"]["name"]: parse_config(name, 'platform', p)
                               for name, p in config['PLATFORMS'].items()},
-                   Services={name.capitalize(): parse_config(name, 'service', s)
+                   Services={s["info"]["name"]: parse_config(name, 'service', s)
                              for name, s in config['SERVICES'].items()})
     return render_template('home.html', Main_Title=main_title, Title="Home", Content=content)
 
