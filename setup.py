@@ -116,6 +116,9 @@ def _parse_requirements(file_path, requirements, links):
     :param links: pre-initialized set in which to store extracted link reference requirements.
     :returns: None
     """
+    if not os.path.isfile(file_path):
+        return
+
     with open(file_path, mode="r", encoding="utf-8") as requirements_file:
         for line in requirements_file:
             # ignore empty line, comment line or reference to other requirements file (-r flag)

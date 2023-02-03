@@ -8,6 +8,7 @@ CHANGES
 
 * Refactor ``canarieapi.test`` into ``canarieapi.schema`` and rename ``test_config`` to ``validate_config_schema``
   to better represent their intended use.
+* Move Python-based configuration schema to ``schema.json`` file to allow reference by external validators.
 * Add multiple linting validations with Makefile targets.
 * Add minimal tests with GitHub Actions CI integration.
 
