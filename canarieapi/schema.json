@@ -176,20 +176,96 @@
             "additionalProperties": false,
             "properties": {
                 "request": {
-                    "description": "Describe the request to be done to the component",
+                    "description": "Describe the request to be done to the component. See parameters of 'requests.request' for more details.",
                     "type": "object",
                     "required": ["url"],
                     "additionalProperties": false,
                     "properties": {
                         "url": {"type": "string"},
-                        "method": {"type": "string"},
-                        "params": {"type": "object"},
-                        "headers": {"type": "object"},
+                        "method": {
+                            "type": "string",
+                            "enum": ["GET", "OPTIONS", "HEAD", "POST", "PUT", "PATCH", "DELETE"],
+                            "default": "GET"
+                        },
+                        "params": {
+                            "description": "Query string of the request as key-value pairs or explicitly as single string.",
+                            "oneOf": [
+                                {
+                                    "type": "object",
+                                    "additionalProperties": {"type": "string"}
+                                },
+                                {"type": "string"}
+                            ]
+                        },
+                        "headers": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        },
+                        "cookies": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        },
                         "json": {"type": "object"},
                         "data": {
                             "oneOf": [
                                 {"type": "object"},
                                 {"type": "string"}
+                            ]
+                        },
+                        "timeout": {
+                            "description": "Timeout for the request response, or distinct Connect/Read Timeouts.",
+                            "oneOf": [
+                                {
+                                    "type": "number",
+                                    "minimum": 0,
+                                    "exclusiveMinimum": false
+                                },
+                                {
+                                    "type": "array",
+                                    "items": [
+                                        {
+                                            "type": "number",
+                                            "minimum": 0,
+                                            "exclusiveMinimum": false
+                                        }
+                                    ],
+                                    "minItems": 2,
+                                    "maxItems": 2
+                                }
+                            ]
+                        },
+                        "proxies": {
+                            "description": "Dictionary mapping protocol to the URL of the proxy.",
+                            "type": "object",
+                            "additionalProperties": {"type": "string"}
+                        },
+                        "allow_redirects": {"type": "boolean"},
+                        "stream": {
+                            "description": "If false, the response content will be immediately downloaded.",
+                            "type": "boolean"
+                        },
+                        "verify": {
+                            "description": "Either a boolean, in which case it controls whether we verify the server's TLS certificate, or a string, in which case it must be a path to a CA bundle to use.",
+                            "default": true,
+                            "oneOf": [
+                                {"type": "boolean"},
+                                {"type": "string"}
+                            ]
+                        },
+                        "cert": {
+                            "description": "Path to SSL client certificate file (.pem), or (cert, key) pair.",
+                            "oneOf": [
+                                {"type": "string"},
+                                {
+                                    "type": "array",
+                                    "items": {"type": "string"},
+                                    "minItems": 2,
+                                    "maxItems": 2
+                                }
                             ]
                         }
                     }

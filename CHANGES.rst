@@ -6,6 +6,9 @@ CHANGES
 `Unreleased <https://github.com/Ouranosinc/CanarieAPI/tree/master>`_ (latest)
 ------------------------------------------------------------------------------------
 
+* Support additional ``request`` parameters, formats and validations for arguments provided to monitoring services and
+  platform definitions loaded from the configuration. New parameters include ``timeout``, ``proxies``, ``stream``,
+  ``verify``, ``cert`` and ``allow_redirects`` all supported by ``requests.request`` method and compatible as JSON.
 * Refactor ``canarieapi.test`` into ``canarieapi.schema`` and rename ``test_config`` to ``validate_config_schema``
   to better represent their intended use.
 * Move Python-based configuration schema to ``schema.json`` file to allow reference by external validators.

@@ -133,7 +133,7 @@ def get_canarie_api_response(route_name, api_type, api_request):
     except KeyError:
         pass
 
-    msg = ("The {0} does not provide in it's configuration file a "
+    msg = ("The {0} does not provide in its configuration file a "
            "valid source for the CANARIE request {1}".format(api_type, api_request))
     raise configparser.Error(msg)
 
