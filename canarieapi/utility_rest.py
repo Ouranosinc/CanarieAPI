@@ -35,9 +35,9 @@ def request_wants_json():
     # Best will be JSON if it's in accepted mimetypes and
     # has a quality greater or equal to HTML.
     # For */* both JSON and HTML will have the same quality so JSON still win
-    choices = ['application/json', 'text/html']
+    choices = ["application/json", "text/html"]
     best = request.accept_mimetypes.best_match(choices)
-    return best == 'application/json'
+    return best == "application/json"
 
 
 def set_html_as_default_response():
@@ -54,13 +54,13 @@ def set_html_as_default_response():
     # Best will be HTML if it's in accept mimetypes and
     # has a quality greater or equal to JSON.
     # For */* both JSON and HTML will have the same quality so HTML still wins
-    best = request.accept_mimetypes.best_match(['text/html',
-                                                'application/json'])
+    best = request.accept_mimetypes.best_match(["text/html",
+                                                "application/json"])
     # Replace any */* by HTML so that JSON isn't picked by default
-    if best == 'text/html':
+    if best == "text/html":
         request.accept_mimetypes = \
-            MIMEAccept([('text/html',
-                         request.accept_mimetypes['text/html'])])
+            MIMEAccept([("text/html",
+                         request.accept_mimetypes["text/html"])])
 
 
 def get_config(route_name, api_type):
@@ -73,9 +73,9 @@ def get_config(route_name, api_type):
     :raises: Exception if the route is unknown
     """
     try:
-        return APP.config[api_type.upper() + 'S'][route_name]
+        return APP.config[api_type.upper() + "S"][route_name]
     except KeyError:
-        raise Exception('The request has been made for a {api_type} that is not supported : {route}'
+        raise Exception("The request has been made for a {api_type} that is not supported : {route}"
                         .format(api_type=api_type,
                                 route=route_name))
 
@@ -104,7 +104,7 @@ def get_api_title(route_name, api_type):
 
     title = api_type.capitalize()
     try:
-        name = get_config(route_name, api_type)['info']['name']
+        name = get_config(route_name, api_type)["info"]["name"]
         title = "{}: {}".format(title, name)
     except Exception:
         pass
@@ -123,12 +123,12 @@ def get_canarie_api_response(route_name, api_type, api_request):
     """
 
     # Factsheet is not part of the service API, so it's expected that the config will not be found
-    if api_type == 'service' and api_request == 'factsheet':
+    if api_type == "service" and api_request == "factsheet":
         return make_error_response(html_status=404)
 
     try:
-        cfg_val = get_config(route_name, api_type)['redirect'][api_request]
-        if cfg_val.find('http') == 0:
+        cfg_val = get_config(route_name, api_type)["redirect"][api_request]
+        if cfg_val.find("http") == 0:
             return redirect(cfg_val)
     except KeyError:
         pass
@@ -161,17 +161,17 @@ def make_error_response(html_status=None,
 
     if request_wants_json():
         response = {
-            'status': html_status,
-            'description': html_status_response
+            "status": html_status,
+            "description": html_status_response
         }
         return jsonify(response), html_status
     else:
-        html_response_header = (u'{status} : {resp}'.format(status=html_status,
+        html_response_header = (u"{status} : {resp}".format(status=html_status,
                                                             resp=html_status_response))
 
-        template = render_template('error.html',
-                                   Main_Title='Canarie API',
-                                   Title='Error',
+        template = render_template("error.html",
+                                   Main_Title="Canarie API",
+                                   Title="Error",
                                    html_response=html_response_header)
         return template, html_status
 
@@ -183,9 +183,9 @@ def get_db():
     If the database does not exist, create a connection to local sqlite3 file.
     If the local sqlite3 file doesn't exist, initialize it using a schema.
     """
-    database = getattr(g, '_stats_database', None)
+    database = getattr(g, "_stats_database", None)
     if database is None:
-        d_fn = APP.config['DATABASE']['filename']
+        d_fn = APP.config["DATABASE"]["filename"]
         if path.isabs(d_fn):
             database_fn = d_fn
         else:
@@ -212,14 +212,14 @@ def init_db(database):
     """
     APP.logger.info(u"Initializing database")
     with current_app.app_context():
-        dbs_fn = 'database_schema.sql'
+        dbs_fn = "database_schema.sql"
         if path.isabs(dbs_fn):
             schema_fn = dbs_fn
         else:
             schema_fn = path.join(APP.root_path, dbs_fn)
 
         APP.logger.debug(u"Using schema filename : {0}".format(schema_fn))
-        with current_app.open_resource(schema_fn, mode='r') as schema_f:
+        with current_app.open_resource(schema_fn, mode="r") as schema_f:
             database.cursor().executescript(schema_f.read())
         database.commit()
 
@@ -245,4 +245,4 @@ class AnyIntConverter(BaseConverter):
     def __init__(self, mapping, *items):
         BaseConverter.__init__(self, mapping)
         # Start by enforcing that x is an integer then convert it to string
-        self.regex = '(?:%s)' % '|'.join([str(int(x)) for x in items])
+        self.regex = "(?:%s)" % "|".join([str(int(x)) for x in items])

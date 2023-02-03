@@ -54,17 +54,17 @@ with APP.app_context():
 START_UTC_TIME = datetime.datetime.utcnow().replace(microsecond=0)
 
 # REST requests required by CANARIE
-CANARIE_API_VALID_REQUESTS = ['doc',
-                              'releasenotes',
-                              'support',
-                              'source',
-                              'tryme',
-                              'licence',
-                              'provenance',
-                              'factsheet']
+CANARIE_API_VALID_REQUESTS = ["doc",
+                              "releasenotes",
+                              "support",
+                              "source",
+                              "tryme",
+                              "licence",
+                              "provenance",
+                              "factsheet"]
 
-CANARIE_API_TYPE = ['service',
-                    'platform']
+CANARIE_API_TYPE = ["service",
+                    "platform"]
 
 # HTML errors for which the application provides a custom error page
 HANDLED_HTML_ERRORS = [400, 404, 405, 500, 503]
@@ -114,19 +114,19 @@ def handle_exceptions(exception_instance):
 
 
 # -- Flask routes ------------------------------------------------------------
-APP.url_map.converters['any_int'] = AnyIntConverter
+APP.url_map.converters["any_int"] = AnyIntConverter
 
 
 @APP.route("/")
 def home():
     def parse_config(name, api_type, conf):
         # type: (str, str, dict) -> dict
-        hostname = APP.config['MY_SERVER_NAME']
-        requests = sorted(['info', 'stats', 'status'] + list(conf.get('redirect', {}).keys()))
+        hostname = APP.config["MY_SERVER_NAME"]
+        requests = sorted(["info", "stats", "status"] + list(conf.get("redirect", {}).keys()))
         _content = [
             (
                 request,
-                '{hostname}/{name}/{api_type}/{request}'.format(
+                "{hostname}/{name}/{api_type}/{request}".format(
                     hostname=hostname, name=name, api_type=api_type, request=request
                 )
             )
@@ -135,18 +135,18 @@ def home():
         return collections.OrderedDict(_content)
 
     config = APP.config
-    main_title = APP.config.get('SERVER_MAIN_TITLE', __meta__.__title__)
-    content = dict(Platforms={p["info"]["name"]: parse_config(name, 'platform', p)
-                              for name, p in config['PLATFORMS'].items()},
-                   Services={s["info"]["name"]: parse_config(name, 'service', s)
-                             for name, s in config['SERVICES'].items()})
-    return render_template('home.html', Main_Title=main_title, Title="Home", Content=content)
+    main_title = APP.config.get("SERVER_MAIN_TITLE", __meta__.__title__)
+    content = dict(Platforms={p["info"]["name"]: parse_config(name, "platform", p)
+                              for name, p in config["PLATFORMS"].items()},
+                   Services={s["info"]["name"]: parse_config(name, "service", s)
+                             for name, s in config["SERVICES"].items()})
+    return render_template("home.html", Main_Title=main_title, Title="Home", Content=content)
 
 
 @APP.route("/test")
 def manual_test():
     validate_config_schema(True)
-    return redirect(APP.config['MY_SERVER_NAME'])
+    return redirect(APP.config["MY_SERVER_NAME"])
 
 
 @APP.route("/<any_int(" + HANDLED_HTML_ERRORS_STR + "):status_code_str>")
@@ -176,29 +176,29 @@ def information(route_name, api_type):
 
     validate_route(route_name, api_type)
 
-    info_categories = ['name',
-                       'synopsis',
-                       'version',
-                       'institution',
-                       'releaseTime',
-                       'researchSubject',
-                       'supportEmail',
-                       'tags']
+    info_categories = ["name",
+                       "synopsis",
+                       "version",
+                       "institution",
+                       "releaseTime",
+                       "researchSubject",
+                       "supportEmail",
+                       "tags"]
 
-    if api_type == 'service':
-        info_categories.append('category')
+    if api_type == "service":
+        info_categories.append("category")
 
-    config = get_config(route_name, api_type).get('info', {})
+    config = get_config(route_name, api_type).get("info", {})
     info = []
     for category in info_categories:
-        cat = config.get(category, '')
+        cat = config.get(category, "")
         info.append((category, cat))
 
     info = collections.OrderedDict(info)
 
     if request_wants_json():
         return jsonify(info)
-    return render_template('default.html', Main_Title=get_api_title(route_name, api_type), Title="Info", Tags=info)
+    return render_template("default.html", Main_Title=get_api_title(route_name, api_type), Title="Info", Tags=info)
 
 
 def get_status(route_name):
@@ -207,7 +207,7 @@ def get_status(route_name):
 
     # Gather service(s) status
     all_status = {}
-    query = 'select service, status, message from status where route = ?'
+    query = "select service, status, message from status where route = ?"
     try:
         cur.execute(query, [route_name])
         rv = cur.fetchall()
@@ -241,39 +241,39 @@ def stats(route_name, api_type):
     all_status = get_status(route_name)
 
     # Status can be 'ok', 'bad' or 'down'
-    if not all(all_status[service]['status'] == Status.ok for service in all_status):
-        message = ', '.join(['{0} : {1}'.format(service, Status.pretty_msg(all_status[service]['status']))
+    if not all(all_status[service]["status"] == Status.ok for service in all_status):
+        message = ", ".join(["{0} : {1}".format(service, Status.pretty_msg(all_status[service]["status"]))
                              for service in all_status])
         return make_error_response(html_status=503,
                                    html_status_response=message)
 
     # Gather route stats
     invocations = 0
-    last_access = 'Never'
-    query = 'select invocations, last_access from stats where route = ?'
+    last_access = "Never"
+    query = "select invocations, last_access from stats where route = ?"
     try:
         cur.execute(query, [route_name])
         rv = cur.fetchall()
         if rv:
             invocations = rv[0][0]
-            last_access = dt_parse(rv[0][1]).replace(tzinfo=None).isoformat() + 'Z'
+            last_access = dt_parse(rv[0][1]).replace(tzinfo=None).isoformat() + "Z"
     except Exception as e:
         APP.logger.error(str(e))
         pass
 
     # Check last time cron job have run (help to diagnose cron problem)
-    last_log_update = 'Never'
-    last_status_update = 'Never'
-    query = 'select job, last_execution from cron'
+    last_log_update = "Never"
+    last_status_update = "Never"
+    query = "select job, last_execution from cron"
     try:
         cur.execute(query)
         rv = cur.fetchall()
         if rv:
             for record in rv:
-                if record[0] == 'log':
-                    last_log_update = dt_parse(record[1]).isoformat() + 'Z'
-                elif record[0] == 'status':
-                    last_status_update = dt_parse(record[1]).isoformat() + 'Z'
+                if record[0] == "log":
+                    last_log_update = dt_parse(record[1]).isoformat() + "Z"
+                elif record[0] == "status":
+                    last_status_update = dt_parse(record[1]).isoformat() + "Z"
 
     except Exception as e:
         APP.logger.error(str(e))
@@ -282,19 +282,19 @@ def stats(route_name, api_type):
     cur.close()
 
     monitor_info = [
-        ('lastAccess', last_access),
-        ('lastInvocationsUpdate', last_log_update),
-        ('lastStatusUpdate', last_status_update)
+        ("lastAccess", last_access),
+        ("lastInvocationsUpdate", last_log_update),
+        ("lastStatusUpdate", last_status_update)
     ]
     for service in all_status:
-        monitor_info.append((service, Status.pretty_msg(all_status[service]['status'])))
+        monitor_info.append((service, Status.pretty_msg(all_status[service]["status"])))
 
     monitor_info = collections.OrderedDict(monitor_info)
 
     service_stats = [
-        ('lastReset', START_UTC_TIME.isoformat() + 'Z'),
-        ('invocations', invocations),
-        ('monitoring', monitor_info)
+        ("lastReset", START_UTC_TIME.isoformat() + "Z"),
+        ("invocations", invocations),
+        ("monitoring", monitor_info)
     ]
     service_stats = collections.OrderedDict(service_stats)
 
@@ -302,7 +302,7 @@ def stats(route_name, api_type):
         return jsonify(service_stats)
 
     return render_template(
-        'default.html',
+        "default.html",
         Main_Title=get_api_title(route_name, api_type),
         Title="Stats",
         Tags=service_stats,
@@ -327,13 +327,13 @@ def status(route_name, api_type):
     all_status = get_status(route_name)
 
     # Check last time cron job have run (help to diagnose cron problem)
-    last_status_update = 'Never'
+    last_status_update = "Never"
     query = "select last_execution from cron where job == 'status'"
     try:
         cur.execute(query)
         rv = cur.fetchall()
         if rv:
-            last_status_update = dt_parse(rv[0][0]).isoformat() + 'Z'
+            last_status_update = dt_parse(rv[0][0]).isoformat() + "Z"
     except Exception as e:
         APP.logger.error(str(e))
         pass
@@ -341,12 +341,12 @@ def status(route_name, api_type):
     cur.close()
 
     monitor_info = [
-        ('lastStatusUpdate', last_status_update)
+        ("lastStatusUpdate", last_status_update)
     ]
     for service in all_status:
-        status_msg = Status.pretty_msg(all_status[service]['status'])
-        if all_status[service]['status'] != Status.ok:
-            status_msg += ' : {0}'.format(all_status[service]['message'])
+        status_msg = Status.pretty_msg(all_status[service]["status"])
+        if all_status[service]["status"] != Status.ok:
+            status_msg += " : {0}".format(all_status[service]["message"])
         monitor_info.append((service, status_msg))
 
     monitor_info = collections.OrderedDict(monitor_info)
@@ -354,13 +354,13 @@ def status(route_name, api_type):
     if request_wants_json():
         return jsonify(monitor_info)
 
-    return render_template('default.html', Main_Title=get_api_title(route_name, api_type), Title="Status",
+    return render_template("default.html", Main_Title=get_api_title(route_name, api_type), Title="Status",
                            Tags=monitor_info)
 
 
 @APP.route("/<route_name>/<any(" + ",".join(CANARIE_API_TYPE) + "):api_type>/<any(" +
            ",".join(CANARIE_API_VALID_REQUESTS) + "):api_request>")
-def simple_requests_handler(route_name, api_type, api_request='home'):
+def simple_requests_handler(route_name, api_type, api_request="home"):
     """
     #Handle simple requests required by CANARIE.
     """

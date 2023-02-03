@@ -38,8 +38,8 @@ def main():
     Command line entry point.
     """
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--destination',
-                        action='store',
+    parser.add_argument("--destination",
+                        action="store",
                         default=DOC_DESTINATION,
                         help="Where the static version of the documentation "
                              "will be sent, "
@@ -49,5 +49,5 @@ def main():
     send_static(destination=args.destination)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

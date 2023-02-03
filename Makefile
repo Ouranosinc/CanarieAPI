@@ -115,7 +115,7 @@ mkdir-reports:
 	@mkdir -p "$(REPORTS_DIR)"
 
 # autogen check variants with pre-install of dependencies using the '-only' target references
-CHECKS := pep8 lint security security-code security-deps doc8 docf links imports css
+CHECKS := pep8 lint quotes security security-code security-deps doc8 docf links imports css
 CHECKS := $(addprefix check-, $(CHECKS))
 
 $(CHECKS): check-%: install-dev check-%-only
@@ -147,8 +147,20 @@ check-lint-only: mkdir-reports		## run linting code style checks
 			--load-plugins pylint_quotes \
 			--rcfile="$(APP_ROOT)/.pylintrc" \
 			--reports y \
-			"$(APP_ROOT)/$(APP_NAME)" "$(APP_ROOT)/$(APP_NAME)/alembic" "$(APP_ROOT)/docs" "$(APP_ROOT)/tests" \
+			"$(APP_ROOT)/$(APP_NAME)" "$(APP_ROOT)/docs" "$(APP_ROOT)/tests" \
 		1> >(tee "$(REPORTS_DIR)/check-lint.txt")'
+
+.PHONY: check-quotes-only
+check-quotes-only: mkdir-reports	## run quotes style checks
+	@echo "Running quotes style checks..."
+	@-rm -fr "$(REPORTS_DIR)/check-quotes.txt"
+	@bash -c '$(CONDA_CMD) \
+		unify \
+			--check-only \
+			--recursive \
+			--quote \" \
+			"$(APP_ROOT)/$(APP_NAME)" "$(APP_ROOT)/docs" "$(APP_ROOT)/tests" \
+		1> >(tee "$(REPORTS_DIR)/check-quotes.txt")'
 
 .PHONY: check-security-only
 check-security-only: check-security-code-only check-security-deps-only  ## run security checks
@@ -239,7 +251,7 @@ check-css-only: mkdir-reports install-npm
 		"$(APP_ROOT)/**/*.css"
 
 # autogen fix variants with pre-install of dependencies using the '-only' target references
-FIXES := imports lint docf css
+FIXES := imports lint quotes docf css
 FIXES := $(addprefix fix-, $(FIXES))
 
 $(FIXES): fix-%: install-dev fix-%-only
@@ -270,6 +282,18 @@ fix-lint-only: mkdir-reports	## fix some PEP8 code style problems automatically
 	@bash -c '$(CONDA_CMD) \
 		autopep8 -v -j 0 -i -r $(APP_ROOT) \
 		1> >(tee "$(REPORTS_DIR)/fixed-lint.txt")'
+
+.PHONY: fix-quotes-only
+fix-quotes-only: mkdir-reports	## fix quotes style problems automatically
+	@echo "Fixing quotes style problems..."
+	@-rm -fr "$(REPORTS_DIR)/fixed-quotes.txt"
+	@bash -c '$(CONDA_CMD) \
+		unify \
+			--in-place \
+			--recursive \
+			--quote \" \
+			"$(APP_ROOT)/$(APP_NAME)" "$(APP_ROOT)/docs" "$(APP_ROOT)/tests" \
+		1> >(tee "$(REPORTS_DIR)/fixed-quotes.txt")'
 
 # FIXME: move parameters to setup.cfg when implemented (https://github.com/myint/docformatter/issues/10)
 .PHONY: fix-docf-only

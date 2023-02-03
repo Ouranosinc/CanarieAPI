@@ -71,6 +71,6 @@ class TestCanarieAPI(unittest.TestCase):
         assert "Ok" in resp.text  # monitored app reached successfully with HTTP OK 200 returned
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
     sys.exit(unittest.main())

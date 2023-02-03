@@ -41,29 +41,29 @@ from canarieapi import __version__  # noqa
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.todo',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.intersphinx'
+    "sphinx.ext.autodoc",
+    "sphinx.ext.todo",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.intersphinx"
 ]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 todo_include_todos = True
 
 # The suffix of source filenames.
-source_suffix = '.rst'
+source_suffix = ".rst"
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = "index"
 
 # General information about the project.
-project = u'CanarieAPI'
-copyright = u'2017, David Byrns'
+project = u"CanarieAPI"
+copyright = u"2017, David Byrns"
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -86,7 +86,7 @@ release = __version__
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build']
+exclude_patterns = ["_build"]
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -104,7 +104,7 @@ exclude_patterns = ['_build']
 # show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
@@ -118,7 +118,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'alabaster'
+html_theme = "alabaster"
 
 # Theme options are theme-specific and customize the look and feel of a
 # theme further.  For a list of options available for each theme, see the
@@ -137,7 +137,7 @@ html_theme = 'alabaster'
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = '_static/logo_crim_FR.png'
+html_logo = "_static/logo_crim_FR.png"
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -147,7 +147,7 @@ html_logo = '_static/logo_crim_FR.png'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -196,7 +196,7 @@ html_static_path = ['_static']
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'canarieapidoc'
+htmlhelp_basename = "canarieapidoc"
 
 
 # -- Options for LaTeX output ------------------------------------------
@@ -216,9 +216,9 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    ('index', 'canarieapi.tex',
-     u'CanarieAPI Documentation',
-     u'David Byrns', 'manual'),
+    ("index", "canarieapi.tex",
+     u"CanarieAPI Documentation",
+     u"David Byrns", "manual"),
 ]
 
 # The name of an image file (relative to this directory) to place at
@@ -247,9 +247,9 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'canarieapi',
-     u'CanarieAPI Documentation',
-     [u'David Byrns'], 1)
+    ("index", "canarieapi",
+     u"CanarieAPI Documentation",
+     [u"David Byrns"], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -262,12 +262,12 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    ('index', 'canarieapi',
-     u'CanarieAPI Documentation',
-     u'David Byrns',
-     'canarieapi',
-     'One line description of project.',
-     'Miscellaneous'),
+    ("index", "canarieapi",
+     u"CanarieAPI Documentation",
+     u"David Byrns",
+     "canarieapi",
+     "One line description of project.",
+     "Miscellaneous"),
 ]
 
 # Documents to append as an appendix to all manuals.
