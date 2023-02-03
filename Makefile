@@ -220,15 +220,6 @@ check-docf-only: mkdir-reports	## run PEP8 code documentation format checks
 			"$(APP_ROOT)" \
 		1>&2 2> >(tee "$(REPORTS_DIR)/check-docf.txt")'
 
-# FIXME: no configuration file support
-define FLYNT_FLAGS
---line-length 120 \
---verbose
-endef
-ifeq ($(shell test $(PYTHON_VERSION_MAJOR) -eq 3 && test $(PYTHON_VERSION_MINOR) -ge 8; echo $$?),0)
-  FLYNT_FLAGS := $(FLYNT_FLAGS) --transform-concats
-endif
-
 .PHONY: check-links-only
 check-links-only: mkdir-reports		## run check of external links in documentation for integrity
 	@echo "Running link checks on docs..."
