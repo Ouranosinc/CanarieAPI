@@ -108,17 +108,17 @@ jobs:
       - name: Display Packages
         if: ${{ matrix.python-version != 'none' }}
         run: pip freeze
-      - name: Setup Environment Variables
-        uses: c-py/action-dotenv-to-setenv@v2
-        with:
-          env-file: ./ci/magpie.env
+#      - name: Setup Environment Variables
+#        uses: c-py/action-dotenv-to-setenv@v2
+#        with:
+#          env-file: ./ci/canarieapi.env
       - name: Display Environment Variables
         run: |
           hash -r
           env | sort
       # run '-only' test variations since dependencies are preinstalled, skip some resolution time
       - name: Run Tests
-        run: ${{ matrix.test-option }} make stop ${{ matrix.test-case }}-only
+        run: ${{ matrix.test-option }} make ${{ matrix.test-case }}-only
       - name: Upload coverage report
         uses: codecov/codecov-action@v2
         if: ${{ success() && matrix.test-case == 'coverage' }}
