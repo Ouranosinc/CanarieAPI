@@ -314,20 +314,26 @@ fix-css-only: mkdir-reports install-npm		## fix CSS styles problems automaticall
 
 ## --- Testing targets --- ##
 
-.PHONY: test
-test: install-req install-dev  ## run tests quickly with the default Python
+.PHONY: test-only
+test-only:  ## run tests without dependencies pre-installation
 	python setup.py test
+
+.PHONY: test
+test: install-req install-dev test-only  ## run tests quickly with the default Python
 
 .PHONY: test-all
 test-all: install-req install-dev  ## run tests on every Python version with tox
 	tox
 
-.PHONY: coverage
-coverage: install-req install-dev  ## check code coverage quickly with the default Python
+.PHONY: coverage-only
+coverage-only:  ## check code coverage without dependencies pre-installation
 	coverage run --source "$(APP_NAME)" setup.py test
 	coverage report -m
 	coverage html
 	$(BROWSER) htmlcov/index.html
+
+.PHONY: coverage
+coverage: install-req install-dev coverage-only  ## check code coverage quickly with the default Python
 
 ## --- Documentation targets --- ##
 

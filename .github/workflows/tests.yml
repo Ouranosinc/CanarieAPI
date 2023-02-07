@@ -50,7 +50,7 @@ jobs:
         os: [ubuntu-latest]
         python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
         allow-failure: [false]
-        test-case: [test-local]
+        test-case: [test]
         # can use below option to set environment variables or makefile settings applied during test execution
         test-option: [""]
         include:
@@ -59,11 +59,6 @@ jobs:
             python-version: 3.7
             allow-failure: false
             test-case: check
-          # remote test
-          - os: ubuntu-latest
-            python-version: 3.7
-            allow-failure: true
-            test-case: start test-remote
           # coverage test
           - os: ubuntu-latest
             python-version: 3.7
@@ -76,18 +71,22 @@ jobs:
             test-case: test-docker
           # test allowed failing for legacy versions
           - os: ubuntu-20.04
+            python-version: 2.7
+            allow-failure: true
+            test-case: test
+          - os: ubuntu-20.04
             python-version: 3.5
             allow-failure: true
-            test-case: test-local
+            test-case: test
           - os: ubuntu-20.04
             python-version: 3.6
             allow-failure: true
-            test-case: test-local
+            test-case: test
           # test allowed failing for recent versions
           # - os: ubuntu-latest
           #   python-version: 3.12
           #   allow-failure: true
-          #   test-case: test-local
+          #   test-case: test
     steps:
       - uses: actions/checkout@v3
         with:
