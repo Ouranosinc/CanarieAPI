@@ -26,7 +26,7 @@ APP_VERSION ?= 0.4.4
 APP_DOCKER_REPO := pavics/canarieapi
 APP_DOCKER_TAG  := $(APP_DOCKER_REPO):$(APP_VERSION)
 APP_LATEST_TAG  := $(APP_DOCKER_REPO):latest
-
+APP_DOCKER_TEST := canarieapi-test
 
 # Auto documented help targets & sections from comments
 #	- detects lines marked by double octothorpe (#), then applies the corresponding target/section markup
@@ -325,6 +325,12 @@ test: install-req install-dev test-only  ## run tests quickly with the default P
 test-all: install-req install-dev  ## run tests on every Python version with tox
 	tox
 
+.PHONY: test-docker
+test-docker: docker-test  ## run test with docker (alias for 'docker-test' target) - WARNING: build image if missing
+
+# for consistency only with other test
+test-docker-only: test-docker ## run test with docker (alias for 'docker-test' target) - WARNING: build image if missing
+
 .PHONY: coverage-only
 coverage-only:  ## check code coverage without dependencies pre-installation
 	coverage run --source "$(APP_NAME)" setup.py test
@@ -407,4 +413,21 @@ docker-push: docker-build  ## push the built docker image
 
 .PHONY: docker-clean
 docker-clean: 	## remove any leftover images from docker target operations
-	docker rmi $(docker images -f "reference=$(APP_DOCKER_REPO)" -q)
+	-docker rmi "$(docker images -f "reference=$(APP_DOCKER_REPO)" -q)"
+
+.PHONY: docker-stop
+docker-stop:
+	@echo "Stopping test docker container: $(APP_DOCKER_TEST)"
+	-docker container stop "$(APP_DOCKER_TEST)" 2>/dev/null || true
+	-docker rm $(APP_DOCKER_TEST) 2>/dev/null || true
+
+.PHONY: docker-test
+docker-test: docker-build docker-stop docker-clean
+	@echo "Smoke test of docker image: $(DOCKER_TAG)"
+	docker run --pull never --name "$(APP_DOCKER_TEST)" -p 2000:2000 -d "$(APP_DOCKER_TAG)"
+	@sleep 2
+	@echo "Testing docker image..."
+	(curl http://localhost:2000 | grep "Canarie API" && \
+	  $(MAKE) docker-stop --no-print-directory || \
+	 ($(MAKE) docker-stop --no-print-directory && \
+	  echo "Failed to obtain expected response from CanarieAPI docker"; exit 1 ))
