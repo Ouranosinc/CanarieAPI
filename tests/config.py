@@ -20,3 +20,6 @@ SERVICES = {
 }
 for name, svc in SERVICES.items():
     svc["info"]["name"] = name
+
+# avoid errors triggered by sample config during tests
+PLATFORMS.clear()
