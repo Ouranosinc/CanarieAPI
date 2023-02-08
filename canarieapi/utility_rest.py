@@ -113,7 +113,7 @@ def get_api_title(route_name, api_type):
 
 def get_canarie_api_response(route_name, api_type, api_request):
     """
-    Provide a valid HTML response for the CANARIE API request based on the service route.
+    Provide a valid response for the CANARIE API request based on the service route.
 
     :param route_name: Route name of the service/platform coming from the URL e.g. :
                           ['pavics', 'node', 'bias', etc.]
@@ -124,7 +124,7 @@ def get_canarie_api_response(route_name, api_type, api_request):
 
     # Factsheet is not part of the service API, so it's expected that the config will not be found
     if api_type == "service" and api_request == "factsheet":
-        return make_error_response(html_status=404)
+        return make_error_response(http_status=404)
 
     try:
         cfg_val = get_config(route_name, api_type)["redirect"][api_request]
@@ -138,42 +138,42 @@ def get_canarie_api_response(route_name, api_type, api_request):
     raise configparser.Error(msg)
 
 
-def make_error_response(html_status=None,
-                        html_status_response=None):
+def make_error_response(http_status=None,
+                        http_status_response=None):
     """
     Make an error response based on the request type and given information.
 
-    :param html_status: HTML status
-    :param html_status_response: Standard message associated with a status
+    :param http_status: HTTP status
+    :param http_status_response: Standard message associated with a status
                 code. Obtained via :py:data:`http.client.responses` if not
                 provided.
     """
 
     # If the status response is None use the one provide by http.client
-    if html_status_response is None:
-        html_status_response = http.client.responses[html_status]
-    # Else, check if html_status_response already contains the HTML status code
+    if http_status_response is None:
+        http_status_response = http.client.responses[http_status]
+    # Else, check if http_status_response already contains the HTML status code
     else:
-        match = re.search("^([0-9]*):? *(.*)$", html_status_response)
-        if match and match.group(1) == str(html_status):
+        match = re.search("^([0-9]*):? *(.*)$", http_status_response)
+        if match and match.group(1) == str(http_status):
             # In which case it is removed from the response
-            html_status_response = match.group(2)
+            http_status_response = match.group(2)
 
     if request_wants_json():
         response = {
-            "status": html_status,
-            "description": html_status_response
+            "status": http_status,
+            "description": http_status_response
         }
-        return jsonify(response), html_status
+        return jsonify(response), http_status
     else:
-        html_response_header = (u"{status} : {resp}".format(status=html_status,
-                                                            resp=html_status_response))
+        html_response_header = (u"{status} : {resp}".format(status=http_status,
+                                                            resp=http_status_response))
 
         template = render_template("error.html",
                                    Main_Title="Canarie API",
                                    Title="Error",
                                    html_response=html_response_header)
-        return template, html_status
+        return template, http_status
 
 
 def get_db():
@@ -239,7 +239,7 @@ class AnyIntConverter(BaseConverter):
 
        1,2,3
 
-    Since it would parse as float 1,2 and 3 .
+    Since it would parse as float 1,2 and 3.
     """
 
     def __init__(self, mapping, *items):

@@ -87,8 +87,8 @@ for status_code in HANDLED_HTML_ERRORS:
     APP.error_handler_spec[None].setdefault(status_code, {})
     APP.error_handler_spec[None][status_code][Exception] = \
         lambda more_info, status_code_copy = status_code: \
-        make_error_response(html_status=status_code_copy,
-                            html_status_response=str(more_info))
+        make_error_response(http_status=status_code_copy,
+                            http_status_response=str(more_info))
 
 
 # avoid error on missing None key for Exception in Flask>2
@@ -109,8 +109,8 @@ def handle_exceptions(exception_instance):
         raise
     template = "An exception of type {0} occurred. Arguments:\n{1!r}"
     message = template.format(type(exception_instance).__name__, exception_instance.args)
-    return make_error_response(html_status=400,
-                               html_status_response=message)
+    return make_error_response(http_status=400,
+                               http_status_response=message)
 
 
 # -- Flask routes ------------------------------------------------------------
@@ -162,7 +162,7 @@ def extern_html_error_handler(status_code_str):
 
        ErrorDocument 400 <Rest root>/400
     """
-    return make_error_response(html_status=int(status_code_str))
+    return make_error_response(http_status=int(status_code_str))
 
 
 @APP.route("/<route_name>/<any(" + ",".join(CANARIE_API_TYPE) + "):api_type>/info")
@@ -244,8 +244,8 @@ def stats(route_name, api_type):
     if not all(all_status[service]["status"] == Status.ok for service in all_status):
         message = ", ".join(["{0} : {1}".format(service, Status.pretty_msg(all_status[service]["status"]))
                              for service in all_status])
-        return make_error_response(html_status=503,
-                                   html_status_response=message)
+        return make_error_response(http_status=503,
+                                   http_status_response=message)
 
     # Gather route stats
     invocations = 0
