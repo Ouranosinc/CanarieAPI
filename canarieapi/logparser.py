@@ -29,7 +29,7 @@ def rotate_log(filename):
             logger.info("nginx pid is {0}".format(int(pid)))
     except IOError:
         # If nginx is not running no needs to force the log reload
-        logger.warn("No pid found!")
+        logger.warning("No pid found!")
         return
 
     # Send SIGUSR1 to nginx to force the log reload

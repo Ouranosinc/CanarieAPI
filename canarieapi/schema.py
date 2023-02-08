@@ -45,7 +45,7 @@ def validate_config_schema(update_db):
         if invocs > 0:
             logger.info("Found {0} invocations to route {1} in {2} log files".format(invocs, route, file_checked))
         else:
-            logger.warn("Found no invocations to route {0} in {1} log files".format(route, file_checked))
+            logger.warning("Found no invocations to route {0} in {1} log files".format(route, file_checked))
     if not route_invocations:
-        logger.warn("Found no invocations at all in {0} log files".format(file_checked))
+        logger.warning("Found no invocations at all in {0} log files".format(file_checked))
     logger.info("Tests completed!")

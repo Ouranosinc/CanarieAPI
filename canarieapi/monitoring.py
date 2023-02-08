@@ -69,7 +69,7 @@ def check_service(request, response):
         r = requests.request(**default_request)
     except ConnectionError as e:
         message = "Cannot reach {0} : {1}".format(default_request["url"], str(e))
-        logger.warn(message)
+        logger.warning(message)
         return Status.down, message
 
     if r.status_code != default_response["status_code"]:
@@ -77,7 +77,7 @@ def check_service(request, response):
             default_request["url"],
             default_response["status_code"],
             r.status_code)
-        logger.warn(message)
+        logger.warning(message)
         return Status.bad, message
 
     if default_response["text"]:
@@ -87,7 +87,7 @@ def check_service(request, response):
                 default_request["url"],
                 default_response["text"],
                 r.text)
-            logger.warn(message)
+            logger.warning(message)
             return Status.bad, message
     return Status.ok, ""
 
