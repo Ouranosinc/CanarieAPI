@@ -21,8 +21,8 @@ https://collaboration.canarie.ca/elgg/discussion/view/3664/research-software-api
 import collections
 import datetime
 
-from dateutil.parser import parse as dt_parse
 # -- 3rd party ---------------------------------------------------------------
+from dateutil.parser import parse as dt_parse
 from flask import jsonify, redirect, render_template
 
 # -- Project specific --------------------------------------------------------
