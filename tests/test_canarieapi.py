@@ -70,6 +70,22 @@ class TestCanarieAPI(unittest.TestCase):
         assert "Bad" not in resp.text
         assert "Ok" in resp.text  # monitored app reached successfully with HTTP OK 200 returned
 
+    def test_service_status_json_query_string(self):
+        name = list(self.app.config["SERVICES"])[0]
+        resp = self.web.get("/{}/service/status".format(name), params={"f": "json"})
+        assert resp.status_code == 200
+        assert resp.content_type == "application/json"
+        assert resp.json["Component"] == "Ok"
+        assert resp.json["lastStatusUpdate"] != "Never"
+
+    def test_service_status_json_accept_header(self):
+        name = list(self.app.config["SERVICES"])[0]
+        resp = self.web.get("/{}/service/status".format(name), headers={"Accept": "application/json"})
+        assert resp.status_code == 200
+        assert resp.content_type == "application/json"
+        assert resp.json["Component"] == "Ok"
+        assert resp.json["lastStatusUpdate"] != "Never"
+
 
 if __name__ == "__main__":
     import sys
