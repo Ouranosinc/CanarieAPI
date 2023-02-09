@@ -28,7 +28,7 @@ from flask import jsonify, redirect, render_template
 # -- Project specific --------------------------------------------------------
 from canarieapi import __meta__
 from canarieapi.app_object import APP
-from canarieapi.schema import validate_config_schema
+from canarieapi.schema import CONFIGURATION_SCHEMA, validate_config_schema
 from canarieapi.status import Status
 from canarieapi.utility_rest import (
     AnyIntConverter,
@@ -54,17 +54,11 @@ with APP.app_context():
 START_UTC_TIME = datetime.datetime.utcnow().replace(microsecond=0)
 
 # REST requests required by CANARIE
-CANARIE_API_VALID_REQUESTS = ["doc",
-                              "releasenotes",
-                              "support",
-                              "source",
-                              "tryme",
-                              "licence",
-                              "provenance",
-                              "factsheet"]
-
-CANARIE_API_TYPE = ["service",
-                    "platform"]
+CANARIE_API_TYPE = ["service", "platform"]
+CANARIE_API_VALID_REQUESTS = set()
+for _api_type in CANARIE_API_TYPE:
+    _required = CONFIGURATION_SCHEMA["definitions"]["{}_redirect_schema".format(_api_type)]["required"]
+    CANARIE_API_VALID_REQUESTS |= set(_required)
 
 # HTML errors for which the application provides a custom error page
 HANDLED_HTML_ERRORS = [400, 404, 405, 500, 503]
@@ -176,17 +170,8 @@ def information(route_name, api_type):
 
     validate_route(route_name, api_type)
 
-    info_categories = ["name",
-                       "synopsis",
-                       "version",
-                       "institution",
-                       "releaseTime",
-                       "researchSubject",
-                       "supportEmail",
-                       "tags"]
-
-    if api_type == "service":
-        info_categories.append("category")
+    info_schema = "{}_info_schema".format(api_type)
+    info_categories = CONFIGURATION_SCHEMA["definitions"][info_schema]["required"]
 
     config = get_config(route_name, api_type).get("info", {})
     info = []

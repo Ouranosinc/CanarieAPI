@@ -16,8 +16,8 @@ import re
 import sqlite3
 from os import path, remove
 
-from flask import current_app, g, jsonify, redirect, render_template, request
 # -- 3rd party ---------------------------------------------------------------
+from flask import current_app, g, jsonify, redirect, render_template, request
 from werkzeug.datastructures import MIMEAccept
 from werkzeug.routing import BaseConverter
 
@@ -58,9 +58,7 @@ def set_html_as_default_response():
                                                 "application/json"])
     # Replace any */* by HTML so that JSON isn't picked by default
     if best == "text/html":
-        request.accept_mimetypes = \
-            MIMEAccept([("text/html",
-                         request.accept_mimetypes["text/html"])])
+        request.accept_mimetypes = MIMEAccept([("text/html", request.accept_mimetypes["text/html"])])
 
 
 def get_config(route_name, api_type):
