@@ -8,16 +8,20 @@ This module implements a middleware that makes the Flask application work
 seamlessly behind a reverse proxy.
 """
 
+from typing import Any, Callable, Dict
+
+from flask import Response
+
 
 class ReverseProxied(object):
     """
-    Class which implements a middleware so flask can be used behind a reverse proxy.
+    Class which implements a middleware so :mod:`Flask` can be used behind a reverse proxy.
     """
 
-    def __init__(self, app):
+    def __init__(self, app: Any) -> None:
         self.app = app
 
-    def __call__(self, environ, start_response):
+    def __call__(self, environ: Dict[str, str], start_response: Callable) -> Response:
         script_name = environ.get("HTTP_X_SCRIPT_NAME", None)
 
         if script_name is not None:

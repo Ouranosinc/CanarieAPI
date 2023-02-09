@@ -15,17 +15,23 @@ import http.client
 import re
 import sqlite3
 from os import path, remove
+from typing import Dict, List, Optional, Tuple, Union
+from typing_extensions import Literal, TypeAlias
 
 # -- 3rd party ---------------------------------------------------------------
-from flask import current_app, g, jsonify, redirect, render_template, request
+from flask import Response, current_app, g, jsonify, redirect, render_template, request
 from werkzeug.datastructures import MIMEAccept
-from werkzeug.routing import BaseConverter
+from werkzeug.routing import BaseConverter, Map
 
 # -- Project specific --------------------------------------------------------
 from canarieapi.app_object import APP
 
+APIType = Literal["platform", "service"]
+_JSON: TypeAlias = "JSON"
+JSON = Union[Dict[str, Union[Dict[str, _JSON], List[_JSON], _JSON, float, int, str, bool, None]], _JSON]
 
-def request_wants_json():
+
+def request_wants_json() -> bool:
     """
     Check if the request type is of type JSON.
 
@@ -40,7 +46,7 @@ def request_wants_json():
     return request.args.get("f", "").lower() == "json" or best == "application/json"
 
 
-def set_html_as_default_response():
+def set_html_as_default_response() -> None:
     """
     Set the default response Media-Type, with fallback to JSON.
 
@@ -61,7 +67,7 @@ def set_html_as_default_response():
         request.accept_mimetypes = MIMEAccept([("text/html", request.accept_mimetypes["text/html"])])
 
 
-def get_config(route_name, api_type):
+def get_config(route_name: str, api_type: APIType) -> JSON:
     """
     Return the config for the particular service/platform associated with the given route name.
 
@@ -78,7 +84,7 @@ def get_config(route_name, api_type):
                                 route=route_name))
 
 
-def validate_route(route_name, api_type):
+def validate_route(route_name: str, api_type: APIType) -> None:
     """
     Check if the route name is a value amongst known services/platforms in the configuration.
 
@@ -90,7 +96,7 @@ def validate_route(route_name, api_type):
     get_config(route_name, api_type)
 
 
-def get_api_title(route_name, api_type):
+def get_api_title(route_name: str, api_type: APIType) -> str:
     """
     Get the API title to be shown in rendered html page.
 
@@ -136,8 +142,10 @@ def get_canarie_api_response(route_name, api_type, api_request):
     raise configparser.Error(msg)
 
 
-def make_error_response(http_status=None,
-                        http_status_response=None):
+def make_error_response(
+    http_status: Optional[int] = None,
+    http_status_response: Optional[str] = None,
+) -> Tuple[Union[Response, str], int]:
     """
     Make an error response based on the request type and given information.
 
@@ -146,6 +154,8 @@ def make_error_response(http_status=None,
                 code. Obtained via :py:data:`http.client.responses` if not
                 provided.
     """
+    if http_status is None or http_status < 100:
+        http_status = 500
 
     # If the status response is None use the one provide by http.client
     if http_status_response is None:
@@ -164,9 +174,7 @@ def make_error_response(http_status=None,
         }
         return jsonify(response), http_status
     else:
-        html_response_header = (u"{status} : {resp}".format(status=http_status,
-                                                            resp=http_status_response))
-
+        html_response_header = f"{http_status} : {http_status_response}"
         template = render_template("error.html",
                                    Main_Title="Canarie API",
                                    Title="Error",
@@ -174,7 +182,7 @@ def make_error_response(http_status=None,
         return template, http_status
 
 
-def get_db():
+def get_db() -> sqlite3.Connection:
     """
     Get a connection to an existing database.
 
@@ -204,7 +212,7 @@ def get_db():
     return database
 
 
-def init_db(database):
+def init_db(database: sqlite3.Connection) -> None:
     """
     Initialize a database from a schema.
     """
@@ -240,7 +248,7 @@ class AnyIntConverter(BaseConverter):
     Since it would parse as float 1,2 and 3.
     """
 
-    def __init__(self, mapping, *items):
+    def __init__(self, mapping: Map, *items: Union[int, str]) -> None:
         BaseConverter.__init__(self, mapping)
         # Start by enforcing that x is an integer then convert it to string
         self.regex = "(?:%s)" % "|".join([str(int(x)) for x in items])

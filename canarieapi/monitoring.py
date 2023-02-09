@@ -1,16 +1,35 @@
 # -- Standard lib ------------------------------------------------------------
 import re
+from typing import Dict, Optional, Tuple, Union
+from typing_extensions import Literal, NotRequired, Required, TypedDict
 
+# -- 3rd party modules -------------------------------------------------------
 import requests
 from requests.exceptions import ConnectionError
 
 # -- Project specific --------------------------------------------------------
 from canarieapi.app_object import APP
 from canarieapi.status import Status
-from canarieapi.utility_rest import get_db
+from canarieapi.utility_rest import JSON, get_db
+
+RequestConfig = TypedDict("RequestConfig", {
+    "url": Required[str],
+    "method": NotRequired[Literal[
+        "GET", "OPTIONS", "HEAD", "POST", "PUT", "PATCH", "DELETE",
+        "get", "options", "head", "post", "put", "patch", "delete",
+    ]],
+    "params": NotRequired[Optional[Union[str, Dict[str, str]]]],
+    "headers": NotRequired[Dict[str, str]],
+    "json": NotRequired[Optional[JSON]],
+    "data": NotRequired[Optional[str]],
+}, total=False)
+ResponseConfig = TypedDict("ResponseConfig", {
+    "status_code": NotRequired[Optional[int]],
+    "text": NotRequired[Optional[str]],
+}, total=True)
 
 
-def monitor(update_db=True):
+def monitor(update_db: bool = True) -> None:
     # Load config
     logger = APP.logger
     config = APP.config
@@ -47,8 +66,8 @@ def monitor(update_db=True):
             db.close()
 
 
-def check_service(request, response):
-    default_request = {
+def check_service(request: RequestConfig, response: ResponseConfig) -> Tuple[Status, str]:
+    default_request: RequestConfig = {
         "headers": {},
         "params": None,
         "data": None,
@@ -58,7 +77,7 @@ def check_service(request, response):
     }
     default_request.update(request)
 
-    default_response = {
+    default_response: ResponseConfig = {
         "status_code": 200,
         "text": None
     }
@@ -92,7 +111,7 @@ def check_service(request, response):
     return Status.ok, ""
 
 
-def cron_job():
+def cron_job() -> None:
     logger = APP.logger
     logger.info("Cron job for monitoring routes status")
     monitor()

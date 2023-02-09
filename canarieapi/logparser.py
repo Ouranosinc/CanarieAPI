@@ -15,7 +15,7 @@ LOG_BACKUP_COUNT = 150
 
 def rotate_log(filename):
     logger = APP.logger
-    logger.info("Rotating {0}".format(filename))
+    logger.info("Rotating %s", filename)
 
     # Base on a rotation every 10 minutes, if we want to keep 1 day worth of logs we have to keep about 150 of them
     rfh = logging.handlers.RotatingFileHandler(filename, backupCount=LOG_BACKUP_COUNT)

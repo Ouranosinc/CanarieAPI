@@ -20,10 +20,12 @@ https://collaboration.canarie.ca/elgg/discussion/view/3664/research-software-api
 # -- Standard lib ------------------------------------------------------------
 import collections
 import datetime
+from typing import Dict
 
 # -- 3rd party ---------------------------------------------------------------
 from dateutil.parser import parse as dt_parse
 from flask import jsonify, redirect, render_template
+from flask.typing import ResponseReturnValue
 
 # -- Project specific --------------------------------------------------------
 from canarieapi import __meta__
@@ -31,6 +33,7 @@ from canarieapi.app_object import APP
 from canarieapi.schema import CONFIGURATION_SCHEMA, validate_config_schema
 from canarieapi.status import Status
 from canarieapi.utility_rest import (
+    APIType,
     AnyIntConverter,
     get_api_title,
     get_canarie_api_response,
@@ -90,21 +93,21 @@ APP.error_handler_spec[None].setdefault(None, {})
 
 
 @APP.errorhandler(Exception)
-def handle_exceptions(exception_instance):
+def handle_exceptions(exception_instance: Exception) -> ResponseReturnValue:
     """
     Generate error response for raised exceptions.
 
     :param exception_instance: Exception instance.
     """
-    APP.logger.debug(u"Generating error response for the exception {e}". format(e=repr(exception_instance)))
+    APP.logger.debug("Generating error response for the exception %s", repr(exception_instance))
     APP.logger.exception(exception_instance)
     if APP.debug:
-        APP.logger.info(u"In debug mode, re-raising exception")
+        APP.logger.info("In debug mode, re-raising exception")
         raise
-    template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-    message = template.format(type(exception_instance).__name__, exception_instance.args)
-    return make_error_response(http_status=400,
-                               http_status_response=message)
+    cls = type(exception_instance)
+    mod = cls.__module__
+    message = f"An exception of type {mod}.{cls} occurred. Arguments:\n{exception_instance.args!r}"
+    return make_error_response(http_status=400, http_status_response=message)
 
 
 # -- Flask routes ------------------------------------------------------------
@@ -112,7 +115,7 @@ APP.url_map.converters["any_int"] = AnyIntConverter
 
 
 @APP.route("/")
-def home():
+def home() -> ResponseReturnValue:
     def parse_config(name, api_type, conf):
         # type: (str, str, dict) -> dict
         hostname = APP.config["MY_SERVER_NAME"]
@@ -138,13 +141,13 @@ def home():
 
 
 @APP.route("/test")
-def manual_test():
+def manual_test() -> ResponseReturnValue:
     validate_config_schema(True)
     return redirect(APP.config["MY_SERVER_NAME"])
 
 
 @APP.route("/<any_int(" + HANDLED_HTML_ERRORS_STR + "):status_code_str>")
-def extern_html_error_handler(status_code_str):
+def extern_html_error_handler(status_code_str: str) -> ResponseReturnValue:
     """
     Handle HTML errors from an external response.
 
@@ -160,7 +163,7 @@ def extern_html_error_handler(status_code_str):
 
 
 @APP.route("/<route_name>/<any(" + ",".join(CANARIE_API_TYPE) + "):api_type>/info")
-def information(route_name, api_type):
+def information(route_name: str, api_type: APIType) -> ResponseReturnValue:
     """
     Info route required by CANARIE.
     """
@@ -187,7 +190,7 @@ def information(route_name, api_type):
     return render_template("default.html", Main_Title=get_api_title(route_name, api_type), Title="Info", Tags=info)
 
 
-def get_status(route_name):
+def get_status(route_name: str) -> Dict[str, Dict[str, Status]]:
     db = get_db()
     cur = db.cursor()
 
@@ -199,8 +202,7 @@ def get_status(route_name):
         rv = cur.fetchall()
 
         for record in rv:
-            all_status[record[0]] = dict(status=record[1],
-                                         message=record[2])
+            all_status[record[0]] = {"status": record[1], "message": record[2]}
     except Exception as e:
         APP.logger.error(str(e))
         pass
@@ -210,7 +212,7 @@ def get_status(route_name):
 
 
 @APP.route("/<route_name>/<any(" + ",".join(CANARIE_API_TYPE) + "):api_type>/stats")
-def stats(route_name, api_type):
+def stats(route_name: str, api_type: APIType) -> ResponseReturnValue:
     """
     Stats route required by CANARIE.
     """
@@ -296,7 +298,7 @@ def stats(route_name, api_type):
 
 
 @APP.route("/<route_name>/<any(" + ",".join(CANARIE_API_TYPE) + "):api_type>/status")
-def status(route_name, api_type):
+def status(route_name: str, api_type: APIType) -> ResponseReturnValue:
     """
     Extra route to know service status.
     """
@@ -346,7 +348,7 @@ def status(route_name, api_type):
 
 @APP.route("/<route_name>/<any(" + ",".join(CANARIE_API_TYPE) + "):api_type>/<any(" +
            ",".join(CANARIE_API_VALID_REQUESTS) + "):api_request>")
-def simple_requests_handler(route_name, api_type, api_request="home"):
+def simple_requests_handler(route_name: str, api_type: APIType, api_request: str = "home") -> ResponseReturnValue:
     """
     #Handle simple requests required by CANARIE.
     """
@@ -358,11 +360,11 @@ def simple_requests_handler(route_name, api_type, api_request="home"):
 
 
 @APP.teardown_appcontext
-def close_connection(dummy_exception):  # noqa
+def close_connection(_: Exception) -> None:
     """
     Disconnect database.
 
-    :param dummy_exception: Exception handled elsewhere, nothing to do with it
+    :param _: Exception handled elsewhere, nothing to do with it
     """
     APP.logger.info(u"Disconnecting from database")
     get_db().close()
