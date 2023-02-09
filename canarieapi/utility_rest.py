@@ -37,7 +37,7 @@ def request_wants_json():
     # For */* both JSON and HTML will have the same quality so JSON still win
     choices = ["application/json", "text/html"]
     best = request.accept_mimetypes.best_match(choices)
-    return best == "application/json"
+    return request.args.get("f", "").lower() == "json" or best == "application/json"
 
 
 def set_html_as_default_response():

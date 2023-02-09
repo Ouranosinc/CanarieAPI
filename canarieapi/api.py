@@ -183,6 +183,7 @@ def information(route_name, api_type):
 
     if request_wants_json():
         return jsonify(info)
+    info["tags"] = ", ".join(info["tags"])
     return render_template("default.html", Main_Title=get_api_title(route_name, api_type), Title="Info", Tags=info)
 
 

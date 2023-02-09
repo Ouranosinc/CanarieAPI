@@ -6,6 +6,7 @@ CHANGES
 `Unreleased <https://github.com/Ouranosinc/CanarieAPI/tree/master>`_ (latest)
 ------------------------------------------------------------------------------------
 
+* Support query parameter ``f=json`` as alternate method to HTTP ``Accept`` header to provide JSON responses.
 * Support additional ``request`` parameters, formats and validations for arguments provided to monitoring services and
   platform definitions loaded from the configuration. New parameters include ``timeout``, ``proxies``, ``stream``,
   ``verify``, ``cert`` and ``allow_redirects`` all supported by ``requests.request`` method and compatible as JSON.
