@@ -12,9 +12,9 @@ module and which are placed here to keep the rest_route module as clean as possi
 # -- Standard lib ------------------------------------------------------------
 import configparser
 import http.client
+import os
 import re
 import sqlite3
-from os import path, remove
 from typing import Dict, List, Optional, Tuple, Union
 from typing_extensions import Literal, TypeAlias
 
@@ -64,7 +64,8 @@ def set_html_as_default_response() -> None:
                                                 "application/json"])
     # Replace any */* by HTML so that JSON isn't picked by default
     if best == "text/html":
-        request.accept_mimetypes = MIMEAccept([("text/html", request.accept_mimetypes["text/html"])])
+        accept = MIMEAccept([("text/html", request.accept_mimetypes["text/html"])])
+        request.accept_mimetypes = accept  # noqa
 
 
 def get_config(route_name: str, api_type: APIType) -> JSON:
@@ -79,9 +80,7 @@ def get_config(route_name: str, api_type: APIType) -> JSON:
     try:
         return APP.config[api_type.upper() + "S"][route_name]
     except KeyError:
-        raise Exception("The request has been made for a {api_type} that is not supported : {route}"
-                        .format(api_type=api_type,
-                                route=route_name))
+        raise Exception(f"The request has been made for a {api_type} that is not supported : {route_name}")
 
 
 def validate_route(route_name: str, api_type: APIType) -> None:
@@ -137,8 +136,10 @@ def get_canarie_api_response(route_name, api_type, api_request):
     except KeyError:
         pass
 
-    msg = ("The {0} does not provide in its configuration file a "
-           "valid source for the CANARIE request {1}".format(api_type, api_request))
+    msg = (
+        f"The {api_type} does not provide in its configuration file a "
+        f"valid source for the CANARIE request {api_request}"
+    )
     raise configparser.Error(msg)
 
 
@@ -191,22 +192,32 @@ def get_db() -> sqlite3.Connection:
     """
     database = getattr(g, "_stats_database", None)
     if database is None:
+        APP.logger.debug("Database not defined. Establishing connection...")
+
         d_fn = APP.config["DATABASE"]["filename"]
-        if path.isabs(d_fn):
+        if os.path.isabs(d_fn):
             database_fn = d_fn
         else:
-            database_fn = path.join(APP.root_path, d_fn)
+            database_fn = os.path.join(APP.root_path, d_fn)
 
-        APP.logger.debug(f"Using db filename : {database_fn}")
-        if not path.exists(database_fn):
+        if not os.path.exists(database_fn):
+            APP.logger.debug("Using database filename (create): %s", database_fn)
             database = g._database = sqlite3.connect(database_fn)
             try:
                 init_db(database)
-            except Exception:
+            except Exception as exc:
+                APP.logger.error(
+                    "Error [%s] occurred when using database filename: %s. Will delete it to reset.",
+                    str(exc), database_fn, exc_info=exc
+                )
+                APP.logger.debug("Closing database.")
                 database.close()
-                remove(database_fn)
+                APP.logger.debug("Deleting database.")
+                os.remove(database_fn)
+                APP.logger.debug("Reraise for HTTP error reporting.")
                 raise
         else:
+            APP.logger.debug("Using db filename (exists): %s", database_fn)
             database = g._database = sqlite3.connect(database_fn)
 
     return database
@@ -216,15 +227,15 @@ def init_db(database: sqlite3.Connection) -> None:
     """
     Initialize a database from a schema.
     """
-    APP.logger.info(u"Initializing database")
+    APP.logger.info("Initializing database")
     with current_app.app_context():
         dbs_fn = "database_schema.sql"
-        if path.isabs(dbs_fn):
+        if os.path.isabs(dbs_fn):
             schema_fn = dbs_fn
         else:
-            schema_fn = path.join(APP.root_path, dbs_fn)
+            schema_fn = os.path.join(APP.root_path, dbs_fn)
 
-        APP.logger.debug(f"Using schema filename : {schema_fn}")
+        APP.logger.debug("Using schema filename : %s", schema_fn)
         with current_app.open_resource(schema_fn, mode="r") as schema_f:
             database.cursor().executescript(schema_f.read())
         database.commit()
