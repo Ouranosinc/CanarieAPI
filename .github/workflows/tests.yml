@@ -5,6 +5,9 @@ on:
   - pull_request
   - push
 
+env:
+  FLASK_DEBUG: 1
+
 jobs:
   # see: https://github.com/fkirc/skip-duplicate-actions
   skip_duplicate:
