@@ -15,6 +15,7 @@ CHANGES
 * Move Python-based configuration schema to ``schema.json`` file to allow reference by external validators.
 * Add multiple linting validations with Makefile targets.
 * Add minimal tests with GitHub Actions CI integration.
+* Fix database global reference not being reused causing connection recreation on each database query.
 * Drop support of end-of-life Python 2.7, 3.5 and 3.6.
 
 `0.4.4 <https://github.com/Ouranosinc/CanarieAPI/tree/0.4.4>`_ (2023-02-01)

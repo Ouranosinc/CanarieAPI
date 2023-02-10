@@ -190,42 +190,41 @@ def get_db() -> sqlite3.Connection:
     If the database does not exist, create a connection to local sqlite3 file.
     If the local sqlite3 file doesn't exist, initialize it using a schema.
     """
-    database = getattr(g, "_stats_database", None)
+    database = getattr(g, "_database", None)
     if database is None:
-        APP.logger.debug("Database not defined. Establishing connection...")
+        APP.logger.info("Database not defined. Establishing connection...")
 
-        d_fn = APP.config["DATABASE"]["filename"]
-        if os.path.isabs(d_fn):
-            database_fn = d_fn
-        else:
-            database_fn = os.path.join(APP.root_path, d_fn)
+        database_fn = APP.config["DATABASE"]["filename"]
+        APP.logger.debug("Using configured filename: [%s]", database_fn)
+        if not os.path.isabs(database_fn):
+            database_fn = os.path.join(APP.root_path, database_fn)
+        database_fn = os.path.abspath(database_fn)
 
-        if not os.path.exists(database_fn):
-            APP.logger.debug("Using database filename (create): %s", database_fn)
+        APP.logger.debug("Setup database connection with filename: [%s]", database_fn)
+        db_exists = os.path.isfile(database_fn)  # must resolve before connect otherwise file already created
+        try:
             database = g._database = sqlite3.connect(database_fn)
+        except Exception as exc:
+            APP.logger.error(
+                "Error [%s] occurred during database connection with filename: [%s].",
+                str(exc), database_fn, exc_info=exc
+            )
+            APP.logger.debug("Reraise for error reporting.")
+            raise
+
+        APP.logger.debug("Initialize database with filename: [%s]", database_fn)
+        if not db_exists:
             try:
                 init_db(database)
             except Exception as exc:
                 APP.logger.error(
-                    "Error [%s] occurred using database filename (create): %s. Will remove it to reset.",
+                    "Error [%s] occurred during database initialization with filename: [%s].",
                     str(exc), database_fn, exc_info=exc
                 )
                 APP.logger.debug("Closing database.")
                 database.close()
-                if os.path.exists(database_fn):
-                    APP.logger.debug("Deleting database.")
-                    os.remove(database_fn)
-                APP.logger.debug("Reraise for error reporting.")
-                raise
-        else:
-            APP.logger.debug("Using db filename (exists): %s", database_fn)
-            try:
-                database = g._database = sqlite3.connect(database_fn)
-            except Exception as exc:
-                APP.logger.error(
-                    "Error [%s] occurred using database filename (exists): %s. Will delete it to reset.",
-                    str(exc), database_fn, exc_info=exc
-                )
+                APP.logger.debug("Deleting database filename (reset for recreation): [%s].", database_fn)
+                os.remove(database_fn)
                 APP.logger.debug("Reraise for error reporting.")
                 raise
 
@@ -236,7 +235,7 @@ def init_db(database: sqlite3.Connection) -> None:
     """
     Initialize a database from a schema.
     """
-    APP.logger.info("Initializing database")
+    APP.logger.debug("Initializing database")
     with current_app.app_context():
         dbs_fn = "database_schema.sql"
         if os.path.isabs(dbs_fn):
