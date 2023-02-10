@@ -83,7 +83,7 @@ version:	## display current version
 ## --- Cleanup targets --- ##
 
 .PHONY: clean
-clean: clean-build clean-pyc clean-test  ## remove all build, test, coverage and Python artifacts
+clean: clean-build clean-docs clean-pyc clean-test  ## remove all build, test, coverage and Python artifacts
 
 .PHONY: clean-build
 clean-build:  ## remove build artifacts
@@ -92,6 +92,16 @@ clean-build:  ## remove build artifacts
 	rm -fr .eggs/
 	find . -type f -name '*.egg-info' -exec rm -fr {} +
 	find . -type f -name '*.egg' -exec rm -f {} +
+
+# rm without quotes important below to allow regex
+.PHONY: clean-docs
+clean-docs:		## remove doc artifacts
+	@echo "Cleaning doc artifacts..."
+	@-find "$(APP_ROOT)/docs/" -type f -name "$(APP_NAME)*.rst" -delete
+	@-rm -f "$(APP_ROOT)/docs/modules.rst"
+	@-rm -f "$(APP_ROOT)/docs/api.json"
+	@-rm -rf "$(APP_ROOT)/docs/autoapi"
+	@-rm -rf "$(APP_ROOT)/docs/_build"
 
 .PHONY: clean-pyc
 clean-pyc:  ## remove Python file artifacts
@@ -342,18 +352,29 @@ coverage: install-req install-dev coverage-only  ## check code coverage quickly 
 
 ## --- Documentation targets --- ##
 
-.PHONY: docs
-docs:  ## generate Sphinx HTML documentation, including API docs
-	rm -f "docs/$(APP_NAME).rst"
-	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ "$(APP_NAME)"
-	$(MAKE) -C docs clean
-	$(MAKE) -C docs html
-	$(BROWSER) docs/_build/html/index.html
+DOC_LOCATION := $(APP_ROOT)/docs/_build/html/index.html
+$(DOC_LOCATION):
+	@echo "Building docs..."
+	@bash -c '$(CONDA_CMD) \
+		sphinx-apidoc -o "$(APP_ROOT)/docs/" "$(APP_ROOT)/$(APP_NAME)"; \
+		"$(MAKE)" -C "$(APP_ROOT)/docs" html;'
+	@-echo "Documentation available: file://$(DOC_LOCATION)"
 
-.PHONY: servedocs
-servedocs: docs
-	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
+.PHONY: _force_docs
+_force_docs:
+	@-rm -f "$(DOC_LOCATION)"
+
+.PHONY: docs-only
+docs-only: _force_docs $(DOC_LOCATION) 	## generate documentation without requirements installation or cleanup
+
+# NOTE: we need almost all base dependencies because magpie package needs to be parsed to generate OpenAPI
+.PHONY: docs
+docs: install-docs install clean-docs docs-only	## generate Sphinx HTML documentation, including API docs
+
+.PHONY: docs-show
+docs-show: $(DOC_LOCATION)	## display HTML webpage of generated documentation (build docs if missing)
+	@-test -f "$(DOC_LOCATION)" || $(MAKE) -C "$(APP_ROOT)" docs
+	$(BROWSER) "$(DOC_LOCATION)"
 
 ## --- Packaging targets --- ##
 
@@ -377,6 +398,10 @@ install-req:  ## install package requirements allowing to run the code
 .PHONY: install-dev
 install-dev:  ## install package requirements allowing to run tests
 	pip install -r requirements-dev.txt
+
+.PHONY: install-docs
+install-docs:  ## install package requirements for documentation generation
+	pip install -r "$(APP_ROOT)/requirements-doc.txt"
 
 # install locally to ensure they can be found by config extending them
 .PHONY: install-npm

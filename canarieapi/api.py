@@ -20,6 +20,7 @@ https://collaboration.canarie.ca/elgg/discussion/view/3664/research-software-api
 # -- Standard lib ------------------------------------------------------------
 import collections
 import datetime
+import os
 from typing import Dict
 
 # -- 3rd party ---------------------------------------------------------------
