@@ -60,7 +60,7 @@ START_UTC_TIME = datetime.datetime.utcnow().replace(microsecond=0)
 CANARIE_API_TYPE = ["service", "platform"]
 CANARIE_API_VALID_REQUESTS = set()
 for _api_type in CANARIE_API_TYPE:
-    _required = CONFIGURATION_SCHEMA["definitions"]["{}_redirect_schema".format(_api_type)]["required"]
+    _required = CONFIGURATION_SCHEMA["definitions"][f"{_api_type}_redirect_schema"]["required"]
     CANARIE_API_VALID_REQUESTS |= set(_required)
 
 # HTML errors for which the application provides a custom error page
@@ -123,9 +123,7 @@ def home() -> ResponseReturnValue:
         _content = [
             (
                 request,
-                "{hostname}/{name}/{api_type}/{request}".format(
-                    hostname=hostname, name=name, api_type=api_type, request=request
-                )
+                f"{hostname}/{name}/{api_type}/{request}"
             )
             for request in requests
         ]
@@ -173,7 +171,7 @@ def information(route_name: str, api_type: APIType) -> ResponseReturnValue:
 
     validate_route(route_name, api_type)
 
-    info_schema = "{}_info_schema".format(api_type)
+    info_schema = f"{api_type}_info_schema"
     info_categories = CONFIGURATION_SCHEMA["definitions"][info_schema]["required"]
 
     config = get_config(route_name, api_type).get("info", {})
@@ -230,7 +228,7 @@ def stats(route_name: str, api_type: APIType) -> ResponseReturnValue:
 
     # Status can be 'ok', 'bad' or 'down'
     if not all(all_status[service]["status"] == Status.ok for service in all_status):
-        message = ", ".join(["{0} : {1}".format(service, Status.pretty_msg(all_status[service]["status"]))
+        message = ", ".join([f"{service} : {Status.pretty_msg(all_status[service]['status'])}"
                              for service in all_status])
         return make_error_response(http_status=503,
                                    http_status_response=message)
@@ -334,7 +332,7 @@ def status(route_name: str, api_type: APIType) -> ResponseReturnValue:
     for service in all_status:
         status_msg = Status.pretty_msg(all_status[service]["status"])
         if all_status[service]["status"] != Status.ok:
-            status_msg += " : {0}".format(all_status[service]["message"])
+            status_msg += f" : {all_status[service]['message']}"
         monitor_info.append((service, status_msg))
 
     monitor_info = collections.OrderedDict(monitor_info)

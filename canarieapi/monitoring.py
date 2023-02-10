@@ -52,13 +52,13 @@ def monitor(update_db: bool = True) -> None:
                     status, message = check_service(request=test_dic["request"],
                                                     response=test_dic.get("response", {}))
                 except Exception:
-                    logger.error("Exception occurs while trying to check status of {0}.{1}".format(route, service))
+                    logger.error("Exception occurs while trying to check status of %s.%s", route, service)
                     raise
-                logger.info("{0}.{1} : {2}".format(route, service, Status.pretty_msg(status)))
+                logger.info("%s.%s : %s", route, service, Status.pretty_msg(status))
 
                 if update_db:
-                    cur.execute(query,
-                                [route, service, status, (message[0:253] + "...") if len(message) > 256 else message])
+                    values = [route, service, status, (message[0:253] + "...") if len(message) > 256 else message]
+                    cur.execute(query, values)
 
         if update_db:
             cur.execute('insert or replace into cron (job, last_execution) values (\'status\', CURRENT_TIMESTAMP)')
@@ -87,7 +87,8 @@ def check_service(request: RequestConfig, response: ResponseConfig) -> Tuple[Sta
     try:
         r = requests.request(**default_request)
     except ConnectionError as e:
-        message = "Cannot reach {0} : {1}".format(default_request["url"], str(e))
+        url = default_request["url"]
+        message = f"Cannot reach {url} : {e!s}"
         logger.warning(message)
         return Status.down, message
 

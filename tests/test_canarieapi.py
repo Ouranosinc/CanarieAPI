@@ -33,7 +33,7 @@ class TestCanarieAPI(unittest.TestCase):
         # setup monitored apps
         for i, (name, cfg) in enumerate(APP.config["SERVICES"].items()):
             port = 6000 + i
-            url = "http://localhost:{}/".format(port)
+            url = f"http://localhost:{port}/"
             cfg["monitoring"]["Component"]["request"]["url"] = url
             responses.get(url, json={}, status=200)  # mock their response
 
@@ -62,7 +62,7 @@ class TestCanarieAPI(unittest.TestCase):
 
     def test_service_status_page(self):
         name = list(self.app.config["SERVICES"])[0]
-        resp = self.web.get("/{}/service/status".format(name))
+        resp = self.web.get(f"/{name}/service/status")
         assert resp.status_code == 200
         assert name in resp.text
         assert "Never" not in resp.text  # if cron update did not work
@@ -72,7 +72,7 @@ class TestCanarieAPI(unittest.TestCase):
 
     def test_service_status_json_query_string(self):
         name = list(self.app.config["SERVICES"])[0]
-        resp = self.web.get("/{}/service/status".format(name), params={"f": "json"})
+        resp = self.web.get(f"/{name}/service/status", params={"f": "json"})
         assert resp.status_code == 200
         assert resp.content_type == "application/json"
         assert resp.json["Component"] == "Ok"
@@ -80,7 +80,7 @@ class TestCanarieAPI(unittest.TestCase):
 
     def test_service_status_json_accept_header(self):
         name = list(self.app.config["SERVICES"])[0]
-        resp = self.web.get("/{}/service/status".format(name), headers={"Accept": "application/json"})
+        resp = self.web.get(f"/{name}/service/status", headers={"Accept": "application/json"})
         assert resp.status_code == 200
         assert resp.content_type == "application/json"
         assert resp.json["Component"] == "Ok"

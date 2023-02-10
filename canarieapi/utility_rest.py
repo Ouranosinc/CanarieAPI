@@ -109,7 +109,7 @@ def get_api_title(route_name: str, api_type: APIType) -> str:
     title = api_type.capitalize()
     try:
         name = get_config(route_name, api_type)["info"]["name"]
-        title = "{}: {}".format(title, name)
+        title = f"{title}: {name}"
     except Exception:
         pass
     return title
@@ -197,7 +197,7 @@ def get_db() -> sqlite3.Connection:
         else:
             database_fn = path.join(APP.root_path, d_fn)
 
-        APP.logger.debug(u"Using db filename : {0}".format(database_fn))
+        APP.logger.debug(f"Using db filename : {database_fn}")
         if not path.exists(database_fn):
             database = g._database = sqlite3.connect(database_fn)
             try:
@@ -224,7 +224,7 @@ def init_db(database: sqlite3.Connection) -> None:
         else:
             schema_fn = path.join(APP.root_path, dbs_fn)
 
-        APP.logger.debug(u"Using schema filename : {0}".format(schema_fn))
+        APP.logger.debug(f"Using schema filename : {schema_fn}")
         with current_app.open_resource(schema_fn, mode="r") as schema_f:
             database.cursor().executescript(schema_f.read())
         database.commit()
@@ -251,4 +251,4 @@ class AnyIntConverter(BaseConverter):
     def __init__(self, mapping: Map, *items: Union[int, str]) -> None:
         BaseConverter.__init__(self, mapping)
         # Start by enforcing that x is an integer then convert it to string
-        self.regex = "(?:%s)" % "|".join([str(int(x)) for x in items])
+        self.regex = f"(?:{'|'.join([str(int(x)) for x in items])})"

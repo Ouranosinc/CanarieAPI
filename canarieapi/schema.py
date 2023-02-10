@@ -24,7 +24,7 @@ def validate_config_schema(update_db):
     try:
         jsonschema.validate(config, CONFIGURATION_SCHEMA)
     except jsonschema.ValidationError as e:
-        raise Exception("The configuration is invalid : {0}".format(str(e)))
+        raise Exception(f"The configuration is invalid : {e!s}")
 
     monitor(update_db=update_db)
 
@@ -32,7 +32,7 @@ def validate_config_schema(update_db):
     route_invocations = {}
     file_checked = 0
     for i in range(0, min(10, LOG_BACKUP_COUNT)):
-        fn = access_log_fn + (".{0}".format(i) if i > 0 else "")
+        fn = access_log_fn + (f".{i}" if i > 0 else "")
         try:
             route_stats = parse_log(fn)
             for route, value in route_stats.items():
@@ -43,9 +43,9 @@ def validate_config_schema(update_db):
 
     for route, invocs in route_invocations.items():
         if invocs > 0:
-            logger.info("Found {0} invocations to route {1} in {2} log files".format(invocs, route, file_checked))
+            logger.info("Found %s invocations to route %s in %s log files", invocs, route, file_checked)
         else:
-            logger.warning("Found no invocations to route {0} in {1} log files".format(route, file_checked))
+            logger.warning("Found no invocations to route %s in %s log files", route, file_checked)
     if not route_invocations:
-        logger.warning("Found no invocations at all in {0} log files".format(file_checked))
+        logger.warning("Found no invocations at all in %s log files", file_checked)
     logger.info("Tests completed!")
