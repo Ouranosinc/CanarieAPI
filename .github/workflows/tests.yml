@@ -59,12 +59,12 @@ jobs:
         include:
           # linter tests
           - os: ubuntu-latest
-            python-version: 3.7
+            python-version: "3.10"
             allow-failure: false
             test-case: check
           # coverage test
           - os: ubuntu-latest
-            python-version: 3.7
+            python-version: "3.11"
             allow-failure: false
             test-case: coverage
           # smoke test of Docker image
