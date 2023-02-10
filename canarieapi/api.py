@@ -370,6 +370,5 @@ def close_connection(_: Exception) -> None:
 
 
 if __name__ == "__main__":
-    port = 5000
     APP.debug = False
-    APP.run(port=port)
+    APP.run(port=5000)

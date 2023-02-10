@@ -31,7 +31,7 @@ class TestCanarieAPI(unittest.TestCase):
         APP.config.from_object(cls.config)
 
         # setup monitored apps
-        for i, (name, cfg) in enumerate(APP.config["SERVICES"].items()):
+        for i, (_, cfg) in enumerate(APP.config["SERVICES"].items()):
             port = 6000 + i
             url = f"http://localhost:{port}/"
             cfg["monitoring"]["Component"]["request"]["url"] = url

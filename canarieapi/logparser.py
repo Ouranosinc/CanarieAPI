@@ -17,7 +17,7 @@ RouteStatistics = Dict[str, Dict[str, Union[str, int]]]
 
 
 def rotate_log(filename: str) -> None:
-    logger = APP.logger
+    logger: logging.Logger = APP.logger
     logger.info("Rotating %s", filename)
 
     # Base on a rotation every 10 minutes, if we want to keep 1 day worth of logs we have to keep about 150 of them

@@ -1,6 +1,7 @@
 # -- Standard lib ------------------------------------------------------------
 import json
-import os.path
+import logging
+import os
 
 # -- 3rd party ---------------------------------------------------------------
 import jsonschema
@@ -18,13 +19,13 @@ with open(os.path.join(os.path.dirname(__file__), "schema.json"), "r") as schema
 def validate_config_schema(update_db):
     # type: (bool) -> None
     config = APP.config
-    logger = APP.logger
+    logger: logging.Logger = APP.logger
 
     logger.info("Testing configuration...")
     try:
         jsonschema.validate(config, CONFIGURATION_SCHEMA)
-    except jsonschema.ValidationError as e:
-        raise Exception(f"The configuration is invalid : {e!s}")
+    except jsonschema.ValidationError as exc:
+        raise Exception(f"The configuration is invalid : {exc!s}")
 
     monitor(update_db=update_db)
 

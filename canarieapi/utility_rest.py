@@ -80,7 +80,7 @@ def get_config(route_name: str, api_type: APIType) -> JSON:
     try:
         return APP.config[api_type.upper() + "S"][route_name]
     except KeyError:
-        raise Exception(f"The request has been made for a {api_type} that is not supported : {route_name}")
+        raise ValueError(f"The request has been made for a {api_type} that is not supported : {route_name}")
 
 
 def validate_route(route_name: str, api_type: APIType) -> None:

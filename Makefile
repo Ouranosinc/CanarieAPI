@@ -144,7 +144,6 @@ check-lint-only: mkdir-reports		## run linting code style checks
 	@-rm -fr "$(REPORTS_DIR)/check-lint.txt"
 	@bash -c '$(CONDA_CMD) \
 		pylint \
-			--load-plugins pylint_quotes \
 			--rcfile="$(APP_ROOT)/.pylintrc" \
 			--reports y \
 			"$(APP_ROOT)/$(APP_NAME)" "$(APP_ROOT)/docs" "$(APP_ROOT)/tests" \

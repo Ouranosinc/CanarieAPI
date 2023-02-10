@@ -61,7 +61,7 @@ def monitor(update_db: bool = True) -> None:
                     cur.execute(query, values)
 
         if update_db:
-            cur.execute('insert or replace into cron (job, last_execution) values (\'status\', CURRENT_TIMESTAMP)')
+            cur.execute("insert or replace into cron (job, last_execution) values ('status', CURRENT_TIMESTAMP)")
             db.commit()
             db.close()
 

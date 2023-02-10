@@ -154,8 +154,6 @@ max-nested-blocks=10
 # printed.
 never-returning-functions=
     sys.exit
-    magpie.utils.raise_log
-    magpie.api.exception.raise_http
 
 
 [TYPECHECK]
@@ -212,18 +210,13 @@ ignored-classes=optparse.Values,
                 _thread._local,
                 str,
                 int,
-                scoped_session,
-                magpie.models.UserStatuses,
-                cornice.Service,
-                cornice.service.Service
+                scoped_session
 
 # List of module names for which member attributes should not be checked
 # (useful for modules/projects where namespaces are manipulated during runtime
 # and thus existing member attributes cannot be deduced by static analysis). It
 # supports qualified module names, as well as Unix pattern matching.
-ignored-modules=magpie.definitions.*_definitions,
-                alembic.op,
-                alembic.context
+ignored-modules=
 
 # Show a hint with possible names when a member name was not found. The aspect
 # of finding the hint is based on edit distance.
@@ -410,7 +403,7 @@ function-naming-style=snake_case
 #function-rgx=
 
 # Good variable names which should always be accepted, separated by a comma.
-good-names=i,j,k,v,kv,ex,x,y,z,f,fd,h,db,kw,ns,qs,_
+good-names=i,j,k,v,kv,ex,fn,x,y,z,f,fd,h,db,kw,ns,qs,_
 
 # Include a hint for the correct naming format with invalid-name.
 include-naming-hint=yes
@@ -509,7 +502,7 @@ valid-metaclass-classmethod-first-arg=cls
 
 # List of modules that can be imported at any level, not just the top level
 # one.
-allow-any-import-level=magpie
+allow-any-import-level=canarieapi
 
 # Allow wildcard imports from modules that define __all__.
 allow-wildcard-with-all=no
