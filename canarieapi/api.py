@@ -26,6 +26,7 @@ from typing import Dict
 from dateutil.parser import parse as dt_parse
 from flask import jsonify, redirect, render_template
 from flask.typing import ResponseReturnValue
+from werkzeug.exceptions import HTTPException
 
 # -- Project specific --------------------------------------------------------
 from canarieapi import __meta__
@@ -101,13 +102,13 @@ def handle_exceptions(exception_instance: Exception) -> ResponseReturnValue:
     """
     APP.logger.debug("Generating error response for the exception %s", repr(exception_instance))
     APP.logger.exception(exception_instance)
-    if APP.debug:
-        APP.logger.info("In debug mode, re-raising exception")
-        raise
     cls = type(exception_instance)
     mod = cls.__module__
-    message = f"An exception of type {mod}.{cls} occurred. Arguments:\n{exception_instance.args!r}"
-    return make_error_response(http_status=400, http_status_response=message)
+    err_name = f"{mod}.{cls}"
+    message = f"An exception of type {err_name} occurred. Arguments:\n{exception_instance.args!r}"
+    code = exception_instance.code if isinstance(exception_instance, HTTPException) else 500
+    APP.logger.error("Making HTTP [%s] exception from [%s]", code, err_name)
+    return make_error_response(http_status=code, http_status_response=message)
 
 
 # -- Flask routes ------------------------------------------------------------
