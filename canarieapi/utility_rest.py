@@ -207,18 +207,27 @@ def get_db() -> sqlite3.Connection:
                 init_db(database)
             except Exception as exc:
                 APP.logger.error(
-                    "Error [%s] occurred when using database filename: %s. Will delete it to reset.",
+                    "Error [%s] occurred using database filename (create): %s. Will remove it to reset.",
                     str(exc), database_fn, exc_info=exc
                 )
                 APP.logger.debug("Closing database.")
                 database.close()
-                APP.logger.debug("Deleting database.")
-                os.remove(database_fn)
-                APP.logger.debug("Reraise for HTTP error reporting.")
+                if os.path.exists(database_fn):
+                    APP.logger.debug("Deleting database.")
+                    os.remove(database_fn)
+                APP.logger.debug("Reraise for error reporting.")
                 raise
         else:
             APP.logger.debug("Using db filename (exists): %s", database_fn)
-            database = g._database = sqlite3.connect(database_fn)
+            try:
+                database = g._database = sqlite3.connect(database_fn)
+            except Exception as exc:
+                APP.logger.error(
+                    "Error [%s] occurred using database filename (exists): %s. Will delete it to reset.",
+                    str(exc), database_fn, exc_info=exc
+                )
+                APP.logger.debug("Reraise for error reporting.")
+                raise
 
     return database
 
