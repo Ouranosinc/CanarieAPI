@@ -174,16 +174,22 @@ generated-members=
     logger.warning,
     logger.error,
     logger.exception,
+    logger.addHandler,
+    logger.setLevel,
     app.logger.debug,
     app.logger.info,
     app.logger.warning,
     app.logger.error,
     app.logger.exception,
+    app.logger.addHandler,
+    app.logger.setLevel,
     APP.logger.debug,
     APP.logger.info,
     APP.logger.warning,
     APP.logger.error,
-    APP.logger.exception
+    APP.logger.exception,
+    APP.logger.addHandler,
+    APP.logger.setLevel
 # note: 'str.value' is flagged by Enum members defined with strings
 
 # Tells whether missing members accessed in mixin class should be ignored. A
