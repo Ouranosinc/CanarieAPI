@@ -32,6 +32,10 @@ load-plugins=
     pylint_flask,
     pylint_quotes
 
+string-quote=double
+triple-quote=double
+docstring-quote=double
+
 # Pickle collected data for later comparisons.
 persistent=yes
 
