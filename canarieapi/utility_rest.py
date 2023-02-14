@@ -21,6 +21,7 @@ from typing_extensions import Literal, TypeAlias
 # -- 3rd party ---------------------------------------------------------------
 from flask import Response, current_app, g, jsonify, redirect, render_template, request
 from werkzeug.datastructures import MIMEAccept
+from werkzeug.exceptions import BadRequest, NotFound
 from werkzeug.routing import BaseConverter, Map
 
 # -- Project specific --------------------------------------------------------
@@ -78,9 +79,13 @@ def get_config(route_name: str, api_type: APIType) -> JSON:
     :raises: Exception if the route is unknown
     """
     try:
-        return APP.config[api_type.upper() + "S"][route_name]
+        conf = APP.config[api_type.upper() + "S"]
     except KeyError:
-        raise ValueError(f"The request has been made for a {api_type} that is not supported : {route_name}")
+        raise BadRequest(f"The request has been made for an unknown type: [{api_type}]")
+    try:
+        return conf[route_name]
+    except KeyError:
+        raise NotFound(f"The request has been made for a {api_type} that is not supported: [{route_name}]")
 
 
 def validate_route(route_name: str, api_type: APIType) -> None:
@@ -174,13 +179,13 @@ def make_error_response(
             "description": http_status_response
         }
         return jsonify(response), http_status
-    else:
-        html_response_header = f"{http_status} : {http_status_response}"
-        template = render_template("error.html",
-                                   Main_Title="Canarie API",
-                                   Title="Error",
-                                   html_response=html_response_header)
-        return template, http_status
+
+    html_response_header = f"{http_status} : {http_status_response}"
+    template = render_template("error.html",
+                               Main_Title="Canarie API",
+                               Title="Error",
+                               html_response=html_response_header)
+    return template, http_status
 
 
 def get_db() -> sqlite3.Connection:

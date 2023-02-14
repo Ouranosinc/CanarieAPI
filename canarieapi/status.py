@@ -8,12 +8,11 @@ class Status:
         pass
 
     @staticmethod
-    def pretty_msg(status):
+    def pretty_msg(status: "Status") -> str:
         if status == Status.ok:
             return "Ok"
-        elif status == Status.bad:
+        if status == Status.bad:
             return "Up but returning unexpected response"
-        elif status == Status.down:
+        if status == Status.down:
             return "Down"
-        else:
-            return "Unknown status"
+        return "Unknown status"

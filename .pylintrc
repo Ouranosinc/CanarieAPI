@@ -29,7 +29,7 @@ limit-inference-results=100
 # List of plugins (as comma separated values of python module names) to load,
 # usually to register additional checkers.
 load-plugins=
-    pylint_flask
+    pylint_flask,
     pylint_quotes
 
 # Pickle collected data for later comparisons.
@@ -581,5 +581,5 @@ min-public-methods=0
 
 # Exceptions that will emit a warning when being caught. Defaults to
 # "BaseException, Exception".
-overgeneral-exceptions=BaseException,
-                       Exception
+overgeneral-exceptions=builtins.BaseException,
+                       builtins.Exception

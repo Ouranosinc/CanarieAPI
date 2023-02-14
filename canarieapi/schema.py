@@ -11,8 +11,9 @@ from canarieapi.app_object import APP
 from canarieapi.logparser import LOG_BACKUP_COUNT, parse_log
 from canarieapi.monitoring import monitor
 
+
 # The schema that must be respected by the config
-with open(os.path.join(os.path.dirname(__file__), "schema.json"), "r") as schema_file:
+with open(os.path.join(os.path.dirname(__file__), "schema.json"), mode="r", encoding="utf-8") as schema_file:
     CONFIGURATION_SCHEMA = json.load(schema_file)
 
 
@@ -25,7 +26,7 @@ def validate_config_schema(update_db):
     try:
         jsonschema.validate(config, CONFIGURATION_SCHEMA)
     except jsonschema.ValidationError as exc:
-        raise Exception(f"The configuration is invalid : {exc!s}")
+        raise jsonschema.ValidationError(f"The configuration is invalid : {exc!s}")
 
     monitor(update_db=update_db)
 

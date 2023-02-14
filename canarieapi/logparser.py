@@ -55,24 +55,25 @@ def parse_log(filename: str) -> RouteStatistics:
     for route in all_stats:
         route_regex = all_stats[route]
         try:
-            route_stats[route] = dict(method_regex=re.compile(route_regex["method"]),
-                                      route_regex=re.compile(route_regex["route"]),
-                                      count=0,
-                                      last_access=None)
+            route_stats[route] = {
+                "method_regex": re.compile(route_regex["method"]),
+                "route_regex": re.compile(route_regex["route"]),
+                "count": 0,
+                "last_access": None,
+            }
         except Exception:
             logger.error("Exception occurs while trying to compile regex of %s", route)
             raise
 
     # Load access log
     logger.info("Loading log file : %s", filename)
-    log_fmt = r'.*\[(?P<datetime>.*)\] "(?P<method>[A-Z]+) (?P<route>/.*) .*'
-    log_regex = re.compile(log_fmt)
+    log_regex = re.compile(r".*\[(?P<datetime>.*)\] \"(?P<method>[A-Z]+) (?P<route>/.*) .*")  # pylint: disable=C4001
     log_records = []
-    with open(filename, "r") as f:
+    with open(filename, mode="r", encoding="utf-8") as f:
         for line in f:
-            m = log_regex.match(line)
-            if m:
-                log_records.append(m.groupdict())
+            match = log_regex.match(line)
+            if match:
+                log_records.append(match.groupdict())
 
     # Compile stats
     logger.info("Compiling stats from %s records", len(log_records))

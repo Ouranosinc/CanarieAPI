@@ -30,9 +30,11 @@ PROJECT_ROOT = os.path.dirname(os.getcwd())
 # version is used.
 sys.path.insert(0, PROJECT_ROOT)
 
-from canarieapi import __meta__  # isort: skip  # noqa
+from canarieapi import __meta__  # isort: skip  # noqa  # pylint: disable=C0413
 
 # -- General configuration ---------------------------------------------
+
+# pylint: disable=C0103  # global scope constants names not upper case
 
 # If your documentation needs a minimal Sphinx version, state it here.
 # needs_sphinx = '1.0'
@@ -236,7 +238,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     ("index", "canarieapi.tex",
-     f"CanarieAPI Documentation",
+     "CanarieAPI Documentation",
      "CRIM", "manual"),
 ]
 

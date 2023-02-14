@@ -5,13 +5,14 @@ from typing_extensions import Literal, NotRequired, Required, TypedDict
 
 # -- 3rd party modules -------------------------------------------------------
 import requests
-from requests.exceptions import ConnectionError
+from requests.exceptions import ConnectionError  # pylint: disable=W0622
 
 # -- Project specific --------------------------------------------------------
 from canarieapi.app_object import APP
 from canarieapi.status import Status
 from canarieapi.utility_rest import JSON, get_db
 
+Number = Union[float, int]
 RequestConfig = TypedDict("RequestConfig", {
     "url": Required[str],
     "method": NotRequired[Literal[
@@ -20,8 +21,15 @@ RequestConfig = TypedDict("RequestConfig", {
     ]],
     "params": NotRequired[Optional[Union[str, Dict[str, str]]]],
     "headers": NotRequired[Dict[str, str]],
+    "cookies": NotRequired[Dict[str, str]],
     "json": NotRequired[Optional[JSON]],
     "data": NotRequired[Optional[str]],
+    "timeout": NotRequired[Optional[Union[Number, Tuple[Number, Number]]]],
+    "proxies": NotRequired[Dict[str, str]],
+    "allow_redirects": NotRequired[bool],
+    "stream": NotRequired[bool],
+    "verify": NotRequired[bool],
+    "cert": NotRequired[Optional[Union[str, Tuple[str, str]]]],
 }, total=False)
 ResponseConfig = TypedDict("ResponseConfig", {
     "status_code": NotRequired[Optional[int]],
@@ -68,6 +76,7 @@ def monitor(update_db: bool = True) -> None:
 
 def check_service(request: RequestConfig, response: ResponseConfig) -> Tuple[Status, str]:
     default_request: RequestConfig = {
+        "timeout": 5,
         "headers": {},
         "params": None,
         "data": None,
@@ -85,28 +94,28 @@ def check_service(request: RequestConfig, response: ResponseConfig) -> Tuple[Sta
 
     logger = APP.logger
     try:
-        r = requests.request(**default_request)
-    except ConnectionError as e:
+        resp = requests.request(**default_request)
+    except ConnectionError as exc:
         url = default_request["url"]
-        message = f"Cannot reach {url} : {e!s}"
+        message = f"Cannot reach {url} : {exc!s}"
         logger.warning(message)
         return Status.down, message
 
-    if r.status_code != default_response["status_code"]:
+    if resp.status_code != default_response["status_code"]:
         message = "Bad return code from {0} (Expecting {1}, Got {2}".format(
             default_request["url"],
             default_response["status_code"],
-            r.status_code)
+            resp.status_code)
         logger.warning(message)
         return Status.bad, message
 
     if default_response["text"]:
         text_regex = re.compile(default_response["text"])
-        if not r.text or not text_regex.match(r.text):
+        if not resp.text or not text_regex.match(resp.text):
             message = "Bad response content from {0} (Expecting : \n{1}\nGot : \n{2}".format(
                 default_request["url"],
                 default_response["text"],
-                r.text)
+                resp.text)
             logger.warning(message)
             return Status.bad, message
     return Status.ok, ""

@@ -20,8 +20,8 @@ https://collaboration.canarie.ca/elgg/discussion/view/3664/research-software-api
 # -- Standard lib ------------------------------------------------------------
 import collections
 import datetime
-import os
 from typing import Dict
+from typing_extensions import TypedDict
 
 # -- 3rd party ---------------------------------------------------------------
 from dateutil.parser import parse as dt_parse
@@ -55,6 +55,11 @@ validate_config_schema(False)
 with APP.app_context():
     get_db()
 
+
+StatusInfo = TypedDict("StatusInfo", {
+    "status": Status,
+    "message": str,
+}, total=True)
 
 START_UTC_TIME = datetime.datetime.utcnow().replace(microsecond=0)
 
@@ -133,10 +138,16 @@ def home() -> ResponseReturnValue:
 
     config = APP.config
     main_title = APP.config.get("SERVER_MAIN_TITLE", __meta__.__title__)
-    content = dict(Platforms={p["info"]["name"]: parse_config(name, "platform", p)
-                              for name, p in config["PLATFORMS"].items()},
-                   Services={s["info"]["name"]: parse_config(name, "service", s)
-                             for name, s in config["SERVICES"].items()})
+    content = {
+        "Platforms": {
+            p["info"]["name"]: parse_config(name, "platform", p)
+            for name, p in config["PLATFORMS"].items()
+        },
+        "Services": {
+            s["info"]["name"]: parse_config(name, "service", s)
+            for name, s in config["SERVICES"].items()
+        }
+    }
     return render_template("home.html", Main_Title=main_title, Title="Home", Content=content)
 
 
@@ -190,7 +201,7 @@ def information(route_name: str, api_type: APIType) -> ResponseReturnValue:
     return render_template("default.html", Main_Title=get_api_title(route_name, api_type), Title="Info", Tags=info)
 
 
-def get_status(route_name: str) -> Dict[str, Dict[str, Status]]:
+def get_status(route_name: str) -> Dict[str, StatusInfo]:
     db = get_db()
     cur = db.cursor()
 
@@ -199,13 +210,12 @@ def get_status(route_name: str) -> Dict[str, Dict[str, Status]]:
     query = "select service, status, message from status where route = ?"
     try:
         cur.execute(query, [route_name])
-        rv = cur.fetchall()
+        records = cur.fetchall()
 
-        for record in rv:
+        for record in records:
             all_status[record[0]] = {"status": record[1], "message": record[2]}
-    except Exception as e:
-        APP.logger.error(str(e))
-        pass
+    except Exception as exc:
+        APP.logger.error(str(exc))
     cur.close()
 
     return all_status
@@ -229,9 +239,11 @@ def stats(route_name: str, api_type: APIType) -> ResponseReturnValue:
     all_status = get_status(route_name)
 
     # Status can be 'ok', 'bad' or 'down'
-    if not all(all_status[service]["status"] == Status.ok for service in all_status):
-        message = ", ".join([f"{service} : {Status.pretty_msg(all_status[service]['status'])}"
-                             for service in all_status])
+    if not all(svc_info["status"] == Status.ok for service, svc_info in all_status.items()):
+        message = ", ".join([
+            f"{service} : {Status.pretty_msg(svc_info['status'])}"
+            for service, svc_info in all_status.items()
+        ])
         return make_error_response(http_status=503,
                                    http_status_response=message)
 
@@ -241,13 +253,12 @@ def stats(route_name: str, api_type: APIType) -> ResponseReturnValue:
     query = "select invocations, last_access from stats where route = ?"
     try:
         cur.execute(query, [route_name])
-        rv = cur.fetchall()
-        if rv:
-            invocations = rv[0][0]
-            last_access = dt_parse(rv[0][1]).replace(tzinfo=None).isoformat() + "Z"
-    except Exception as e:
-        APP.logger.error(str(e))
-        pass
+        records = cur.fetchone()
+        if records:
+            invocations = records[0][0]
+            last_access = dt_parse(records[0][1]).replace(tzinfo=None).isoformat() + "Z"
+    except Exception as exc:
+        APP.logger.error(str(exc))
 
     # Check last time cron job have run (help to diagnose cron problem)
     last_log_update = "Never"
@@ -255,17 +266,16 @@ def stats(route_name: str, api_type: APIType) -> ResponseReturnValue:
     query = "select job, last_execution from cron"
     try:
         cur.execute(query)
-        rv = cur.fetchall()
-        if rv:
-            for record in rv:
+        records = cur.fetchall()
+        if records:
+            for record in records:
                 if record[0] == "log":
                     last_log_update = dt_parse(record[1]).isoformat() + "Z"
                 elif record[0] == "status":
                     last_status_update = dt_parse(record[1]).isoformat() + "Z"
 
-    except Exception as e:
-        APP.logger.error(str(e))
-        pass
+    except Exception as exc:
+        APP.logger.error(str(exc))
 
     cur.close()
 
@@ -274,8 +284,8 @@ def stats(route_name: str, api_type: APIType) -> ResponseReturnValue:
         ("lastInvocationsUpdate", last_log_update),
         ("lastStatusUpdate", last_status_update)
     ]
-    for service in all_status:
-        monitor_info.append((service, Status.pretty_msg(all_status[service]["status"])))
+    for service, svc_info in all_status.items():
+        monitor_info.append((service, Status.pretty_msg(svc_info["status"])))
 
     monitor_info = collections.OrderedDict(monitor_info)
 
@@ -319,22 +329,23 @@ def status(route_name: str, api_type: APIType) -> ResponseReturnValue:
     query = "select last_execution from cron where job == 'status'"
     try:
         cur.execute(query)
-        rv = cur.fetchall()
-        if rv:
-            last_status_update = dt_parse(rv[0][0]).isoformat() + "Z"
-    except Exception as e:
-        APP.logger.error(str(e))
-        pass
+        records = cur.fetchone()
+        if records:
+            last_status_update = dt_parse(records[0][0]).isoformat() + "Z"
+    except Exception as exc:
+        APP.logger.error(str(exc))
 
     cur.close()
 
     monitor_info = [
         ("lastStatusUpdate", last_status_update)
     ]
-    for service in all_status:
-        status_msg = Status.pretty_msg(all_status[service]["status"])
-        if all_status[service]["status"] != Status.ok:
-            status_msg += f" : {all_status[service]['message']}"
+    for service, svc_info in all_status.items():
+        svc_status = svc_info["status"]
+        status_msg = Status.pretty_msg(svc_status)
+        if svc_status != Status.ok:
+            svc_msg = svc_info["message"]
+            status_msg += f" : {svc_msg}"
         monitor_info.append((service, status_msg))
 
     monitor_info = collections.OrderedDict(monitor_info)
@@ -342,8 +353,12 @@ def status(route_name: str, api_type: APIType) -> ResponseReturnValue:
     if request_wants_json():
         return jsonify(monitor_info)
 
-    return render_template("default.html", Main_Title=get_api_title(route_name, api_type), Title="Status",
-                           Tags=monitor_info)
+    return render_template(
+        "default.html",
+        Main_Title=get_api_title(route_name, api_type),
+        Title="Status",
+        Tags=monitor_info,
+    )
 
 
 @APP.route("/<route_name>/<any(" + ",".join(CANARIE_API_TYPE) + "):api_type>/<any(" +

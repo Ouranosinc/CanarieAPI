@@ -9,7 +9,7 @@ from shlex import split
 from subprocess import check_call
 from urllib.parse import urljoin
 
-from conf import __meta__
+from canarieapi import __meta__
 
 DOC_DESTINATION = None  # TODO: Edit this
 
