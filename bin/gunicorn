@@ -1,6 +1,0 @@
-import gunicorn.app.wsgiapp
-import sys
-
-
-if __name__ == '__main__':
-    sys.exit(gunicorn.app.wsgiapp.run())
