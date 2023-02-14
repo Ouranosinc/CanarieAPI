@@ -47,14 +47,16 @@ from canarieapi.utility_rest import (
     validate_route
 )
 
-# Make sure to test the config on launch to raise exception as soon as possible
+# NOTE:
+#   Establish the DB connection to ensure the file can be configured from the start.
+#   Similarly, test the application configuration against the schema on launch.
+#   This raises an exception as soon as possible instead of waiting until an eventual
+#   request that could fail much later after the application started.
+#   When importing 'canarieapi.api', if the (default/overridden) configuration and
+#   parameters are not valid, this could cause failure to import the module itself.
 validate_config_schema(False)
-
-# Creates the database if it doesn't exist, connects to it and keeps it in
-# cache for hassle-free runtime access
 with APP.app_context():
     get_db()
-
 
 StatusInfo = TypedDict("StatusInfo", {
     "status": Status,

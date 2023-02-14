@@ -195,6 +195,8 @@ def get_db() -> sqlite3.Connection:
 
     If the database does not exist, create a connection to local sqlite3 file.
     If the local sqlite3 file doesn't exist, initialize it using a schema.
+
+    Stores the established connection in the application's global context to reuse it whenever required.
     """
     database = getattr(g, "_database", None)
     if database is None:

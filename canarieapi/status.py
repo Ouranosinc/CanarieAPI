@@ -4,9 +4,6 @@ class Status:
     bad = "bad"
     down = "down"
 
-    def __init__(self):
-        pass
-
     @staticmethod
     def pretty_msg(status: "Status") -> str:
         if status == Status.ok:
