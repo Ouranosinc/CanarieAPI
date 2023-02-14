@@ -25,7 +25,7 @@ from typing_extensions import TypedDict
 
 # -- 3rd party ---------------------------------------------------------------
 from dateutil.parser import parse as dt_parse
-from flask import jsonify, redirect, render_template
+from flask import jsonify, redirect, render_template, request
 from flask.typing import ResponseReturnValue
 from werkzeug.exceptions import HTTPException
 
@@ -129,10 +129,10 @@ def home() -> ResponseReturnValue:
         requests = sorted(["info", "stats", "status"] + list(conf.get("redirect", {}).keys()))
         _content = [
             (
-                request,
-                f"{hostname}/{name}/{api_type}/{request}"
+                req,
+                f"{hostname}/{name}/{api_type}/{req}"
             )
-            for request in requests
+            for req in requests
         ]
         return collections.OrderedDict(_content)
 
@@ -148,13 +148,19 @@ def home() -> ResponseReturnValue:
             for name, s in config["SERVICES"].items()
         }
     }
+    if request_wants_json():
+        return jsonify(content)
     return render_template("home.html", Main_Title=main_title, Title="Home", Content=content)
 
 
 @APP.route("/test")
 def manual_test() -> ResponseReturnValue:
     validate_config_schema(True)
-    return redirect(APP.config["MY_SERVER_NAME"])
+    base = APP.config["MY_SERVER_NAME"]
+    qs = request.query_string.decode()
+    qs = f"?{qs}" if qs else ""
+    url = f"{base}{qs}"
+    return redirect(url)
 
 
 @APP.route("/<any_int(" + HANDLED_HTML_ERRORS_STR + "):status_code_str>")
@@ -165,7 +171,7 @@ def extern_html_error_handler(status_code_str: str) -> ResponseReturnValue:
     Handle errors that occur externally provided that Apache is configured so
     that it uses this route for handling errors.
 
-    For this add this line for each handled html errors in the Apache
+    For this add this line for each handled HTML errors in the Apache
     configuration::
 
        ErrorDocument 400 <Rest root>/400
@@ -214,7 +220,7 @@ def get_status(route_name: str) -> Dict[str, StatusInfo]:
 
         for record in records:
             all_status[record[0]] = {"status": record[1], "message": record[2]}
-    except Exception as exc:
+    except Exception as exc:  # pragma: no cover
         APP.logger.error(str(exc))
     cur.close()
 
@@ -257,7 +263,7 @@ def stats(route_name: str, api_type: APIType) -> ResponseReturnValue:
         if records:
             invocations = records[0][0]
             last_access = dt_parse(records[0][1]).replace(tzinfo=None).isoformat() + "Z"
-    except Exception as exc:
+    except Exception as exc:  # pragma: no cover
         APP.logger.error(str(exc))
 
     # Check last time cron job have run (help to diagnose cron problem)
@@ -274,7 +280,7 @@ def stats(route_name: str, api_type: APIType) -> ResponseReturnValue:
                 elif record[0] == "status":
                     last_status_update = dt_parse(record[1]).isoformat() + "Z"
 
-    except Exception as exc:
+    except Exception as exc:  # pragma: no cover
         APP.logger.error(str(exc))
 
     cur.close()
@@ -332,7 +338,7 @@ def status(route_name: str, api_type: APIType) -> ResponseReturnValue:
         records = cur.fetchone()
         if records:
             last_status_update = dt_parse(records[0][0]).isoformat() + "Z"
-    except Exception as exc:
+    except Exception as exc:  # pragma: no cover
         APP.logger.error(str(exc))
 
     cur.close()

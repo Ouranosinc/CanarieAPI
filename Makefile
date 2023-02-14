@@ -345,6 +345,9 @@ coverage-only:  ## check code coverage without dependencies pre-installation
 	coverage run --source "$(APP_NAME)" setup.py test
 	coverage report -m
 	coverage html
+
+.PHONY: coverage-show
+coverage-show: coverage-only  ## display coverage HTML report after analysis
 	$(BROWSER) htmlcov/index.html
 
 .PHONY: coverage

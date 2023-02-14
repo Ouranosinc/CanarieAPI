@@ -20,6 +20,7 @@ from typing_extensions import Literal, TypeAlias
 
 # -- 3rd party ---------------------------------------------------------------
 from flask import Response, current_app, g, jsonify, redirect, render_template, request
+from flask.typing import ResponseReturnValue
 from werkzeug.datastructures import MIMEAccept
 from werkzeug.exceptions import BadRequest, NotFound
 from werkzeug.routing import BaseConverter, Map
@@ -119,7 +120,7 @@ def get_api_title(route_name: str, api_type: APIType) -> str:
     return title
 
 
-def get_canarie_api_response(route_name, api_type, api_request):
+def get_canarie_api_response(route_name: str, api_type: APIType, api_request: str) -> ResponseReturnValue:
     """
     Provide a valid response for the CANARIE API request based on the service route.
 

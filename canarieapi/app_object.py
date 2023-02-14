@@ -27,7 +27,7 @@ APP.wsgi_app = ReverseProxied(APP.wsgi_app)
 # Config
 APP.config.from_object(default_configuration)
 if "CANARIE_API_CONFIG_FN" in environ:
-    APP.config.from_envvar("CANARIE_API_CONFIG_FN")
+    APP.config.from_envvar("CANARIE_API_CONFIG_FN")  # pragma: no cover
     APP.logger.info("Loading custom configuration from %s", environ["CANARIE_API_CONFIG_FN"])
 else:
     APP.logger.info("Using default configuration")

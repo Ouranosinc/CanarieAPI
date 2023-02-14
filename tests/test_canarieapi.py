@@ -36,6 +36,8 @@ class TestCanarieAPI(unittest.TestCase):
             url = f"http://localhost:{port}/"
             cfg["monitoring"]["Component"]["request"]["url"] = url
             responses.get(url, json={}, status=200)  # mock their response
+            for req in cfg["redirect"]:
+                cfg["redirect"][req] = f"{url.rstrip('/')}/{req}"  # not called, just set for compare
 
         cls.app = APP
         cls.web = TestApp(cls.app)
@@ -59,6 +61,42 @@ class TestCanarieAPI(unittest.TestCase):
         assert resp.status_code == 200
         assert all(info in resp.text for info in ["Canarie API", "Platforms", "Services"])
         assert all(name in resp.text for name in self.app.config["SERVICES"])
+
+    def test_extern_http_error(self):
+        from canarieapi.api import HANDLED_HTML_ERRORS
+
+        for code in HANDLED_HTML_ERRORS:
+            resp = self.web.get(f"/{code}", expect_errors=True)
+            assert resp.status_code == code
+
+    def test_test_endpoint(self):
+        resp = self.web.get("/test", params={"f": "json"})
+        while 300 < resp.status_code < 310:
+            resp = resp.follow()
+        assert resp.status_code == 200
+        assert "Platforms" in resp.json
+        assert "Services" in resp.json
+        assert all(svc in resp.json["Services"] for svc in self.app.config["SERVICES"])
+
+    def test_service_info_json(self):
+        name = list(self.app.config["SERVICES"])[0]
+        resp = self.web.get(f"/{name}/service/info", params={"f": "json"})
+        assert resp.status_code == 200
+
+        fields = [
+            "category",
+            "institution",
+            "name",
+            "releaseTime",
+            "researchSubject",
+            "supportEmail",
+            "synopsis",
+            "tags",
+            "version",
+        ]
+        assert all(field in resp.json for field in fields)
+        assert all(isinstance(resp.json[field], str) and resp.json[field] for field in set(fields) - {"tags"})
+        assert isinstance(resp.json["tags"], list) and all(isinstance(tag, str) for tag in resp.json["tags"])
 
     def test_service_status_page(self):
         name = list(self.app.config["SERVICES"])[0]
@@ -85,6 +123,34 @@ class TestCanarieAPI(unittest.TestCase):
         assert resp.content_type == "application/json"
         assert resp.json["Component"] == "Ok"
         assert resp.json["lastStatusUpdate"] != "Never"
+
+    def test_service_stats_page(self):
+        name = list(self.app.config["SERVICES"])[0]
+        resp = self.web.get(f"/{name}/service/stats")
+        assert resp.status_code == 200
+        assert resp.content_type == "text/html"
+        assert f"Service: {name}" in resp.text
+        assert all(
+            field in resp.text
+            for field in ["invocations", "lastReset", "monitoring"]
+        )
+
+    def test_service_stats_json(self):
+        name = list(self.app.config["SERVICES"])[0]
+        resp = self.web.get(f"/{name}/service/stats", params={"f": "json"})
+        assert resp.status_code == 200
+        assert all(
+            field in resp.json
+            for field in ["invocations", "lastReset", "monitoring"]
+        )
+
+    def test_service_redirect_json(self):
+        name = list(self.app.config["SERVICES"])[0]
+        cfg = self.app.config["SERVICES"][name]
+        url = cfg["monitoring"]["Component"]["request"]["url"]
+        resp = self.web.get(f"/{name}/service/doc", params={"f": "json"})
+        assert resp.status_code == 302, "Expect redirect request to the service's doc redirect endpoint"
+        assert resp.location == f"{url.rstrip('/')}/doc"
 
 
 if __name__ == "__main__":
