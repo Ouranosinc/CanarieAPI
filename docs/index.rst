@@ -1,4 +1,4 @@
-Magpie documentation
+CanarieAPI documentation
 ======================================
 
 .. include:: ../README.rst
