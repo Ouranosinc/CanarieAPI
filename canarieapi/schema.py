@@ -11,7 +11,6 @@ from canarieapi.app_object import APP
 from canarieapi.logparser import LOG_BACKUP_COUNT, parse_log
 from canarieapi.monitoring import monitor
 
-
 # The schema that must be respected by the config
 with open(os.path.join(os.path.dirname(__file__), "schema.json"), mode="r", encoding="utf-8") as schema_file:
     CONFIGURATION_SCHEMA = json.load(schema_file)

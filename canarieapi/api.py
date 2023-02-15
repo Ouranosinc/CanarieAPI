@@ -38,8 +38,8 @@ from canarieapi.app_object import APP
 from canarieapi.schema import CONFIGURATION_SCHEMA, validate_config_schema
 from canarieapi.status import Status
 from canarieapi.utility_rest import (
-    APIType,
     AnyIntConverter,
+    APIType,
     get_api_title,
     get_canarie_api_response,
     get_config,
