@@ -35,17 +35,24 @@ JSON = Union[Dict[str, Union[Dict[str, _JSON], List[_JSON], _JSON, float, int, s
 
 def request_wants_json() -> bool:
     """
-    Check if the request type is of type JSON.
+    Check if the request type is of type JSON considering both the ``Accept`` header and ``f`` query parameter.
 
-    The default mimetype */* is interpreted as JSON.
+    The default Media-Type ``*/*`` will be interpreted as JSON.
+    Omitting a preferred type entirely will also default to JSON.
     """
 
-    # Best will be JSON if it's in accepted mimetypes and
-    # has a quality greater or equal to HTML.
-    # For */* both JSON and HTML will have the same quality so JSON still win
+    # Best will be JSON if it's in accepted mimetypes and has a quality greater or equal to HTML.
+    # For */* both JSON and HTML will have the same quality so JSON still win.
+    # Unspecified type is usually the case for scripts (requests, curl, etc.).
+    # In the case of web browsers, the HTML with low quality is usually provided by default.
+    # This way, the returned type matches by default most of the expected values in both contexts.
+    accept = request.accept_mimetypes
+    fmt = str(request.args.get("f", "")).lower()
+    if fmt in ["json", "html"]:
+        return fmt == "json"
     choices = ["application/json", "text/html"]
-    best = request.accept_mimetypes.best_match(choices)
-    return request.args.get("f", "").lower() == "json" or best == "application/json"
+    best = accept.best_match(choices)
+    return accept.accept_json and best == "application/json"
 
 
 def set_html_as_default_response() -> None:

@@ -454,7 +454,7 @@ docker-test: docker-build docker-stop docker-clean
 	docker run --pull never --name "$(APP_DOCKER_TEST)" -p 2000:2000 -d "$(APP_DOCKER_TAG)"
 	@sleep 2
 	@echo "Testing docker image..."
-	(curl http://localhost:2000 | grep "Canarie API" && \
-	  $(MAKE) docker-stop --no-print-directory || \
-	 ($(MAKE) docker-stop --no-print-directory && \
+	(curl http://localhost:2000 -H "Accept: text/html" | grep "Canarie API" && \
+	  $(MAKE) docker-stop -t 5 --no-print-directory || \
+	 ($(MAKE) docker-stop -t 5 --no-print-directory && \
 	  echo "Failed to obtain expected response from CanarieAPI docker"; exit 1 ))
