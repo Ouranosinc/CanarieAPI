@@ -1,0 +1,131 @@
+# run test suites
+
+name: Tests
+on:
+  - pull_request
+  - push
+
+env:
+  FLASK_DEBUG: 1
+  # loaded by canarieapi code, relative to Flask APP
+  CANARIE_API_CONFIG_FN: ../tests/config.py
+  # avoid web-test setup failing due to no-yet configured configuration
+  CANARIE_API_SKIP_CHECK: true
+
+jobs:
+  # see: https://github.com/fkirc/skip-duplicate-actions
+  skip_duplicate:
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@master
+        with:
+          concurrent_skipping: "same_content"
+          skip_after_successful_duplicate: "true"
+          do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
+
+  # see: https://github.com/actions/setup-python
+  tests:
+    needs: skip_duplicate
+    if: ${{ needs.skip_duplicate.outputs.should_skip != 'true' }}
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.allow-failure }}
+    env:
+      # override make command to install directly in active python
+      CONDA_COMMAND: ""
+    services:
+      # Label used to access the service container
+      postgres:
+        image: postgres  # DockerHub
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: qwerty
+        ports:
+          - "5432:5432"
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    strategy:
+      matrix:
+        # os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+        allow-failure: [false]
+        test-case: [test]
+        # can use below option to set environment variables or makefile settings applied during test execution
+        test-option: [""]
+        include:
+          # linter tests
+          - os: ubuntu-latest
+            python-version: "3.10"
+            allow-failure: false
+            test-case: check
+          # coverage test
+          - os: ubuntu-latest
+            python-version: "3.11"
+            allow-failure: false
+            test-case: coverage
+          # smoke test of Docker image
+          - os: ubuntu-latest
+            python-version: none
+            allow-failure: true
+            test-case: test-docker
+          # test allowed failing for legacy versions
+#          - os: ubuntu-20.04
+#            python-version: 3.5
+#            allow-failure: true
+#            test-case: test
+#          - os: ubuntu-20.04
+#            python-version: 3.6
+#            allow-failure: true
+#            test-case: test
+          # test allowed failing for recent versions
+          # - os: ubuntu-latest
+          #   python-version: 3.12
+          #   allow-failure: true
+          #   test-case: test
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: "0"
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        if: ${{ matrix.python-version != 'none' }}
+        with:
+          python-version: ${{ matrix.python-version }}
+      # run 'install-sys' by itself first even if other targets depend on it to setup pip
+      # this ensures that the auto-resolved PIP_XARGS will match the active pip version for following installs
+#      - name: Install Package Managers
+#        if: ${{ matrix.python-version != 'none' }}
+#        run: make install-sys
+      - name: Install Dependencies
+        if: ${{ matrix.python-version != 'none' }}
+        run: make install install-dev version
+      - name: Display Packages
+        if: ${{ matrix.python-version != 'none' }}
+        run: pip freeze
+#      - name: Setup Environment Variables
+#        uses: c-py/action-dotenv-to-setenv@v2
+#        with:
+#          env-file: ./ci/canarieapi.env
+      - name: Display Environment Variables
+        run: |
+          hash -r
+          env | sort
+      # run '-only' test variations since dependencies are preinstalled, skip some resolution time
+      - name: Run Tests
+        run: ${{ matrix.test-option }} make ${{ matrix.test-case }}-only
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v3
+        if: ${{ success() && matrix.test-case == 'coverage' }}
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./reports/coverage.xml
+          fail_ci_if_error: true
+          verbose: true

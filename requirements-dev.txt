@@ -1,4 +1,23 @@
+# doc deps required because of linkchecks
+-r requirements-doc.txt
+autopep8
+bandit
 bump2version
-coverage==4.0
-flake8==2.4.1
-tox==2.1.1
+codacy-coverage>=1.3.11
+coverage>=5.5
+doc8>=0.8
+docformatter
+flake8
+flake8-docstrings
+flake8-quotes
+flask_webtest
+isort>5.5
+mock
+pylint>=2.11,!=2.12,!=2.15
+pylint-flask
+pylint-quotes
+pytest
+responses
+safety
+tox
+unify

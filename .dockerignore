@@ -1,19 +1,19 @@
-# Docker
+## Docker
 Dockerfile
 .dockerignore
 
-# Git
+## Git
 .git
 .github
 
-# Environment
+## Environment
 env/*.env
 venv
 
-# Makefile
+## Makefile
 downloads
 
-# Unit test / Coverage reports
+## Unit test / Coverage reports
 **/.cache
 **/.coverage
 **/.pytest_cache
@@ -21,13 +21,13 @@ downloads
 reports
 share
 
-# PyCharm
+## PyCharm
 .idea
 
-# vscode
+## vscode
 .vscode
 
-# Build artifacts
+## Build artifacts
 **/__pycache__
 **/*.py[cod]
 *.egg-info
@@ -35,8 +35,11 @@ share
 build
 dist
 pip-selfcheck.json
+node_modules
+package-lock.json
+package.json
 
-# Project
+## Project
 *.log
 **/custom.ini
 docs/

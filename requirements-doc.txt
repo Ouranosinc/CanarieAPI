@@ -1,0 +1,12 @@
+# these are doc-only requirements
+# we actually need to install all requirements during docs build because of OpenAPI generation
+# (see 'docs/conf.py')
+astroid
+cloud_sptheme
+jinja2<3.1  # fix sphinx failing with cloud_sptheme, see: https://github.com/sphinx-doc/sphinx/issues/10291
+pycodestyle>=2.6.0,<3
+sphinx>=5.0,<6
+sphinx-autoapi>=1.7.0
+sphinx-autodoc-typehints
+sphinx-paramlinks>=0.4.1
+sphinxcontrib-redoc>=1.6.0
