@@ -77,14 +77,14 @@ jobs:
             allow-failure: true
             test-case: test-docker
           # test allowed failing for legacy versions
-          - os: ubuntu-20.04
-            python-version: 3.5
-            allow-failure: true
-            test-case: test
-          - os: ubuntu-20.04
-            python-version: 3.6
-            allow-failure: true
-            test-case: test
+#          - os: ubuntu-20.04
+#            python-version: 3.5
+#            allow-failure: true
+#            test-case: test
+#          - os: ubuntu-20.04
+#            python-version: 3.6
+#            allow-failure: true
+#            test-case: test
           # test allowed failing for recent versions
           # - os: ubuntu-latest
           #   python-version: 3.12
