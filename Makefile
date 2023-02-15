@@ -336,15 +336,19 @@ test-docker: docker-test  ## run test with docker (alias for 'docker-test' targe
 # for consistency only with other test
 test-docker-only: test-docker ## run test with docker (alias for 'docker-test' target) - WARNING: build image if missing
 
+COVERAGE_HTML_DIR := $(REPORTS_DIR)/coverage
+COVERAGE_HTML_IDX := $(COVERAGE_HTML_DIR)/index.html
+
 .PHONY: coverage-only
 coverage-only:  ## check code coverage without dependencies pre-installation
 	coverage run --source "$(APP_NAME)" setup.py test
+	coverage xml -i -o "$(REPORTS_DIR)/coverage.xml"
 	coverage report -m
-	coverage html
+	coverage html -d "$(COVERAGE_HTML_DIR)"
 
 .PHONY: coverage-show
 coverage-show: coverage-only  ## display coverage HTML report after analysis
-	$(BROWSER) htmlcov/index.html
+	$(BROWSER) "$(COVERAGE_HTML_IDX)"
 
 .PHONY: coverage
 coverage: install-req install-dev coverage-only  ## check code coverage quickly with the default Python
