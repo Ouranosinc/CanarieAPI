@@ -1,5 +1,9 @@
-*.pyc
+## IDE
 .idea
+.vscode
+
+## Artifacts
+*.pyc
 *.egg[s]
 *egg-info
 .coverage
@@ -8,7 +12,10 @@ build/
 dist/
 docs/_build
 env/
+node_modules
+package-lock.json
+package.json
 
-# project files
+## Project Files
 configuration.py
 stats.db

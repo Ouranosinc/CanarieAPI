@@ -1,64 +1,171 @@
-body            { font-family: sans-serif;
-                  background-color: black;
-                  background-image: url("background.jpg");
-                  background-repeat: no-repeat;
-                  background-position: center top;}
-h1, h2          { color: white;}
-a               { color: black; text-decoration: none;}
-a:hover         { text-decoration: underline; cursor: pointer;}
-h1, h2          { font-family: 'Georgia', serif; margin: 0; }
-h2              { font-size: 1.2em; padding-top: 0.5em; padding-bottom: 0.5em;}
-ul, li          { margin: 0; }
-embed, iframe   { height: 500px; width: 50%; border: 0px solid; overflow:hidden;}
-table           { width: 100%; }
-th              { text-align: left; background: #ffffff; padding: 0.5em; bordercolor:#bbbbbb; }
-
-.page           { margin: 2em auto; width: 80%; max-width: 70em;}
-.title          { padding: 1em; background-color: #25a8b5;}
-.title_gradient { background: #db3873; /* For browsers that do not support gradients */
-                  background: -webkit-linear-gradient(left bottom, #db3873, #25a8b5); /* For Safari 5.1 to 6.0 */
-                  background: -o-linear-gradient(bottom top, #db3873, #25a8b5); /* For Opera 11.1 to 12.0 */
-                  background: -moz-linear-gradient(bottom top, #db3873, #25a8b5); /* For Firefox 3.6 to 15 */
-                  background: linear-gradient(to bottom top, #db3873, #25a8b5); /* Standard syntax (must be last) */
-                  padding: 0em; margin: 0em; height: 0.2em; width: 50%; }
-.content        { padding: 1em; background: white;}
-.split          { width: 100%; background: black; font-size: 0}
-.entries        { list-style: none; margin: 0; padding: 0; }
-.add-entry      { font-size: 0.9em; border-bottom: 1px solid #ccc; }
-.add-entry dl   { font-weight: bold; }
-.metanav        { text-align: right; font-size: 0.8em; padding: 0.3em;
-                  margin-bottom: 1em; background: #fafafa; }
-.flash          { background: #d9eff1; padding: 0.5em;
-                  border: 1px solid #25a8b5; }
-.col_header     { font-weight: bold; width: 100px; display: inline-block; }
-.home_link      { border-left: 1px solid #25a8b5; padding: 0 1em 0 1em; }
-.error          { background: #f0d6d6; padding: 0.5em; }
-.succeed        { background: #32c864; padding: 0.5em; }
-.code           { padding: 0.5em; 
-                  font-family:Consolas,"Andale Mono WT","Andale Mono","Bitstream Vera Sans Mono","Nimbus Mono L",Monaco,"Courier New",monospace;
-                  font-size:1em;
-                  direction:ltr;
-                  text-align:left;
-                  background-color:#fbfaf9;
-                  color:#333;
-                  margin-top: 0.5em;
-                  margin-bottom: 0.5em;
-                  box-shadow:inset 0 0 .3em #ccc;
-                  border-radius:2px;
-                }
-.key_value {
-  table-layout: fixed;
-  width: 100%;
-  white-space: initial;
+body {
+    font-family: sans-serif;
+    background-color: black;
+    background-image: url("background.jpg");
+    background-repeat: no-repeat;
+    background-position: center top;
 }
+
+a {
+    color: black;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+h1,
+h2 {
+    color: white;
+    font-family: 'Georgia', serif;
+    margin: 0;
+}
+
+h2 {
+    font-size: 1.2em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+}
+
+ul,
+li {
+    margin: 0;
+}
+
+embed,
+iframe {
+    height: 500px;
+    width: 50%;
+    border: 0 solid;
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+}
+
+th {
+    text-align: left;
+    background: #FFFFFF;
+    padding: 0.5em;
+    border-color: #BBBBBB;
+}
+
+.page {
+    margin: 2em auto;
+    width: 80%;
+    max-width: 70em;
+}
+
+.title {
+    padding: 1em;
+    background-color: #25A8B5;
+}
+
+.title_gradient {
+    background: #DB3873; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(left bottom, #DB3873, #25A8B5); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(bottom top, #DB3873, #25A8B5); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(bottom top, #DB3873, #25A8B5); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(to bottom top, #DB3873, #25A8B5); /* Standard syntax (must be last) */
+    padding: 0;
+    margin: 0;
+    height: 0.2em;
+    width: 50%;
+}
+
+.content {
+    padding: 1em;
+    background: white;
+}
+
+.split {
+    width: 100%;
+    background: black;
+    font-size: 0;
+}
+
+.entries {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.add-entry {
+    font-size: 0.9em;
+    border-bottom: 1px solid #CCCCCC;
+}
+
+.add-entry dl {
+    font-weight: bold;
+}
+
+.metanav {
+    text-align: right;
+    font-size: 0.8em;
+    padding: 0.3em;
+    margin-bottom: 1em;
+    background: #FAFAFA;
+}
+
+.flash {
+    background: #D9EFF1;
+    padding: 0.5em;
+    border: 1px solid #25A8B5;
+}
+
+.col_header {
+    font-weight: bold;
+    width: 100px;
+    display: inline-block;
+}
+
+.home_link {
+    border-left: 1px solid #25A8B5;
+    padding: 0 1em 0 1em;
+}
+
+.error {
+    background: #F0D6D6;
+    padding: 0.5em;
+}
+
+.succeed {
+    background: #32C864;
+    padding: 0.5em;
+}
+
+.code {
+    padding: 0.5em;
+    font-family: Consolas, "Andale Mono WT", "Andale Mono", "Bitstream Vera Sans Mono", "Nimbus Mono L", Monaco, "Courier New", monospace;
+    font-size: 1em;
+    direction: ltr;
+    text-align: left;
+    background-color: #FBFAF9;
+    color: #333333;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    box-shadow: inset 0 0 0.3em #CCCCCC;
+    border-radius: 2px;
+}
+
+.key_value {
+    table-layout: fixed;
+    width: 100%;
+    white-space: initial;
+}
+
 .key_value td {
-  white-space: initial;
+    white-space: initial;
 }
 
 /* Column widths are based on these cells */
 .col-key {
-  width: 25%;
+    width: 25%;
 }
+
 .col-value {
-  width: 75%;
+    width: 75%;
 }

@@ -1,0 +1,18 @@
+{
+  "extends": "stylelint-config-standard",
+  "ignoreFiles": [
+    "build/**",
+    "docs/_build/**"
+  ],
+  "rules": {
+    "block-no-empty": null,
+    "color-no-invalid-hex": true,
+    "color-hex-case": "upper",
+    "color-hex-length": "long",
+    "indentation": [4],
+    "no-descending-specificity": null,
+    "property-no-vendor-prefix": null,
+    "shorthand-property-no-redundant-values": null,
+    "value-no-vendor-prefix": null
+  }
+}
