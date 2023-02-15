@@ -20,6 +20,7 @@ https://collaboration.canarie.ca/elgg/discussion/view/3664/research-software-api
 # -- Standard lib ------------------------------------------------------------
 import collections
 import datetime
+import os
 from typing import Dict
 from typing_extensions import TypedDict
 
@@ -54,9 +55,10 @@ from canarieapi.utility_rest import (
 #   request that could fail much later after the application started.
 #   When importing 'canarieapi.api', if the (default/overridden) configuration and
 #   parameters are not valid, this could cause failure to import the module itself.
-validate_config_schema(False)
-with APP.app_context():
-    get_db()
+if str(os.getenv("CANARIE_API_SKIP_CHECK")).lower() != "true":
+    validate_config_schema(False)
+    with APP.app_context():
+        get_db()
 
 StatusInfo = TypedDict("StatusInfo", {
     "status": Status,

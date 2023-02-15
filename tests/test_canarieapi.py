@@ -8,6 +8,7 @@ import os
 import shutil
 import unittest
 
+import mock
 import responses
 from flask_webtest import TestApp
 
@@ -26,7 +27,13 @@ class TestCanarieAPI(unittest.TestCase):
 
         # important not to import APP at the top nor before config/env were applied
         # otherwise, configuration is loaded immediately and raises an error due to missing directory to store DB file
-        from canarieapi.api import APP  # isort: skip  # noqa
+        cfg_path = os.path.abspath(test_config.__file__)
+        try:
+            with mock.patch.dict("os.environ", {"CANARIE_API_CONFIG_FN": cfg_path, "CANARIE_API_SKIP_CHECK": "true"}):
+                from canarieapi.api import APP  # isort: skip  # noqa
+        except ImportError:
+            print(f"Failed loading APP with test config. Ensure [CANARIE_API_CONFIG_FN={cfg_path}] is set!")
+            raise
 
         APP.config.from_object(cls.config)
 

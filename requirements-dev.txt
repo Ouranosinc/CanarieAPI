@@ -9,6 +9,7 @@ flake8-docstrings
 flake8-quotes
 flask_webtest
 isort>5.5
+mock
 pylint>=2.11,!=2.12,!=2.15
 pylint-flask
 pylint-quotes
