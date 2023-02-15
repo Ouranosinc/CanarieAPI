@@ -445,7 +445,7 @@ docker-clean: 	## remove any leftover images from docker target operations
 .PHONY: docker-stop
 docker-stop:
 	@echo "Stopping test docker container: $(APP_DOCKER_TEST)"
-	-docker container stop "$(APP_DOCKER_TEST)" 2>/dev/null || true
+	-docker container stop -t 5 "$(APP_DOCKER_TEST)" 2>/dev/null || true
 	-docker rm $(APP_DOCKER_TEST) 2>/dev/null || true
 
 .PHONY: docker-test
@@ -455,6 +455,6 @@ docker-test: docker-build docker-stop docker-clean
 	@sleep 2
 	@echo "Testing docker image..."
 	(curl http://localhost:2000 -H "Accept: text/html" | grep "Canarie API" && \
-	  $(MAKE) docker-stop -t 5 --no-print-directory || \
-	 ($(MAKE) docker-stop -t 5 --no-print-directory && \
+	  $(MAKE) docker-stop --no-print-directory || \
+	 ($(MAKE) docker-stop --no-print-directory && \
 	  echo "Failed to obtain expected response from CanarieAPI docker"; exit 1 ))
