@@ -1,3 +1,5 @@
+# doc deps required because of linkchecks
+-r requirements-doc.txt
 autopep8
 bandit
 bump2version
