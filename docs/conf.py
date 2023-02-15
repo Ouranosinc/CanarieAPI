@@ -122,12 +122,29 @@ pygments_style = "sphinx"
 
 
 autoapi_dirs = [os.path.join(PROJECT_ROOT, __meta__.__package__)]
-autoapi_ignore = [os.path.join(PROJECT_ROOT, "magpie/alembic/*")]
+autoapi_ignore = []
 autoapi_python_class_content = "both"
 
 linkcheck_timeout = 20
 linkcheck_retries = 5
 
+# cases to ignore during link checking
+linkcheck_ignore = [
+    # might not exist yet (we are generating it!)
+    "https://canarieapi.readthedocs.io/en/latest/api.html",
+    # FIXME: tmp disable due to Retry-After header for rate-limiting by Github not respected
+    #        (see: https://github.com/sphinx-doc/sphinx/issues/7388)
+    "https://github.com/Ouranosinc/CanarieAPI/*",    # limit so others are still checked
+    # ignore private links
+    "https://github.com/Ouranosinc/PAVICS/*",
+    # ignore false-positive broken links to local doc files used for rendering on GitHub
+    "CHANGES.rst",
+    r"docs/\w+.rst",
+    r"./docs/\w+.rst",
+]
+linkcheck_anchors_ignore = [
+    r".*issuecomment.*"   # GitHub issue comment anchors not resolved
+]
 
 # -- Options for HTML output -------------------------------------------
 

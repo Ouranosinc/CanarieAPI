@@ -58,7 +58,7 @@ CHANGES
 * Fix bug in monitoring introduced in previous version.
 
 `0.3.4 <https://github.com/Ouranosinc/CanarieAPI/tree/0.3.4>`_ (2017-11-09) and prior
-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 
 * [TODO] missing details
 

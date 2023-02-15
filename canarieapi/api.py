@@ -12,8 +12,10 @@
 API definition.
 
 This module defines the generic REST API for platforms and services as defined by
-the CANARIE API specification. See :
-https://collaboration.canarie.ca/elgg/discussion/view/3664/research-software-api-documentation
+the CANARIE API specification.
+
+.. seealso::
+    https://www.canarie.ca/software/support/documentation-guides/
 """
 
 
