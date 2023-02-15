@@ -174,8 +174,6 @@ check-quotes-only: mkdir-reports	## run quotes style checks
 .PHONY: check-security-only
 check-security-only: check-security-code-only check-security-deps-only  ## run security checks
 
-# ignored codes:
-#	42194: https://github.com/kvesteri/sqlalchemy-utils/issues/166  # not fixed since 2015
 .PHONY: check-security-deps-only
 check-security-deps-only: mkdir-reports  ## run security checks on package dependencies
 	@echo "Running security checks of dependencies..."
@@ -185,8 +183,6 @@ check-security-deps-only: mkdir-reports  ## run security checks on package depen
 			-r "$(APP_ROOT)/requirements.txt" \
 			-r "$(APP_ROOT)/requirements-dev.txt" \
 			-r "$(APP_ROOT)/requirements-doc.txt" \
-			-r "$(APP_ROOT)/requirements-sys.txt" \
-			-i 42194 \
 		1> >(tee "$(REPORTS_DIR)/check-security-deps.txt")'
 
 .PHONY: check-security-code-only

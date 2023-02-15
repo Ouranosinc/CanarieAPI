@@ -22,7 +22,7 @@ from typing_extensions import Literal, TypeAlias
 from flask import Response, current_app, g, jsonify, redirect, render_template, request
 from flask.typing import ResponseReturnValue
 from werkzeug.datastructures import MIMEAccept
-from werkzeug.exceptions import BadRequest, NotFound
+from werkzeug.exceptions import BadRequest, HTTPException, NotFound
 from werkzeug.routing import BaseConverter, Map
 
 # -- Project specific --------------------------------------------------------
@@ -115,7 +115,7 @@ def get_api_title(route_name: str, api_type: APIType) -> str:
     try:
         name = get_config(route_name, api_type)["info"]["name"]
         title = f"{title}: {name}"
-    except Exception:
+    except (KeyError, HTTPException):
         pass
     return title
 
