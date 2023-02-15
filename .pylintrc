@@ -193,6 +193,7 @@ generated-members=
     APP.logger.error,
     APP.logger.exception,
     APP.logger.addHandler,
+    APP.logger.handlers,
     APP.logger.setLevel
 # note: 'str.value' is flagged by Enum members defined with strings
 

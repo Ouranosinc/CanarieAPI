@@ -55,7 +55,7 @@ from canarieapi.utility_rest import (
 #   request that could fail much later after the application started.
 #   When importing 'canarieapi.api', if the (default/overridden) configuration and
 #   parameters are not valid, this could cause failure to import the module itself.
-if str(os.getenv("CANARIE_API_SKIP_CHECK")).lower() != "true":
+if str(os.getenv("CANARIE_API_SKIP_CHECK")).lower() != "true":  # pragma: no cover
     validate_config_schema(False)
     with APP.app_context():
         get_db()
