@@ -18,6 +18,7 @@ APP = Flask(__name__)
 formatter = logging.Formatter("[%(asctime)s] [%(process)d] [%(levelname)s] %(name)s : %(message)s")
 ch = logging.StreamHandler(sys.stdout)
 ch.setFormatter(formatter)
+APP.logger.handlers.clear()  # backward compatibility to avoid duplicate log entries
 APP.logger.addHandler(ch)
 APP.logger.setLevel(logging.DEBUG)
 

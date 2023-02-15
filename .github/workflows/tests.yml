@@ -9,6 +9,8 @@ env:
   FLASK_DEBUG: 1
   # loaded by canarieapi code, relative to Flask APP
   CANARIE_API_CONFIG_FN: ../tests/config.py
+  # avoid web-test setup failing due to no-yet configured configuration
+  CANARIE_API_SKIP_CHECK: true
 
 jobs:
   # see: https://github.com/fkirc/skip-duplicate-actions
