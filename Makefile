@@ -440,7 +440,7 @@ docker-push: docker-build  ## push the built docker image
 
 .PHONY: docker-clean
 docker-clean: 	## remove any leftover images from docker target operations
-	-docker rmi "$(docker images -f "reference=$(APP_DOCKER_REPO)" -q)"
+	-docker rmi "$(docker images -f "reference=$(APP_DOCKER_REPO)" -q)" || true
 
 .PHONY: docker-stop
 docker-stop:
@@ -453,8 +453,14 @@ docker-test: docker-build docker-stop docker-clean
 	@echo "Smoke test of docker image: $(DOCKER_TAG)"
 	docker run --pull never --name "$(APP_DOCKER_TEST)" -p 2000:2000 -d "$(APP_DOCKER_TAG)"
 	@sleep 2
-	@echo "Testing docker image..."
+	@echo "Testing docker image package installation..."
+	(docker exec "$(APP_DOCKER_TEST)" \
+	  python -c 'from canarieapi import __meta__; print(__meta__.__version__)' \
+	  | grep "$(APP_VERSION)" || \
+	  ($(MAKE) docker-stop --no-print-directory && \
+	   echo "Failed to obtain expected response from CanarieAPI package in Docker"; exit 1 ))
+	@echo "Testing docker image API response..."
 	(curl http://localhost:2000 -H "Accept: text/html" | grep "Canarie API" && \
 	  $(MAKE) docker-stop --no-print-directory || \
 	 ($(MAKE) docker-stop --no-print-directory && \
-	  echo "Failed to obtain expected response from CanarieAPI docker"; exit 1 ))
+	  echo "Failed to obtain expected response from CanarieAPI Web App in Docker"; exit 1 ))
