@@ -6,8 +6,11 @@ CHANGES
 `Unreleased <https://github.com/Ouranosinc/CanarieAPI/tree/master>`_ (latest)
 ------------------------------------------------------------------------------------
 
-* Fix ``canarieapi-cron`` default configuration to provide the ``PYTHONPATH`` to avoid unresolved package location
-  with ``ImportError``/``ModuleNotFoundError`` when calling the ``logparser`` and ``monitoring`` scripts.
+* Fix ``Dockerfile`` to setup ``CanarieAPI`` accessible from anywhere to avoid ``canarieapi-cron`` failure unless
+  explicit ``PYTHONPATH`` was specified. Avoids unresolved package location with ``ImportError``/``ModuleNotFoundError``
+  when calling the ``logparser`` and ``monitoring`` scripts.
+* Add ``CanarieAPI`` import validation with ``test-docker`` to ensure package is properly installed and accessible
+  from anywhere in the Docker image.
 
 `0.5.0 <https://github.com/Ouranosinc/CanarieAPI/tree/0.5.0>`_ (2023-02-15)
 ------------------------------------------------------------------------------------

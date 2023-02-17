@@ -31,7 +31,7 @@ RUN apt-get update \
 
 # Install package
 COPY ./ ${PKG_DIR}/
-RUN pip install --no-dependencies -e ${PKG_DIR}
+RUN pip install --no-dependencies ${PKG_DIR}
 
 # cron job will inherit the current user environment
 # start cron service
