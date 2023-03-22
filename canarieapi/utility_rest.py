@@ -206,7 +206,9 @@ def get_db() -> sqlite3.Connection:
     Stores the established connection in the application's global context to reuse it whenever required.
     """
     database = getattr(g, "_database", None)
-    if database is None:
+    if database is not None:
+        APP.logger.info("Database found. Reusing cached connection...")
+    else:
         APP.logger.info("Database not defined. Establishing connection...")
 
         database_fn = APP.config["DATABASE"]["filename"]

@@ -252,12 +252,23 @@ def stats(route_name: str, api_type: APIType) -> ResponseReturnValue:
 
     # Status can be 'ok', 'bad' or 'down'
     if not all(svc_info["status"] == Status.ok for service, svc_info in all_status.items()):
-        message = ", ".join([
-            f"{service} : {Status.pretty_msg(svc_info['status'])}"
+        msg_ok = Status.pretty_msg(Status.ok)
+        error_info = collections.OrderedDict([
+            (service, {
+                "status": Status.pretty_msg(svc_info["status"]),
+                "message": svc_info["message"] or (msg_ok if svc_info["status"] == Status.ok else "Undefined Error"),
+            })
             for service, svc_info in all_status.items()
         ])
-        return make_error_response(http_status=503,
-                                   http_status_response=message)
+        if request_wants_json():
+            return jsonify(error_info), 503
+        error_html = render_template(
+            "default.html",
+            Main_Title=get_api_title(route_name, api_type),
+            Title="Error",
+            Tags=error_info,
+        )
+        return error_html, 503
 
     # Gather route stats
     invocations = 0
