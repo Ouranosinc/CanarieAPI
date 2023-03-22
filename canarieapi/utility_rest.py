@@ -30,7 +30,22 @@ from canarieapi.app_object import APP
 
 APIType = Literal["platform", "service"]
 _JSON: TypeAlias = "JSON"
-JSON = Union[Dict[str, Union[Dict[str, _JSON], List[_JSON], _JSON, float, int, str, bool, None]], _JSON]
+JSON = Union[  # pylint: disable=C0103
+    Dict[
+        str,
+        Union[
+            Dict[str, _JSON],
+            List[_JSON],
+            _JSON,
+            float,
+            int,
+            str,
+            bool,
+            None
+        ]
+    ],
+    _JSON
+]
 
 
 def request_wants_json() -> bool:
@@ -206,7 +221,9 @@ def get_db() -> sqlite3.Connection:
     Stores the established connection in the application's global context to reuse it whenever required.
     """
     database = getattr(g, "_database", None)
-    if database is None:
+    if database is not None:
+        APP.logger.info("Database found. Reusing cached connection...")
+    else:
         APP.logger.info("Database not defined. Establishing connection...")
 
         database_fn = APP.config["DATABASE"]["filename"]

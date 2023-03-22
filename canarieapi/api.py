@@ -213,7 +213,10 @@ def information(route_name: str, api_type: APIType) -> ResponseReturnValue:
     return render_template("default.html", Main_Title=get_api_title(route_name, api_type), Title="Info", Tags=info)
 
 
-def get_status(route_name: str) -> Dict[str, StatusInfo]:
+def get_monitoring_statuses(route_name: str) -> Dict[str, StatusInfo]:
+    """
+    Obtain all monitoring statuses for the requested service or platform.
+    """
     db = get_db()
     cur = db.cursor()
 
@@ -248,16 +251,31 @@ def stats(route_name: str, api_type: APIType) -> ResponseReturnValue:
     cur = db.cursor()
 
     # Gather service(s) status
-    all_status = get_status(route_name)
+    all_status = get_monitoring_statuses(route_name)
 
     # Status can be 'ok', 'bad' or 'down'
     if not all(svc_info["status"] == Status.ok for service, svc_info in all_status.items()):
-        message = ", ".join([
-            f"{service} : {Status.pretty_msg(svc_info['status'])}"
-            for service, svc_info in all_status.items()
+        msg_ok = Status.pretty_msg(Status.ok)
+        error_info = collections.OrderedDict([
+            (svc_monitor, {
+                "status": Status.pretty_msg(svc_info["status"]),
+                "message": svc_info["message"] or (msg_ok if svc_info["status"] == Status.ok else "Undefined Error"),
+            })
+            for svc_monitor, svc_info in all_status.items()
         ])
-        return make_error_response(http_status=503,
-                                   http_status_response=message)
+        if request_wants_json():
+            body = {
+                api_type: route_name,
+                "monitoring": error_info,
+            }
+            return jsonify(body), 503
+        error_html = render_template(
+            "default.html",
+            Main_Title=get_api_title(route_name, api_type),
+            Title="Error",
+            Tags=error_info,
+        )
+        return error_html, 503
 
     # Gather route stats
     invocations = 0
@@ -302,6 +320,7 @@ def stats(route_name: str, api_type: APIType) -> ResponseReturnValue:
     monitor_info = collections.OrderedDict(monitor_info)
 
     service_stats = [
+        (api_type, route_name),
         ("lastReset", START_UTC_TIME.isoformat() + "Z"),
         ("invocations", invocations),
         ("monitoring", monitor_info)
@@ -334,7 +353,7 @@ def status(route_name: str, api_type: APIType) -> ResponseReturnValue:
     cur = db.cursor()
 
     # Gather service(s) status
-    all_status = get_status(route_name)
+    all_status = get_monitoring_statuses(route_name)
 
     # Check last time cron job have run (help to diagnose cron problem)
     last_status_update = "Never"

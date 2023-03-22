@@ -6,6 +6,10 @@ CHANGES
 `Unreleased <https://github.com/Ouranosinc/CanarieAPI/tree/master>`_ (latest)
 ------------------------------------------------------------------------------------
 
+* Add better table formatted HTML rendering from the stats endpoints even when a monitoring error of an underlying
+  endpoint occurs to allow better readability of the cause of error.
+* Add cached database logging entry to facilitate debugging.
+
 `0.5.1 <https://github.com/Ouranosinc/CanarieAPI/tree/0.5.1>`_ (2023-02-16)
 ------------------------------------------------------------------------------------
 

@@ -2,7 +2,8 @@
   "extends": "stylelint-config-standard",
   "ignoreFiles": [
     "build/**",
-    "docs/_build/**"
+    "docs/_build/**",
+    "reports/**"
   ],
   "rules": {
     "block-no-empty": null,

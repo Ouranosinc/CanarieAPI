@@ -51,6 +51,7 @@ class TestCanarieAPI(unittest.TestCase):
 
         responses.start()  # mock for monitors
 
+    def setUp(self) -> None:
         # trigger cron updates immediately to generate status update entries
         # these should end up calling the above monitored apps
         cron_job_logparse()
@@ -131,7 +132,7 @@ class TestCanarieAPI(unittest.TestCase):
         assert resp.json["Component"] == "Ok"
         assert resp.json["lastStatusUpdate"] != "Never"
 
-    def test_service_stats_page(self):
+    def test_service_stats_page_service_success(self):
         name = list(self.app.config["SERVICES"])[0]
         resp = self.web.get(f"/{name}/service/stats")
         assert resp.status_code == 200
@@ -142,7 +143,7 @@ class TestCanarieAPI(unittest.TestCase):
             for field in ["invocations", "lastReset", "monitoring"]
         )
 
-    def test_service_stats_json(self):
+    def test_service_stats_json_service_success(self):
         name = list(self.app.config["SERVICES"])[0]
         resp = self.web.get(f"/{name}/service/stats", params={"f": "json"})
         assert resp.status_code == 200
@@ -150,6 +151,40 @@ class TestCanarieAPI(unittest.TestCase):
             field in resp.json
             for field in ["invocations", "lastReset", "monitoring"]
         )
+
+    def test_service_stats_page_service_error(self):
+        name = list(self.app.config["SERVICES"])[0]
+        url = self.app.config["SERVICES"][name]["monitoring"]["Component"]["request"]["url"]
+
+        with responses.RequestsMock() as mock_responses:
+            mock_responses.get(url, json={}, status=400)
+            cron_job_monitor()  # re-trigger to cause the above error to happen when calling the service
+            resp = self.web.get(f"/{name}/service/stats", expect_errors=True)
+
+        assert resp.status_code == 503
+        assert resp.content_type == "text/html"
+        assert f"Service: {name}" in resp.text
+        assert all(field in resp.text for field in ["status", "message"])
+        assert "Expecting 200, Got 400" in resp.text
+
+    def test_service_stats_json_service_error(self):
+        service = list(self.app.config["SERVICES"])[0]
+        monitor = "Component"
+        url = self.app.config["SERVICES"][service]["monitoring"][monitor]["request"]["url"]
+
+        with responses.RequestsMock() as mock_responses:
+            mock_responses.get(url, json={}, status=400)
+            cron_job_monitor()  # re-trigger to cause the above error to happen when calling the service
+            resp = self.web.get(f"/{service}/service/stats", params={"f": "json"}, expect_errors=True)
+
+        assert resp.status_code == 503
+        assert "service" in resp.json
+        assert resp.json["service"] == service
+        assert "monitoring" in resp.json
+        assert monitor in resp.json["monitoring"]
+        assert all(field in resp.json["monitoring"][monitor] for field in ["status", "message"])
+        assert resp.json["monitoring"][monitor]["status"].upper() != "OK"
+        assert "Expecting 200, Got 400" in resp.json["monitoring"][monitor]["message"]
 
     def test_service_redirect_json(self):
         name = list(self.app.config["SERVICES"])[0]
