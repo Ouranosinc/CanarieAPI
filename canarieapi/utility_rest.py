@@ -30,7 +30,22 @@ from canarieapi.app_object import APP
 
 APIType = Literal["platform", "service"]
 _JSON: TypeAlias = "JSON"
-JSON = Union[Dict[str, Union[Dict[str, _JSON], List[_JSON], _JSON, float, int, str, bool, None]], _JSON]
+JSON = Union[  # pylint: disable=C0103
+    Dict[
+        str,
+        Union[
+            Dict[str, _JSON],
+            List[_JSON],
+            _JSON,
+            float,
+            int,
+            str,
+            bool,
+            None
+        ]
+    ],
+    _JSON
+]
 
 
 def request_wants_json() -> bool:
