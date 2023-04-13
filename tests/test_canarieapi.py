@@ -25,6 +25,7 @@ class TestCanarieAPI(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.config = test_config
+        os.makedirs(cls.config.db_dir, exist_ok=True)
 
         # important not to import APP at the top nor before config/env were applied
         # otherwise, configuration is loaded immediately and raises an error due to missing directory to store DB file
@@ -203,6 +204,7 @@ class TestDatabaseErrorHandling(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.config = test_config
+        os.makedirs(cls.config.db_dir, exist_ok=True)
 
         # important not to import APP at the top nor before config/env were applied
         # otherwise, configuration is loaded immediately and raises an error due to missing directory to store DB file
