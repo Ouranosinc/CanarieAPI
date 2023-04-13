@@ -1,15 +1,17 @@
 # -- Standard lib ------------------------------------------------------------
+import sqlite3
+
 import logging
 import logging.handlers
 import os
 import re
 import signal
 import time
-from typing import Dict, Union
+from typing import Dict, Optional, Union
 
 # -- Project specific --------------------------------------------------------
 from canarieapi.app_object import APP
-from canarieapi.utility_rest import get_db
+from canarieapi.utility_rest import get_db, retry_db_error_after_init
 
 LOG_BACKUP_COUNT = 150
 
@@ -87,12 +89,13 @@ def parse_log(filename: str) -> RouteStatistics:
     return route_stats
 
 
-def update_db(route_stats: RouteStatistics) -> None:
+@retry_db_error_after_init
+def update_db(route_stats: RouteStatistics, database: Optional[sqlite3.Connection] = None) -> None:
     # Update stats in database
     logger = APP.logger
     logger.info("Updating database")
     with APP.app_context():
-        db = get_db()
+        db = database or get_db()
         cur = db.cursor()
 
         for route, value in route_stats.items():
