@@ -16,8 +16,8 @@ import inspect
 import os
 import re
 import sqlite3
-from typing import Any, Dict, List, Optional, Protocol, Tuple, TypeVar, Union
-from typing_extensions import Literal, TypeAlias
+from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
+from typing_extensions import Literal, Protocol, TypeAlias
 
 # -- 3rd party ---------------------------------------------------------------
 from flask import Response, current_app, g, jsonify, redirect, render_template, request
