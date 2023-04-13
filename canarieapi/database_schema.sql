@@ -1,20 +1,23 @@
-CREATE TABLE [stats] (
+CREATE TABLE IF NOT EXISTS [stats] (
   [route] VARCHAR(32),
   [invocations] INTEGER,
-  [last_access] DATETIME);
+  [last_access] DATETIME
+);
 
-CREATE UNIQUE INDEX [stats_id] ON [stats] ([route]);
+CREATE UNIQUE INDEX IF NOT EXISTS [stats_id] ON [stats] ([route]);
 
-CREATE TABLE [status] (
+CREATE TABLE IF NOT EXISTS [status] (
   [route] VARCHAR(32),
   [service] VARCHAR(32),
   [status] VARCHAR(8),
-  [message] VARCHAR(256));
+  [message] VARCHAR(256)
+);
 
-CREATE UNIQUE INDEX [status_id] ON [status] ([route], [service]);
+CREATE UNIQUE INDEX IF NOT EXISTS [status_id] ON [status] ([route], [service]);
 
-CREATE TABLE [cron] (
+CREATE TABLE IF NOT EXISTS [cron] (
   [job] VARCHAR(32),
-  [last_execution] DATETIME);
+  [last_execution] DATETIME
+);
 
-CREATE UNIQUE INDEX [cron_id] ON [cron] ([job]);
+CREATE UNIQUE INDEX IF NOT EXISTS [cron_id] ON [cron] ([job]);

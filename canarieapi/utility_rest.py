@@ -8,14 +8,15 @@ This module is a collection of utility functions used mainly by the rest_route
 module and which are placed here to keep the rest_route module as clean as possible.
 """
 
-
 # -- Standard lib ------------------------------------------------------------
 import configparser
+import functools
 import http.client
+import inspect
 import os
 import re
 import sqlite3
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Protocol, Tuple, TypeVar, Union
 from typing_extensions import Literal, TypeAlias
 
 # -- 3rd party ---------------------------------------------------------------
@@ -46,6 +47,8 @@ JSON = Union[  # pylint: disable=C0103
     ],
     _JSON
 ]
+
+ReturnType = TypeVar("ReturnType")
 
 
 def request_wants_json() -> bool:
@@ -245,7 +248,9 @@ def get_db() -> sqlite3.Connection:
             raise
 
         APP.logger.debug("Initialize database with filename: [%s]", database_fn)
-        if not db_exists:
+        if db_exists:
+            APP.logger.debug("Skipping database initialization: [%s] (already exists)", database_fn)
+        else:
             try:
                 init_db(database)
             except Exception as exc:
@@ -279,6 +284,51 @@ def init_db(database: sqlite3.Connection) -> None:
         with current_app.open_resource(schema_fn, mode="r") as schema_f:
             database.cursor().executescript(schema_f.read())
         database.commit()
+
+
+class DatabaseRetryFunction(Protocol):
+    def __call__(self, *args: Any, database: Optional[sqlite3.Connection] = None, **kwargs: Any) -> ReturnType: ...
+
+
+def retry_db_error_after_init(func: DatabaseRetryFunction) -> DatabaseRetryFunction:
+    """
+    Decorator that will retry a failing operation if an error related to database initialization occurred.
+    """
+
+    @functools.wraps(func)
+    def retry(*args: Any, database: sqlite3.Connection = None, **kwargs: Any) -> ReturnType:
+        db_param = inspect.signature(func).parameters.get("database")
+        db = None
+        with APP.app_context():
+            if db_param and "sqlite3.Connection" in str(db_param.annotation):
+                db = database or get_db()
+                kwargs["database"] = db
+            try:
+                return func(*args, **kwargs)
+            except sqlite3.OperationalError as exc:
+                mod = getattr(func, "__module__", "")
+                mod = f"{mod}." if mod else ""
+                name = f"{mod}.{func.__name__}"
+                if "no such table" in str(exc):
+                    if not db:
+                        APP.logger.debug(
+                            "Missing database parameter to retry operation [%s] after initialization.",
+                            name,
+                        )
+                    else:
+                        APP.logger.warning(
+                            "Error from database [%s] during [%s] operation. Retrying after initialization.",
+                            name, exc,
+                        )
+                        init_db(db)
+                        return func(*args, **kwargs)
+                APP.logger.error(
+                    "Error from database: [%s] during [%s] operation. Could not recover.",
+                    name, exc,
+                )
+                raise
+
+    return retry
 
 
 class AnyIntConverter(BaseConverter):

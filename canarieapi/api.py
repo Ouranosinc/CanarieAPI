@@ -17,13 +17,13 @@ the CANARIE API specification.
 .. seealso::
     https://www.canarie.ca/software/support/documentation-guides/
 """
-
+import sqlite3
 
 # -- Standard lib ------------------------------------------------------------
 import collections
 import datetime
 import os
-from typing import Dict
+from typing import Dict, Optional
 from typing_extensions import TypedDict
 
 # -- 3rd party ---------------------------------------------------------------
@@ -46,6 +46,7 @@ from canarieapi.utility_rest import (
     get_db,
     make_error_response,
     request_wants_json,
+    retry_db_error_after_init,
     set_html_as_default_response,
     validate_route
 )
@@ -58,14 +59,26 @@ from canarieapi.utility_rest import (
 #   When importing 'canarieapi.api', if the (default/overridden) configuration and
 #   parameters are not valid, this could cause failure to import the module itself.
 if str(os.getenv("CANARIE_API_SKIP_CHECK")).lower() != "true":  # pragma: no cover
-    validate_config_schema(False)
+    validate_config_schema(update_db=False)
     with APP.app_context():
         get_db()
 
-StatusInfo = TypedDict("StatusInfo", {
+CronAccessStats = TypedDict("CronAccessStats", {
+    "invocations": int,
+    "last_access": str,  # ISO datetime | Never
+    "last_log_update": str,  # ISO datetime | Never
+    "last_status_update": str,  # ISO datetime | Never
+}, total=True)
+
+CronLastStatus = TypedDict("CronLastStatus", {
+    "last_status_update": str,  # ISO datetime | Never
+}, total=True)
+
+MonitorStatus = TypedDict("MonitorStatus", {
     "status": Status,
     "message": str,
 }, total=True)
+MonitorInfo = Dict[str, MonitorStatus]
 
 START_UTC_TIME = datetime.datetime.utcnow().replace(microsecond=0)
 
@@ -161,7 +174,7 @@ def home() -> ResponseReturnValue:
 
 @APP.route("/test")
 def manual_test() -> ResponseReturnValue:
-    validate_config_schema(True)
+    validate_config_schema(update_db=True)
     base = APP.config["MY_SERVER_NAME"]
     qs = request.query_string.decode()
     qs = f"?{qs}" if qs else ""
@@ -213,11 +226,12 @@ def information(route_name: str, api_type: APIType) -> ResponseReturnValue:
     return render_template("default.html", Main_Title=get_api_title(route_name, api_type), Title="Info", Tags=info)
 
 
-def get_monitoring_statuses(route_name: str) -> Dict[str, StatusInfo]:
+@retry_db_error_after_init
+def collect_monitoring_statuses(route_name: str, *, database: Optional[sqlite3.Connection] = None) -> MonitorInfo:
     """
     Obtain all monitoring statuses for the requested service or platform.
     """
-    db = get_db()
+    db = database or get_db()
     cur = db.cursor()
 
     # Gather service(s) status
@@ -236,51 +250,17 @@ def get_monitoring_statuses(route_name: str) -> Dict[str, StatusInfo]:
     return all_status
 
 
-@APP.route("/<route_name>/<any(" + ",".join(CANARIE_API_TYPE) + "):api_type>/stats")
-def stats(route_name: str, api_type: APIType) -> ResponseReturnValue:
+@retry_db_error_after_init
+def collect_cron_access_stats(route_name: str, *, database: Optional[sqlite3.Connection] = None) -> CronAccessStats:
     """
-    Stats route required by CANARIE.
+    Obtain access statuses of a service or platform from cron monitoring and logging jobs.
     """
-
-    # JSON is used by default but the Canarie API requires html as default
-    set_html_as_default_response()
-
-    validate_route(route_name, api_type)
-
-    db = get_db()
-    cur = db.cursor()
-
-    # Gather service(s) status
-    all_status = get_monitoring_statuses(route_name)
-
-    # Status can be 'ok', 'bad' or 'down'
-    if not all(svc_info["status"] == Status.ok for service, svc_info in all_status.items()):
-        msg_ok = Status.pretty_msg(Status.ok)
-        error_info = collections.OrderedDict([
-            (svc_monitor, {
-                "status": Status.pretty_msg(svc_info["status"]),
-                "message": svc_info["message"] or (msg_ok if svc_info["status"] == Status.ok else "Undefined Error"),
-            })
-            for svc_monitor, svc_info in all_status.items()
-        ])
-        if request_wants_json():
-            body = {
-                api_type: route_name,
-                "monitoring": error_info,
-            }
-            return jsonify(body), 503
-        error_html = render_template(
-            "default.html",
-            Main_Title=get_api_title(route_name, api_type),
-            Title="Error",
-            Tags=error_info,
-        )
-        return error_html, 503
-
-    # Gather route stats
     invocations = 0
     last_access = "Never"
+
     query = "select invocations, last_access from stats where route = ?"
+    db = database or get_db()
+    cur = db.cursor()
     try:
         cur.execute(query, [route_name])
         records = cur.fetchone()
@@ -309,10 +289,84 @@ def stats(route_name: str, api_type: APIType) -> ResponseReturnValue:
 
     cur.close()
 
+    info: CronAccessStats = {
+        "invocations": invocations,
+        "last_access": last_access,
+        "last_log_update": last_log_update,
+        "last_status_update": last_status_update,
+    }
+    return info
+
+
+@retry_db_error_after_init
+def collect_cron_last_status(*, database: Optional[sqlite3.Connection] = None) -> CronLastStatus:
+    """
+    Obtain the last time cron job have run (help to diagnose cron problem).
+    """
+    last_status_update = "Never"
+    query = "select last_execution from cron where job == 'status'"
+    db = database or get_db()
+    cur = db.cursor()
+    try:
+        cur.execute(query)
+        records = cur.fetchone()
+        if records:
+            last_status_update = dt_parse(records[0][0]).isoformat() + "Z"
+    except Exception as exc:  # pragma: no cover
+        APP.logger.error(str(exc))
+
+    cur.close()
+    
+    return {"last_status_update": last_status_update}
+
+
+@APP.route("/<route_name>/<any(" + ",".join(CANARIE_API_TYPE) + "):api_type>/stats")
+def stats(route_name: str, api_type: APIType) -> ResponseReturnValue:
+    """
+    Stats route required by CANARIE.
+    """
+
+    # JSON is used by default but the Canarie API requires html as default
+    set_html_as_default_response()
+
+    validate_route(route_name, api_type)
+
+    db = get_db()
+
+    # Gather service(s) status
+    all_status = collect_monitoring_statuses(route_name, database=db)
+
+    # Status can be 'ok', 'bad' or 'down'
+    if not all(svc_info["status"] == Status.ok for service, svc_info in all_status.items()):
+        msg_ok = Status.pretty_msg(Status.ok)
+        error_info = collections.OrderedDict([
+            (svc_monitor, {
+                "status": Status.pretty_msg(svc_info["status"]),
+                "message": svc_info["message"] or (msg_ok if svc_info["status"] == Status.ok else "Undefined Error"),
+            })
+            for svc_monitor, svc_info in all_status.items()
+        ])
+        if request_wants_json():
+            body = {
+                api_type: route_name,
+                "monitoring": error_info,
+            }
+            return jsonify(body), 503
+        error_html = render_template(
+            "default.html",
+            Main_Title=get_api_title(route_name, api_type),
+            Title="Error",
+            Tags=error_info,
+        )
+        return error_html, 503
+
+    # Gather route stats
+    cron_info = collect_cron_access_stats(route_name, database=db)
+
     monitor_info = [
-        ("lastAccess", last_access),
-        ("lastInvocationsUpdate", last_log_update),
-        ("lastStatusUpdate", last_status_update)
+        ("lastAccess", cron_info["last_access"]),
+        ("lastInvocationsUpdate", cron_info["last_log_update"]),
+        ("lastStatusUpdate", cron_info["last_status_update"])
     ]
     for service, svc_info in all_status.items():
         monitor_info.append((service, Status.pretty_msg(svc_info["status"])))
@@ -322,7 +376,7 @@ def stats(route_name: str, api_type: APIType) -> ResponseReturnValue:
     service_stats = [
         (api_type, route_name),
         ("lastReset", START_UTC_TIME.isoformat() + "Z"),
-        ("invocations", invocations),
+        ("invocations", cron_info["invocations"]),
         ("monitoring", monitor_info)
     ]
     service_stats = collections.OrderedDict(service_stats)
@@ -353,23 +407,13 @@ def status(route_name: str, api_type: APIType) -> ResponseReturnValue:
     cur = db.cursor()
 
     # Gather service(s) status
-    all_status = get_monitoring_statuses(route_name)
+    all_status = collect_monitoring_statuses(route_name, database=db)
 
     # Check last time cron job have run (help to diagnose cron problem)
-    last_status_update = "Never"
-    query = "select last_execution from cron where job == 'status'"
-    try:
-        cur.execute(query)
-        records = cur.fetchone()
-        if records:
-            last_status_update = dt_parse(records[0][0]).isoformat() + "Z"
-    except Exception as exc:  # pragma: no cover
-        APP.logger.error(str(exc))
-
-    cur.close()
+    cron_status = collect_cron_last_status(database=db)
 
     monitor_info = [
-        ("lastStatusUpdate", last_status_update)
+        ("lastStatusUpdate", cron_status["last_status_update"])
     ]
     for service, svc_info in all_status.items():
         svc_status = svc_info["status"]
