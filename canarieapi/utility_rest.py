@@ -48,7 +48,7 @@ JSON = Union[  # pylint: disable=C0103
     _JSON
 ]
 
-ReturnType = TypeVar("ReturnType")
+ReturnType = TypeVar("ReturnType")  # pylint: disable=C0103
 
 
 def request_wants_json() -> bool:
@@ -287,7 +287,8 @@ def init_db(database: sqlite3.Connection) -> None:
 
 
 class DatabaseRetryFunction(Protocol):
-    def __call__(self, *args: Any, database: Optional[sqlite3.Connection] = None, **kwargs: Any) -> ReturnType: ...
+    def __call__(self, *args: Any, database: Optional[sqlite3.Connection] = None, **kwargs: Any) -> ReturnType:
+        ...
 
 
 def retry_db_error_after_init(func: DatabaseRetryFunction) -> DatabaseRetryFunction:

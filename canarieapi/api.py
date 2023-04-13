@@ -17,12 +17,11 @@ the CANARIE API specification.
 .. seealso::
     https://www.canarie.ca/software/support/documentation-guides/
 """
-import sqlite3
-
 # -- Standard lib ------------------------------------------------------------
 import collections
 import datetime
 import os
+import sqlite3
 from typing import Dict, Optional
 from typing_extensions import TypedDict
 
@@ -316,7 +315,7 @@ def collect_cron_last_status(*, database: Optional[sqlite3.Connection] = None) -
         APP.logger.error(str(exc))
 
     cur.close()
-    
+
     return {"last_status_update": last_status_update}
 
 
@@ -404,7 +403,6 @@ def status(route_name: str, api_type: APIType) -> ResponseReturnValue:
     validate_route(route_name, api_type)
 
     db = get_db()
-    cur = db.cursor()
 
     # Gather service(s) status
     all_status = collect_monitoring_statuses(route_name, database=db)

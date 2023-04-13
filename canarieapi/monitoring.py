@@ -1,7 +1,6 @@
 # -- Standard lib ------------------------------------------------------------
-import sqlite3
-
 import re
+import sqlite3
 from typing import Dict, Optional, Tuple, Union
 from typing_extensions import Literal, NotRequired, Required, TypedDict
 

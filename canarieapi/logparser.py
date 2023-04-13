@@ -1,11 +1,10 @@
 # -- Standard lib ------------------------------------------------------------
-import sqlite3
-
 import logging
 import logging.handlers
 import os
 import re
 import signal
+import sqlite3
 import time
 from typing import Dict, Optional, Union
 
