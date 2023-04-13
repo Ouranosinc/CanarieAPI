@@ -456,8 +456,10 @@ def close_connection(_: Exception) -> None:
 
     :param _: Exception handled elsewhere, nothing to do with it
     """
-    APP.logger.info(u"Disconnecting from database")
-    get_db().close()
+    db = get_db(connect=False)  # avoid creating a connection only to close it.
+    if db:
+        APP.logger.info("Disconnecting from database.")
+        db.close()
 
 
 if __name__ == "__main__":

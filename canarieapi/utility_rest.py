@@ -214,7 +214,7 @@ def make_error_response(
     return template, http_status
 
 
-def get_db() -> sqlite3.Connection:
+def get_db(allow_cache: bool = True, connect: bool = True) -> sqlite3.Connection:
     """
     Get a connection to an existing database.
 
@@ -224,9 +224,9 @@ def get_db() -> sqlite3.Connection:
     Stores the established connection in the application's global context to reuse it whenever required.
     """
     database = getattr(g, "_database", None)
-    if database is not None:
+    if database is not None and allow_cache:
         APP.logger.info("Database found. Reusing cached connection...")
-    else:
+    elif connect:
         APP.logger.info("Database not defined. Establishing connection...")
 
         database_fn = APP.config["DATABASE"]["filename"]

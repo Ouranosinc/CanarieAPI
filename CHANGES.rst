@@ -9,6 +9,9 @@ CHANGES
 * Add a retry function decorator for database operations to handle rare occurrences where the database could have been
   improperly initialized. In case of relevant database issue, the operation is retried after running the initialization.
 * Add more logging entries to help debug error causes and relevant database operations that lead to them if applicable.
+* Avoid unnecessary creation of a database connection simply to close it when performing teardown request cleanup.
+  This occurred at least 3 times for each HTML requests because of UI static file requests retrieved for display.
+  Also, avoids the unnecessary verbose logging of opening, finding and closing this unused database connection.
 
 `0.6.0 <https://github.com/Ouranosinc/CanarieAPI/tree/0.6.0>`_ (2023-03-22)
 ------------------------------------------------------------------------------------
