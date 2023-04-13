@@ -58,7 +58,6 @@ def request_wants_json() -> bool:
     The default Media-Type ``*/*`` will be interpreted as JSON.
     Omitting a preferred type entirely will also default to JSON.
     """
-
     # Best will be JSON if it's in accepted mimetypes and has a quality greater or equal to HTML.
     # For */* both JSON and HTML will have the same quality so JSON still win.
     # Unspecified type is usually the case for scripts (requests, curl, etc.).
@@ -83,7 +82,6 @@ def set_html_as_default_response() -> None:
     This is useful for automatically rendering HTML by web browsers that do not
     provide explicitly the desired mimetype.
     """
-
     # Best will be HTML if it's in accept mimetypes and
     # has a quality greater or equal to JSON.
     # For */* both JSON and HTML will have the same quality so HTML still wins
@@ -135,7 +133,6 @@ def get_api_title(route_name: str, api_type: APIType) -> str:
     :param api_type: Api type of the route which must be one of platform or service
     :returns: An API title
     """
-
     title = api_type.capitalize()
     try:
         name = get_config(route_name, api_type)["info"]["name"]
@@ -155,7 +152,6 @@ def get_canarie_api_response(route_name: str, api_type: APIType, api_request: st
     :param api_request: The request specified in the URL
     :returns: A valid HTML response
     """
-
     # Factsheet is not part of the service API, so it's expected that the config will not be found
     if api_type == "service" and api_request == "factsheet":
         return make_error_response(http_status=404)
@@ -295,7 +291,6 @@ def retry_db_error_after_init(func: DatabaseRetryFunction) -> DatabaseRetryFunct
     """
     Decorator that will retry a failing operation if an error related to database initialization occurred.
     """
-
     @functools.wraps(func)
     def retry(*args: Any, database: sqlite3.Connection = None, **kwargs: Any) -> ReturnType:
         db_param = inspect.signature(func).parameters.get("database")

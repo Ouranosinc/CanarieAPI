@@ -202,7 +202,6 @@ def information(route_name: str, api_type: APIType) -> ResponseReturnValue:
     """
     Info route required by CANARIE.
     """
-
     # JSON is used by default but the Canarie API requires html as default
     set_html_as_default_response()
 
@@ -324,7 +323,6 @@ def stats(route_name: str, api_type: APIType) -> ResponseReturnValue:
     """
     Stats route required by CANARIE.
     """
-
     # JSON is used by default but the Canarie API requires html as default
     set_html_as_default_response()
 
@@ -396,7 +394,6 @@ def status(route_name: str, api_type: APIType) -> ResponseReturnValue:
     """
     Extra route to know service status.
     """
-
     # JSON is used by default but the Canarie API requires html as default
     set_html_as_default_response()
 
@@ -440,7 +437,6 @@ def simple_requests_handler(route_name: str, api_type: APIType, api_request: str
     """
     #Handle simple requests required by CANARIE.
     """
-
     # JSON is used by default but the Canarie API requires html as default
     set_html_as_default_response()
 

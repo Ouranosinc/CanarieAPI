@@ -22,7 +22,6 @@ def test_validate_error_wrong_schema(tmp_config):  # noqa  # pylint: disable=W06
     """
     Ensure the configuration schema is used to validate the application configuration at startup.
     """
-
     from canarieapi.api import APP  # isort: skip  # noqa
 
     APP.config.update({
