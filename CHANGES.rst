@@ -6,6 +6,12 @@ CHANGES
 `Unreleased <https://github.com/Ouranosinc/CanarieAPI/tree/master>`_ (latest)
 ------------------------------------------------------------------------------------
 
+.. **ADD LIST ITEMS WITH NEW CHANGES AND REMOVE THIS COMMENT**
+No changes yet.
+
+`0.7.0 <https://github.com/Ouranosinc/CanarieAPI/tree/0.7.0>`_ (2023-04-14)
+------------------------------------------------------------------------------------
+
 * Add a retry function decorator for database operations to handle rare occurrences where the database could have been
   improperly initialized. In case of relevant database issue, the operation is retried after running the initialization.
 * Add more logging entries to help debug error causes and relevant database operations that lead to them if applicable.

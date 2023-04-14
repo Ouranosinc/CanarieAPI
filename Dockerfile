@@ -2,7 +2,7 @@ FROM nginx
 LABEL description="CanarieAPI: Self describing REST service for Canarie registry."
 LABEL maintainer="David Byrns <david.byrns@crim.ca>, Francis Charette-Migneault <francis.charette-migneault@crim.ca>"
 LABEL vendor="Ouranosinc, CRIM"
-LABEL version="0.6.0"
+LABEL version="0.7.0"
 
 ENV PKG_DIR=/opt/local/src/CanarieAPI
 WORKDIR ${PKG_DIR}
