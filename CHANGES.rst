@@ -6,8 +6,8 @@ CHANGES
 `Unreleased <https://github.com/Ouranosinc/CanarieAPI/tree/master>`_ (latest)
 ------------------------------------------------------------------------------------
 
-.. **ADD LIST ITEMS WITH NEW CHANGES AND REMOVE THIS COMMENT**
-No changes yet.
+* Remove unnecessary packages installed in Docker image to reduce security issues.
+* Update flagged Python packages with minimal versions to resolve known security issues.
 
 `0.7.0 <https://github.com/Ouranosinc/CanarieAPI/tree/0.7.0>`_ (2023-04-14)
 ------------------------------------------------------------------------------------
