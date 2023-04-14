@@ -1,4 +1,4 @@
-FROM nginx
+FROM nginx:bullseye
 LABEL description="CanarieAPI: Self describing REST service for Canarie registry."
 LABEL maintainer="David Byrns <david.byrns@crim.ca>, Francis Charette-Migneault <francis.charette-migneault@crim.ca>"
 LABEL vendor="Ouranosinc, CRIM"
@@ -19,9 +19,7 @@ RUN apt-get update \
         build-essential \
         python3-dev \
         python3-pip \
-        curl \
         cron \
-        vim \
         sqlite3 \
     && ln -s $(which pip3) /usr/local/bin/pip \
     && ln -s $(which python3) /usr/bin/python \
