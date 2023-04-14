@@ -14,6 +14,7 @@ from flask_webtest import TestApp
 
 from canarieapi.logparser import cron_job as cron_job_logparse
 from canarieapi.monitoring import cron_job as cron_job_monitor
+from canarieapi.utility_rest import get_db, init_db
 from tests import config as test_config
 
 
@@ -24,6 +25,7 @@ class TestCanarieAPI(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.config = test_config
+        os.makedirs(cls.config.db_dir, exist_ok=True)
 
         # important not to import APP at the top nor before config/env were applied
         # otherwise, configuration is loaded immediately and raises an error due to missing directory to store DB file
@@ -193,6 +195,77 @@ class TestCanarieAPI(unittest.TestCase):
         resp = self.web.get(f"/{name}/service/doc", params={"f": "json"})
         assert resp.status_code == 302, "Expect redirect request to the service's doc redirect endpoint"
         assert resp.location == f"{url.rstrip('/')}/doc"
+
+
+class TestDatabaseErrorHandling(unittest.TestCase):
+    app = None
+    config = None
+
+    @classmethod
+    def setUpClass(cls):
+        cls.config = test_config
+        os.makedirs(cls.config.db_dir, exist_ok=True)
+
+        # important not to import APP at the top nor before config/env were applied
+        # otherwise, configuration is loaded immediately and raises an error due to missing directory to store DB file
+        cfg_path = os.path.abspath(test_config.__file__)
+        try:
+            with mock.patch.dict("os.environ",
+                                 {"CANARIE_API_CONFIG_FN": cfg_path, "CANARIE_API_SKIP_CHECK": "true"}):
+                from canarieapi.api import APP  # isort: skip  # noqa
+        except ImportError:
+            print(f"Failed loading APP with test config. Ensure [CANARIE_API_CONFIG_FN={cfg_path}] is set!")
+            raise
+
+        APP.config.from_object(cls.config)
+
+        # setup monitored apps
+        for i, (_, cfg) in enumerate(APP.config["SERVICES"].items()):
+            port = 6000 + i
+            url = f"http://localhost:{port}/"
+            cfg["monitoring"]["Component"]["request"]["url"] = url
+            responses.get(url, json={}, status=200)  # mock their response
+            for req in cfg["redirect"]:
+                cfg["redirect"][req] = f"{url.rstrip('/')}/{req}"  # not called, just set for compare
+
+        cls.app = APP
+        cls.web = TestApp(cls.app)
+
+        responses.start()  # mock for monitors
+
+    def setUp(self) -> None:
+        # trigger cron updates immediately to generate status update entries
+        # these should end up calling the above monitored apps
+        cron_job_logparse()
+        cron_job_monitor()
+
+    @classmethod
+    def tearDownClass(cls):
+        path = cls.app.config.get("DATABASE", {}).get("filename", "")
+        dir_path = os.path.dirname(path)
+        if path and os.path.isdir(dir_path) and "tmp" in os.path.basename(dir_path):
+            shutil.rmtree(dir_path)
+
+    def test_database_handled_init_retry_from_error(self):
+        # simulate an invalid database definition
+        with self.app.app_context():
+            db = get_db()
+            cur = db.cursor()
+            cur.execute("DROP TABLE cron")
+            db.commit()
+            cur.close()
+
+        # perform a request that will lead to a database operation that needs the missing table
+        with mock.patch("canarieapi.utility_rest.init_db", side_effect=init_db) as mock_init_db:
+            assert mock_init_db.call_count == 0
+            resp = self.web.get("/test", params={"f": "json"})
+            while 300 < resp.status_code < 310:
+                resp = resp.follow()
+            assert resp.status_code == 200
+            assert "Platforms" in resp.json
+            assert "Services" in resp.json
+            assert all(svc in resp.json["Services"] for svc in self.app.config["SERVICES"])
+            assert mock_init_db.call_count == 1
 
 
 if __name__ == "__main__":

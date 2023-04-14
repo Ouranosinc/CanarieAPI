@@ -8,15 +8,16 @@ This module is a collection of utility functions used mainly by the rest_route
 module and which are placed here to keep the rest_route module as clean as possible.
 """
 
-
 # -- Standard lib ------------------------------------------------------------
 import configparser
+import functools
 import http.client
+import inspect
 import os
 import re
 import sqlite3
-from typing import Dict, List, Optional, Tuple, Union
-from typing_extensions import Literal, TypeAlias
+from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
+from typing_extensions import Literal, Protocol, TypeAlias
 
 # -- 3rd party ---------------------------------------------------------------
 from flask import Response, current_app, g, jsonify, redirect, render_template, request
@@ -47,6 +48,8 @@ JSON = Union[  # pylint: disable=C0103
     _JSON
 ]
 
+ReturnType = TypeVar("ReturnType")  # pylint: disable=C0103
+
 
 def request_wants_json() -> bool:
     """
@@ -55,7 +58,6 @@ def request_wants_json() -> bool:
     The default Media-Type ``*/*`` will be interpreted as JSON.
     Omitting a preferred type entirely will also default to JSON.
     """
-
     # Best will be JSON if it's in accepted mimetypes and has a quality greater or equal to HTML.
     # For */* both JSON and HTML will have the same quality so JSON still win.
     # Unspecified type is usually the case for scripts (requests, curl, etc.).
@@ -80,7 +82,6 @@ def set_html_as_default_response() -> None:
     This is useful for automatically rendering HTML by web browsers that do not
     provide explicitly the desired mimetype.
     """
-
     # Best will be HTML if it's in accept mimetypes and
     # has a quality greater or equal to JSON.
     # For */* both JSON and HTML will have the same quality so HTML still wins
@@ -132,7 +133,6 @@ def get_api_title(route_name: str, api_type: APIType) -> str:
     :param api_type: Api type of the route which must be one of platform or service
     :returns: An API title
     """
-
     title = api_type.capitalize()
     try:
         name = get_config(route_name, api_type)["info"]["name"]
@@ -152,7 +152,6 @@ def get_canarie_api_response(route_name: str, api_type: APIType, api_request: st
     :param api_request: The request specified in the URL
     :returns: A valid HTML response
     """
-
     # Factsheet is not part of the service API, so it's expected that the config will not be found
     if api_type == "service" and api_request == "factsheet":
         return make_error_response(http_status=404)
@@ -211,7 +210,7 @@ def make_error_response(
     return template, http_status
 
 
-def get_db() -> sqlite3.Connection:
+def get_db(allow_cache: bool = True, connect: bool = True) -> sqlite3.Connection:
     """
     Get a connection to an existing database.
 
@@ -221,9 +220,9 @@ def get_db() -> sqlite3.Connection:
     Stores the established connection in the application's global context to reuse it whenever required.
     """
     database = getattr(g, "_database", None)
-    if database is not None:
+    if database is not None and allow_cache:
         APP.logger.info("Database found. Reusing cached connection...")
-    else:
+    elif connect:
         APP.logger.info("Database not defined. Establishing connection...")
 
         database_fn = APP.config["DATABASE"]["filename"]
@@ -245,7 +244,9 @@ def get_db() -> sqlite3.Connection:
             raise
 
         APP.logger.debug("Initialize database with filename: [%s]", database_fn)
-        if not db_exists:
+        if db_exists:
+            APP.logger.debug("Skipping database initialization: [%s] (already exists)", database_fn)
+        else:
             try:
                 init_db(database)
             except Exception as exc:
@@ -279,6 +280,51 @@ def init_db(database: sqlite3.Connection) -> None:
         with current_app.open_resource(schema_fn, mode="r") as schema_f:
             database.cursor().executescript(schema_f.read())
         database.commit()
+
+
+class DatabaseRetryFunction(Protocol):
+    def __call__(self, *args: Any, database: Optional[sqlite3.Connection] = None, **kwargs: Any) -> ReturnType:
+        ...
+
+
+def retry_db_error_after_init(func: DatabaseRetryFunction) -> DatabaseRetryFunction:
+    """
+    Decorator that will retry a failing operation if an error related to database initialization occurred.
+    """
+    @functools.wraps(func)
+    def retry(*args: Any, database: sqlite3.Connection = None, **kwargs: Any) -> ReturnType:
+        db_param = inspect.signature(func).parameters.get("database")
+        db = None
+        with APP.app_context():
+            if db_param and "sqlite3.Connection" in str(db_param.annotation):
+                db = database or get_db()
+                kwargs["database"] = db
+            try:
+                return func(*args, **kwargs)
+            except sqlite3.OperationalError as exc:
+                mod = getattr(func, "__module__", "")
+                mod = f"{mod}." if mod else ""
+                name = f"{mod}.{func.__name__}"
+                if "no such table" in str(exc):
+                    if not db:
+                        APP.logger.debug(
+                            "Missing database parameter to retry operation [%s] after initialization.",
+                            name,
+                        )
+                    else:
+                        APP.logger.warning(
+                            "Error from database [%s] during [%s] operation. Retrying after initialization.",
+                            name, exc,
+                        )
+                        init_db(db)
+                        return func(*args, **kwargs)
+                APP.logger.error(
+                    "Error from database: [%s] during [%s] operation. Could not recover.",
+                    name, exc,
+                )
+                raise
+
+    return retry
 
 
 class AnyIntConverter(BaseConverter):

@@ -1,5 +1,6 @@
 # -- Standard lib ------------------------------------------------------------
 import re
+import sqlite3
 from typing import Dict, Optional, Tuple, Union
 from typing_extensions import Literal, NotRequired, Required, TypedDict
 
@@ -10,7 +11,7 @@ from requests.exceptions import ConnectionError  # pylint: disable=W0622
 # -- Project specific --------------------------------------------------------
 from canarieapi.app_object import APP
 from canarieapi.status import Status
-from canarieapi.utility_rest import JSON, get_db
+from canarieapi.utility_rest import JSON, get_db, retry_db_error_after_init
 
 Number = Union[float, int]
 RequestConfig = TypedDict("RequestConfig", {
@@ -37,7 +38,8 @@ ResponseConfig = TypedDict("ResponseConfig", {
 }, total=True)
 
 
-def monitor(update_db: bool = True) -> None:
+@retry_db_error_after_init
+def monitor(*, update_db: bool = True, database: Optional[sqlite3.Connection] = None) -> None:
     # Load config
     logger = APP.logger
     config = APP.config
@@ -50,7 +52,7 @@ def monitor(update_db: bool = True) -> None:
     logger.info("Checking status of routes...")
     with APP.app_context():
         if update_db:
-            db = get_db()
+            db = database or get_db()
             cur = db.cursor()
             query = "insert or replace into status (route, service, status, message) values (?, ?, ?, ?)"
 
