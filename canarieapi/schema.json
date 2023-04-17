@@ -13,7 +13,7 @@
         "DATABASE": {
             "description": "Parameters about database and its data source",
             "type": "object",
-            "required": ["filename", "access_log", "log_pid"],
+            "required": ["filename", "access_log"],
             "additionalProperties": false,
             "properties": {
                 "filename": {
@@ -22,10 +22,6 @@
                 },
                 "access_log": {
                     "description": "NGINX log file location",
-                    "type": "string"
-                },
-                "log_pid": {
-                    "description": "NGINX pid file location",
                     "type": "string"
                 }
             }

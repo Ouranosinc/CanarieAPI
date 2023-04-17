@@ -13,8 +13,7 @@ SERVER_MAIN_TITLE = "Canarie API"
 
 DATABASE = {
     "filename": "/opt/local/src/CanarieAPI/stats.db",
-    "access_log": "/var/log/nginx/access_file.log",
-    "log_pid": "/var/run/nginx.pid"
+    "access_log": "/opt/local/src/access_file.log"
 }
 
 SERVICES = {

@@ -1,0 +1,26 @@
+services:
+  canarie-api:
+    build: .
+    ports:
+      - '2000:2000'
+
+  canarie-api-cron:
+    build: .
+    command: cron -f
+    environment:
+      # set CANARIE_PARSE_LOGS to parse proxy logs (proxy must be running and sharing logs as a volume)
+      - CANARIE_PARSE_LOGS=1
+      # set CANARIE_MONITOR to monitor whether a registered service is up or not
+      - CANARIE_MONITOR=1
+    depends_on:
+      - canarie-api
+    volumes:
+      - access_log:/opt/local/src/access_file.log
+
+  proxy:
+    image: nginx
+    volumes:
+      - access_log:/var/log/nginx/access.log
+
+volumes:
+  access_log:
