@@ -96,11 +96,12 @@ def update_db(route_stats: RouteStatistics, database: Optional[sqlite3.Connectio
 
 
 def cron_job() -> None:
-    logger = APP.logger
-    logger.info("Cron job for parsing server log")
-    access_log_fn = APP.config["DATABASE"]["access_log"]
-    update_db(parse_log(access_log_fn))
-    logger.info("Done")
+    if APP.config.get("PARSE_LOGS", True):
+        logger = APP.logger
+        logger.info("Cron job for parsing server log")
+        access_log_fn = APP.config["DATABASE"]["access_log"]
+        update_db(parse_log(access_log_fn))
+        logger.info("Done")
 
 
 if __name__ == "__main__":

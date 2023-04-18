@@ -11,19 +11,12 @@ WORKDIR ${PKG_DIR}
 ADD canarieapi-cron /etc/cron.d/canarieapi-cron
 RUN chmod 0644 /etc/cron.d/canarieapi-cron
 
-# Add entrypoint that will be used to run cron jobs
-ADD cron-entrypoint /entrypoint
-RUN chmod 0744 /entrypoint
-
-ENTRYPOINT ["/entrypoint"]
-
 # Install dependencies
 COPY canarieapi/__init__.py canarieapi/__meta__.py ${PKG_DIR}/canarieapi/
 COPY requirements.txt setup.* README.rst CHANGES.rst ${PKG_DIR}/
 RUN apt-get update \
     && apt-get install -y \
         build-essential \
-        curl \
         cron \
         sqlite3 \
     && pip install --no-cache-dir --upgrade pip setuptools gunicorn gevent \
@@ -31,7 +24,7 @@ RUN apt-get update \
     && pip install --no-cache-dir -e ${PKG_DIR}
 
 # Install package
-COPY ./ ${PKG_DIR}/
+COPY .. ${PKG_DIR}/
 RUN pip install --no-dependencies ${PKG_DIR}
 
 # start gunicorn

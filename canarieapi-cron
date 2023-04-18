@@ -1,2 +1,2 @@
-* * * * * root [ -n "$CANARIE_PARSE_LOGS" ] && /usr/local/bin/python3 -c 'from canarieapi import logparser; logparser.cron_job()' 2>&1 | /usr/bin/tee -a /var/log/logparser_cron.log >/proc/1/fd/1 2>/proc/1/fd/1
-* * * * * root [ -n "$CANARIE_MONITOR" ] && /usr/local/bin/python3 -c 'from canarieapi import monitoring; monitoring.cron_job()' 2>&1 | /usr/bin/tee -a /var/log/monitoring_cron.log >/proc/1/fd/1 2>/proc/1/fd/1
+* * * * * root /usr/local/bin/python3 -c 'from canarieapi import logparser; logparser.cron_job()' 2>&1 | /usr/bin/tee -a /var/log/logparser_cron.log >/proc/1/fd/1 2>/proc/1/fd/1
+* * * * * root /usr/local/bin/python3 -c 'from canarieapi import monitoring; monitoring.cron_job()' 2>&1 | /usr/bin/tee -a /var/log/monitoring_cron.log >/proc/1/fd/1 2>/proc/1/fd/1
