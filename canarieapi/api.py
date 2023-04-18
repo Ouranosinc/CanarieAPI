@@ -145,6 +145,8 @@ def home() -> ResponseReturnValue:
         # type: (str, str, dict) -> dict
         hostname = APP.config["MY_SERVER_NAME"]
         requests = sorted(["info", "stats", "status"] + list(conf.get("redirect", {}).keys()))
+        if not APP.config.get("MONITOR", True):
+            requests.remove("status")
         _content = [
             (
                 req,
@@ -330,52 +332,66 @@ def stats(route_name: str, api_type: APIType) -> ResponseReturnValue:
 
     db = get_db()
 
-    # Gather service(s) status
-    all_status = collect_monitoring_statuses(route_name, database=db)
-
-    # Status can be 'ok', 'bad' or 'down'
-    if not all(svc_info["status"] == Status.ok for service, svc_info in all_status.items()):
-        msg_ok = Status.pretty_msg(Status.ok)
-        error_info = collections.OrderedDict([
-            (svc_monitor, {
-                "status": Status.pretty_msg(svc_info["status"]),
-                "message": svc_info["message"] or (msg_ok if svc_info["status"] == Status.ok else "Undefined Error"),
-            })
-            for svc_monitor, svc_info in all_status.items()
-        ])
-        if request_wants_json():
-            body = {
-                api_type: route_name,
-                "monitoring": error_info,
-            }
-            return jsonify(body), 503
-        error_html = render_template(
-            "default.html",
-            Main_Title=get_api_title(route_name, api_type),
-            Title="Error",
-            Tags=error_info,
-        )
-        return error_html, 503
-
-    # Gather route stats
-    cron_info = collect_cron_access_stats(route_name, database=db)
-
-    monitor_info = [
-        ("lastAccess", cron_info["last_access"]),
-        ("lastInvocationsUpdate", cron_info["last_log_update"]),
-        ("lastStatusUpdate", cron_info["last_status_update"])
-    ]
-    for service, svc_info in all_status.items():
-        monitor_info.append((service, Status.pretty_msg(svc_info["status"])))
-
-    monitor_info = collections.OrderedDict(monitor_info)
-
     service_stats = [
         (api_type, route_name),
         ("lastReset", START_UTC_TIME.isoformat() + "Z"),
-        ("invocations", cron_info["invocations"]),
-        ("monitoring", monitor_info)
     ]
+
+    monitor_enabled = APP.config.get("MONITOR", True)
+    parse_logs_enabled = APP.config.get("PARSE_LOGS", True)
+
+    if monitor_enabled:
+        # Gather service(s) status
+        all_status = collect_monitoring_statuses(route_name, database=db)
+
+        # Status can be 'ok', 'bad' or 'down'
+        if not all(svc_info["status"] == Status.ok for service, svc_info in all_status.items()):
+            msg_ok = Status.pretty_msg(Status.ok)
+            error_info = collections.OrderedDict([
+                (svc_monitor, {
+                    "status": Status.pretty_msg(svc_info["status"]),
+                    "message": svc_info["message"] or (
+                        msg_ok if svc_info["status"] == Status.ok else "Undefined Error"),
+                })
+                for svc_monitor, svc_info in all_status.items()
+            ])
+            if request_wants_json():
+                body = {
+                    api_type: route_name,
+                    "monitoring": error_info,
+                }
+                return jsonify(body), 503
+            error_html = render_template(
+                "default.html",
+                Main_Title=get_api_title(route_name, api_type),
+                Title="Error",
+                Tags=error_info,
+            )
+            return error_html, 503
+    else:
+        all_status = []
+
+    monitor_info = []
+    cron_info = collect_cron_access_stats(route_name, database=db)
+
+    if parse_logs_enabled:
+        service_stats.append(("invocations", cron_info["invocations"]))
+        monitor_info.append(("lastInvocationsUpdate", cron_info["last_log_update"]))
+
+
+    if parse_logs_enabled or monitor_enabled:
+        monitor_info.extend([
+            ("lastAccess", cron_info["last_access"]),
+            ("lastStatusUpdate", cron_info["last_status_update"])
+        ])
+
+    if monitor_enabled:
+        for service, svc_info in all_status.items():
+            monitor_info.append((service, Status.pretty_msg(svc_info["status"])))
+
+        monitor_info = collections.OrderedDict(monitor_info)
+        service_stats.append(("monitoring", monitor_info))
+
     service_stats = collections.OrderedDict(service_stats)
 
     if request_wants_json():
@@ -402,23 +418,26 @@ def status(route_name: str, api_type: APIType) -> ResponseReturnValue:
     db = get_db()
 
     # Gather service(s) status
-    all_status = collect_monitoring_statuses(route_name, database=db)
+    if APP.config.get("MONITOR", True):
+        all_status = collect_monitoring_statuses(route_name, database=db)
 
-    # Check last time cron job have run (help to diagnose cron problem)
-    cron_status = collect_cron_last_status(database=db)
+        # Check last time cron job have run (help to diagnose cron problem)
+        cron_status = collect_cron_last_status(database=db)
 
-    monitor_info = [
-        ("lastStatusUpdate", cron_status["last_status_update"])
-    ]
-    for service, svc_info in all_status.items():
-        svc_status = svc_info["status"]
-        status_msg = Status.pretty_msg(svc_status)
-        if svc_status != Status.ok:
-            svc_msg = svc_info["message"]
-            status_msg += f" : {svc_msg}"
-        monitor_info.append((service, status_msg))
+        monitor_info = [
+            ("lastStatusUpdate", cron_status["last_status_update"])
+        ]
+        for service, svc_info in all_status.items():
+            svc_status = svc_info["status"]
+            status_msg = Status.pretty_msg(svc_status)
+            if svc_status != Status.ok:
+                svc_msg = svc_info["message"]
+                status_msg += f" : {svc_msg}"
+            monitor_info.append((service, status_msg))
 
-    monitor_info = collections.OrderedDict(monitor_info)
+        monitor_info = collections.OrderedDict(monitor_info)
+    else:
+        monitor_info = []
 
     if request_wants_json():
         return jsonify(monitor_info)

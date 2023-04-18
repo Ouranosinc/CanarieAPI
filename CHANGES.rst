@@ -6,8 +6,7 @@ CHANGES
 `Unreleased <https://github.com/Ouranosinc/CanarieAPI/tree/master>`_ (latest)
 ------------------------------------------------------------------------------------
 
-.. **ADD LIST ITEMS WITH NEW CHANGES AND REMOVE THIS COMMENT**
-No changes yet.
+* Add option to independently enable/disable the two cron jobs that can be run (monitor, parse logs).
 
 `0.7.1 <https://github.com/Ouranosinc/CanarieAPI/tree/0.7.1>`_ (2023-04-14)
 ------------------------------------------------------------------------------------
