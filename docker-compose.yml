@@ -1,3 +1,10 @@
+x-logging:
+  &default-logging
+  driver: "json-file"
+  options:
+    max-size: "50m"
+    max-file: "10"
+
 services:
   canarie-api:
     build: .
@@ -6,7 +13,7 @@ services:
       - '2000:2000'
     volumes:
       - workdir:/opt/local/src/CanarieAPI/
-
+    logging: *default-logging
   canarie-api-cron:
     build: .
     image: canarie-api # this will build a local image (change this to use one from a registry)
@@ -19,8 +26,12 @@ services:
 
   proxy:
     image: nginx
-    volumes:
-      - access_log:/var/log/nginx/access.log
+    ports:
+      - "8080:80"
+    logging:
+      options:
+        max-size: "50m"
+        max-file: "10"
 
 volumes:
   access_log:
