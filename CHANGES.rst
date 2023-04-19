@@ -6,8 +6,7 @@ CHANGES
 `Unreleased <https://github.com/Ouranosinc/CanarieAPI/tree/master>`_ (latest)
 ------------------------------------------------------------------------------------
 
-.. **ADD LIST ITEMS WITH NEW CHANGES AND REMOVE THIS COMMENT**
-No changes yet.
+* Minor CSS adjustments to allow platform links to display on a single line if the monitor viewport is sufficient.
 
 `0.7.1 <https://github.com/Ouranosinc/CanarieAPI/tree/0.7.1>`_ (2023-04-14)
 ------------------------------------------------------------------------------------
