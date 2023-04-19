@@ -16,10 +16,33 @@ LOG_BACKUP_COUNT = 150
 
 RouteStatistics = Dict[str, Dict[str, Union[str, int]]]
 
-def parse_log(filename: str) -> RouteStatistics:
-    if not os.path.isfile(filename):
-        return {}
 
+def rotate_log(filename: str) -> None:
+    logger: logging.Logger = APP.logger
+    logger.info("Rotating %s", filename)
+
+    # Base on a rotation every 10 minutes, if we want to keep 1 day worth of logs we have to keep about 150 of them
+    rfh = logging.handlers.RotatingFileHandler(filename, backupCount=LOG_BACKUP_COUNT)
+    rfh.doRollover()
+
+    pid_file = APP.config["DATABASE"]["log_pid"]
+    logger.info("Asking nginx to reload log file (using pid file : %s", pid_file)
+    try:
+        with open(pid_file, "rb") as pid_f:
+            pid = pid_f.read()
+            logger.info("nginx pid is %s", int(pid))
+    except IOError:
+        # If nginx is not running no needs to force the log reload
+        logger.warning("No pid found!")
+        return
+
+    # Send SIGUSR1 to nginx to force the log reload
+    logger.info("Sending USR1 (to reload log) signal to nginx process")
+    os.kill(int(pid), signal.SIGUSR1)
+    time.sleep(1)
+
+
+def parse_log(filename: str) -> RouteStatistics:
     # Load config
     logger = APP.logger
     logger.info("Loading configuration")
@@ -100,7 +123,8 @@ def cron_job() -> None:
         logger = APP.logger
         logger.info("Cron job for parsing server log")
         access_log_fn = APP.config["DATABASE"]["access_log"]
-        update_db(parse_log(access_log_fn))
+        rotate_log(access_log_fn)
+        update_db(parse_log(access_log_fn + ".1"))
         logger.info("Done")
 
 
