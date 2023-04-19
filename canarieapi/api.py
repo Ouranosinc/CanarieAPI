@@ -64,9 +64,9 @@ if str(os.getenv("CANARIE_API_SKIP_CHECK")).lower() != "true":  # pragma: no cov
 
 CronAccessStats = TypedDict("CronAccessStats", {
     "invocations": Optional[int], # count | Not monitored
-    "last_access": str,  # ISO datetime | Never | Not monitored
-    "last_log_update": str,  # ISO datetime | Never | Not monitored
-    "last_status_update": str,  # ISO datetime | Never | Not monitored
+    "last_access": str,  # ISO datetime | Never
+    "last_log_update": str,  # ISO datetime | Never
+    "last_status_update": str,  # ISO datetime | Never
 }, total=True)
 
 CronLastStatus = TypedDict("CronLastStatus", {

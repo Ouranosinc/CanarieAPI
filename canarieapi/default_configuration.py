@@ -16,7 +16,7 @@ MONITOR = True
 
 DATABASE = {
     "filename": "/opt/local/src/CanarieAPI/stats.db",
-    "access_log": "/opt/local/src/access_file.log"
+    "access_log": "/logs/nginx-access.log"
 }
 
 SERVICES = {
