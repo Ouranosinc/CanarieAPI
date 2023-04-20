@@ -124,11 +124,10 @@ def check_service(request: RequestConfig, response: ResponseConfig) -> Tuple[Sta
 
 
 def cron_job() -> None:
-    if APP.config.get("MONITOR", True):
-        logger = APP.logger
-        logger.info("Cron job for monitoring routes status")
-        monitor()
-        logger.info("Done")
+    logger = APP.logger
+    logger.info("Cron job for monitoring routes status")
+    monitor()
+    logger.info("Done")
 
 
 if __name__ == "__main__":

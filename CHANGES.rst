@@ -7,9 +7,9 @@ CHANGES
 ------------------------------------------------------------------------------------
 
 * Separate the application, cron job, and proxy (nginx) into separate containers so that they can be run independently.
-* Add option to independently enable/disable the two cron jobs that can be run (monitor, parse logs).
+* Add option to independently enable/disable the parse_logs cron job.
 * Do not handle log rotation for nginx anymore. Nginx should handle this on its own.
-* Made default port 2000 everywhere (not just in docker)
+* Made default port 2000 everywhere (not just in docker).
 
 `0.7.2 <https://github.com/Ouranosinc/CanarieAPI/tree/0.7.2>`_ (2023-04-19)
 ------------------------------------------------------------------------------------

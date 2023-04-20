@@ -5,7 +5,8 @@ services:
     ports:
       - '2000:2000'
     volumes:
-      - workdir:/opt/local/src/CanarieAPI/
+      # share the sqlite database file between containers with this volume
+      - data:/data/
 
   canarie-api-cron:
     build: .
@@ -14,17 +15,20 @@ services:
     depends_on:
       - canarie-api
     volumes:
+      # The access_logs volume shares the nginx logs between the canarie-api-cron service and the proxy service
+      # It is only required if the PARSE_LOGS setting is True.
       - access_logs:/logs/
-      - workdir:/opt/local/src/CanarieAPI/
+      # share the sqlite database file between containers with this volume
+      - data:/data/
 
   proxy:
     image: nginx
-    ports:
-      - "8080:80"
     volumes:
+      # This nginx config file ensure that the nginx container will write the access logs to stdout as well as a file
+      # on disk. This is required because canarie-api-cron expects a regular file to parse logs from.
       - ./nginx-log.conf:/etc/nginx/conf.d/nginx-log.conf
       - access_logs:/logs/
 
 volumes:
   access_logs:
-  workdir:
+  data:

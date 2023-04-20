@@ -11,11 +11,11 @@ found in this file, you need to set the environment variable named
 MY_SERVER_NAME = "http://localhost:2000"
 SERVER_MAIN_TITLE = "Canarie API"
 
+# If this is True, canarie-api will parse the nginx logs in DATABASE["access_log"] and report statistics
 PARSE_LOGS = True
-MONITOR = True
 
 DATABASE = {
-    "filename": "/opt/local/src/CanarieAPI/stats.db",
+    "filename": "/data/stats.db",
     "access_log": "/logs/nginx-access.log"
 }
 

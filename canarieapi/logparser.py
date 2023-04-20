@@ -109,7 +109,7 @@ def update_db(route_stats: RouteStatistics, database: Optional[sqlite3.Connectio
 
 
 def cron_job() -> None:
-    if APP.config.get("PARSE_LOGS", True):
+    if APP.config.get("PARSE_LOGS"):
         logger = APP.logger
         logger.info("Cron job for parsing server log")
         access_log_fn = APP.config["DATABASE"]["access_log"]
