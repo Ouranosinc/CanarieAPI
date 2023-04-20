@@ -24,7 +24,7 @@ RUN apt-get update \
     && pip install --no-cache-dir -e ${PKG_DIR}
 
 # Install package
-COPY .. ${PKG_DIR}/
+COPY ./ ${PKG_DIR}/
 RUN pip install --no-dependencies ${PKG_DIR}
 
 # start gunicorn
