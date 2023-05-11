@@ -63,7 +63,7 @@ if str(os.getenv("CANARIE_API_SKIP_CHECK")).lower() != "true":  # pragma: no cov
         get_db()
 
 CronAccessStats = TypedDict("CronAccessStats", {
-    "invocations": Optional[int], # count | Not monitored
+    "invocations": Optional[int],  # count | Not monitored
     "last_access": str,  # ISO datetime | Never
     "last_log_update": str,  # ISO datetime | Never
     "last_status_update": str,  # ISO datetime | Never
@@ -369,11 +369,9 @@ def stats(route_name: str, api_type: APIType) -> ResponseReturnValue:
     if APP.config.get("PARSE_LOGS"):
         service_stats.append(("invocations", cron_info["invocations"]))
         monitor_info.append(("lastInvocationsUpdate", cron_info["last_log_update"]))
+        monitor_info.append(("lastAccess", cron_info["last_access"]))
 
-    monitor_info.extend([
-        ("lastAccess", cron_info["last_access"]),
-        ("lastStatusUpdate", cron_info["last_status_update"])
-    ])
+    monitor_info.append(("lastStatusUpdate", cron_info["last_status_update"]))
 
     for service, svc_info in all_status.items():
         monitor_info.append((service, Status.pretty_msg(svc_info["status"])))

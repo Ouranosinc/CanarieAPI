@@ -35,9 +35,10 @@ def test_validate_error_wrong_schema():  # noqa  # pylint: disable=W0621
     with pytest.raises(jsonschema.ValidationError):
         validate_config_schema(False, run_jobs=False)
 
+
 def test_validate_schema_no_parse_logs():
     """
-    Ensure the configuration schema is valid when PARSE_LOGS is False and stats are not set
+    Ensure the configuration schema is valid when PARSE_LOGS is False and stats are not set.
     """
     from canarieapi.api import APP
 

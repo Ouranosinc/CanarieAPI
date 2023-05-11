@@ -1,23 +1,18 @@
 # -- Standard lib ------------------------------------------------------------
-import logging
-import logging.handlers
-import os
 import re
-import signal
 import sqlite3
-import time
 from typing import Dict, Optional, Union
+
+# -- 3rd party ---------------------------------------------------------------
+from dateutil.parser import parse as dt_parse
 
 # -- Project specific --------------------------------------------------------
 from canarieapi.app_object import APP
 from canarieapi.utility_rest import get_db, retry_db_error_after_init
 
-# -- 3rd party ---------------------------------------------------------------
-from dateutil.parser import parse as dt_parse
-
-LOG_BACKUP_COUNT = 150
 
 RouteStatistics = Dict[str, Dict[str, Union[str, int]]]
+
 
 def parse_log(filename: str, database: Optional[sqlite3.Connection] = None) -> RouteStatistics:
     # Load config
@@ -47,7 +42,7 @@ def parse_log(filename: str, database: Optional[sqlite3.Connection] = None) -> R
     with APP.app_context():
         db = database or get_db()
         cur = db.cursor()
-        cur.execute('select last_access from stats order by last_access desc limit 1')
+        cur.execute("select last_access from stats order by last_access desc limit 1")
         records = cur.fetchone()
         if records:
             last_access = dt_parse(records[0][0])

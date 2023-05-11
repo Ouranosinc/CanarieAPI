@@ -8,7 +8,7 @@ import jsonschema
 
 # -- Project specific --------------------------------------------------------
 from canarieapi.app_object import APP
-from canarieapi.logparser import LOG_BACKUP_COUNT, parse_log
+from canarieapi.logparser import parse_log
 from canarieapi.monitoring import monitor
 
 # The schema that must be respected by the config
@@ -37,15 +37,13 @@ def validate_config_schema(update_db: bool, run_jobs: bool = True) -> None:
             access_log_fn = config["DATABASE"]["access_log"]
             route_invocations = {}
             file_checked = 0
-            for i in range(0, min(10, LOG_BACKUP_COUNT)):
-                fn = access_log_fn + (f".{i}" if i > 0 else "")
-                try:
-                    route_stats = parse_log(fn)
-                    for route, value in route_stats.items():
-                        route_invocations[route] = route_invocations.get(route, 0) + value["count"]
-                    file_checked += 1
-                except IOError:
-                    break
+            try:
+                route_stats = parse_log(access_log_fn)
+            except IOError:
+                logger.warning("Unable to read logs from %s", access_log_fn)
+            else:
+                for route, value in route_stats.items():
+                    route_invocations[route] = route_invocations.get(route, 0) + value["count"]
 
             for route, invocs in route_invocations.items():
                 if invocs > 0:
