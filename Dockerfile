@@ -8,7 +8,7 @@ ENV PKG_DIR=/opt/local/src/CanarieAPI
 WORKDIR ${PKG_DIR}
 
 # Add logparser cron job in the cron directory
-ADD canarieapi-cron /etc/cron.d/canarieapi-cron
+ADD docker/canarieapi-cron /etc/cron.d/canarieapi-cron
 RUN chmod 0644 /etc/cron.d/canarieapi-cron
 
 # Install dependencies

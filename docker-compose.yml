@@ -26,7 +26,7 @@ services:
     volumes:
       # This nginx config file ensure that the nginx container will write the access logs to stdout as well as a file
       # on disk. This is required because canarie-api-cron expects a regular file to parse logs from.
-      - ./nginx-log.conf:/etc/nginx/conf.d/nginx-log.conf
+      - ./docker/nginx-log.conf:/etc/nginx/conf.d/nginx-log.conf
       - access_logs:/logs/
 
 volumes:
