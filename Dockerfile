@@ -1,4 +1,4 @@
-FROM nginx:bullseye
+FROM nginx:1-bullseye
 LABEL description="CanarieAPI: Self describing REST service for Canarie registry."
 LABEL maintainer="David Byrns <david.byrns@crim.ca>, Francis Charette-Migneault <francis.charette-migneault@crim.ca>"
 LABEL vendor="Ouranosinc, CRIM"
