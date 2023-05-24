@@ -1,5 +1,4 @@
 # coding: utf-8
-
 """
 Default configuration values for Canarie API.
 

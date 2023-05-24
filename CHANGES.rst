@@ -7,7 +7,8 @@ CHANGES
 ------------------------------------------------------------------------------------
 
 .. **ADD LIST ITEMS WITH NEW CHANGES AND REMOVE THIS COMMENT**
-No changes yet.
+
+* No changes yet.
 
 `0.7.2 <https://github.com/Ouranosinc/CanarieAPI/tree/0.7.2>`_ (2023-04-19)
 ------------------------------------------------------------------------------------
