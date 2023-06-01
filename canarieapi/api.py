@@ -7,7 +7,6 @@
 # In the context of a REST application, this module must be loaded first as it
 # is the one that instantiates the Flask Application on which other modules
 # will depend.
-
 """
 API definition.
 
