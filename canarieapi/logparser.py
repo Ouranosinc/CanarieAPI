@@ -10,7 +10,6 @@ from dateutil.parser import parse as dt_parse
 from canarieapi.app_object import APP
 from canarieapi.utility_rest import get_db, retry_db_error_after_init
 
-
 RouteStatistics = Dict[str, Dict[str, Union[str, int]]]
 
 
