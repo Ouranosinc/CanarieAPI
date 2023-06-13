@@ -17,12 +17,11 @@ with open(os.path.join(os.path.dirname(__file__), "schema.json"), mode="r", enco
 
 
 def validate_config_schema(update_db: bool, run_jobs: bool = True) -> None:
-    # type: (bool) -> None
     config = APP.config
     logger: logging.Logger = APP.logger
 
     logger.info("Testing configuration...")
-    if config.get("PARSE_LOG"):
+    if config.get("PARSE_LOG", True):
         CONFIGURATION_SCHEMA["definitions"]["service_description_schema"]["required"].append("stats")
         CONFIGURATION_SCHEMA["definitions"]["platform_description_schema"]["required"].append("stats")
     try:
@@ -33,7 +32,7 @@ def validate_config_schema(update_db: bool, run_jobs: bool = True) -> None:
     if run_jobs:
         monitor(update_db=update_db)
 
-        if config.get("PARSE_LOG"):
+        if config.get("PARSE_LOG", True):
             access_log_fn = config["DATABASE"]["access_log"]
             route_invocations = {}
             file_checked = 0

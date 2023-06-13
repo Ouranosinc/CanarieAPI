@@ -365,7 +365,7 @@ def stats(route_name: str, api_type: APIType) -> ResponseReturnValue:
     monitor_info = []
     cron_info = collect_cron_access_stats(route_name, database=db)
 
-    if APP.config.get("PARSE_LOGS"):
+    if APP.config.get("PARSE_LOGS", True):
         service_stats.append(("invocations", cron_info["invocations"]))
         monitor_info.append(("lastInvocationsUpdate", cron_info["last_log_update"]))
         monitor_info.append(("lastAccess", cron_info["last_access"]))

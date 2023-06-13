@@ -21,7 +21,7 @@ def tmp_config():
         shutil.rmtree(tmp_dir)
 
 
-def test_validate_error_wrong_schema():  # noqa  # pylint: disable=W0621
+def test_validate_error_wrong_schema():
     """
     Ensure the configuration schema is used to validate the application configuration at startup.
     """
