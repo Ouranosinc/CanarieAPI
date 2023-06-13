@@ -1,4 +1,5 @@
 # -- Standard lib ------------------------------------------------------------
+import copy
 import json
 import logging
 import os
@@ -21,11 +22,13 @@ def validate_config_schema(update_db: bool, run_jobs: bool = True) -> None:
     logger: logging.Logger = APP.logger
 
     logger.info("Testing configuration...")
+
+    configuration_schema = copy.deepcopy(CONFIGURATION_SCHEMA)
     if config.get("PARSE_LOG", True):
-        CONFIGURATION_SCHEMA["definitions"]["service_description_schema"]["required"].append("stats")
-        CONFIGURATION_SCHEMA["definitions"]["platform_description_schema"]["required"].append("stats")
+        configuration_schema["definitions"]["service_description_schema"]["required"].append("stats")
+        configuration_schema["definitions"]["platform_description_schema"]["required"].append("stats")
     try:
-        jsonschema.validate(config, CONFIGURATION_SCHEMA)
+        jsonschema.validate(config, configuration_schema)
     except jsonschema.ValidationError as exc:
         raise jsonschema.ValidationError(f"The configuration is invalid : {exc!s}")
 
