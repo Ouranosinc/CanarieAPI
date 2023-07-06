@@ -47,6 +47,7 @@
         "service_description_schema": {
             "description": "Describe a service",
             "type": "object",
+            "$comment": "When the PARSE_LOG configuration option is True, \"stats\" will be dynamically added to the list of required properties",
             "required": ["info", "redirect", "monitoring"],
             "additionalProperties": false,
             "properties": {
@@ -59,6 +60,7 @@
         "platform_description_schema": {
             "description": "Describe a platform",
             "type": "object",
+            "$comment": "When the PARSE_LOG configuration option is True, \"stats\" will be dynamically added to the list of required properties",
             "required": ["info", "redirect", "monitoring"],
             "additionalProperties": false,
             "properties": {
