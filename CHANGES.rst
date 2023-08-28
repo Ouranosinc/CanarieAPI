@@ -6,9 +6,8 @@ CHANGES
 `Unreleased <https://github.com/Ouranosinc/CanarieAPI/tree/master>`_ (latest)
 ------------------------------------------------------------------------------------
 
-.. **ADD LIST ITEMS WITH NEW CHANGES AND REMOVE THIS COMMENT**
-
-* No changes yet.
+* Replace Docker image reference ``nginx:bullseye`` by ``nginx:stable-bullseye`` which gets updated more often,
+  for latest security vulnerability fixes.
 
 `0.7.2 <https://github.com/Ouranosinc/CanarieAPI/tree/0.7.2>`_ (2023-04-19)
 ------------------------------------------------------------------------------------
