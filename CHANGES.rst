@@ -7,8 +7,8 @@ CHANGES
 ------------------------------------------------------------------------------------
 
 * Separate the application, cron job, and proxy (nginx) into separate containers so that they can be run independently.
-* Add option to independently enable/disable the `parse_logs` cron job by setting the `PARSE_LOGS` configuration option
-  to `True`.
+* Add option to independently enable/disable the ``parse_logs`` cron job by setting the ``PARSE_LOGS`` configuration
+  option to ``True``.
 * Do not handle log rotation for nginx anymore. Nginx should handle this on its own.
 * Made default port 2000 everywhere (not just in docker).
 * Replace Docker image reference ``nginx:bullseye`` by ``nginx:stable-bullseye`` which gets updated more often,
