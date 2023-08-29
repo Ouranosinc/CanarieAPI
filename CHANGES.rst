@@ -11,6 +11,8 @@ CHANGES
   to `True`.
 * Do not handle log rotation for nginx anymore. Nginx should handle this on its own.
 * Made default port 2000 everywhere (not just in docker).
+* Replace Docker image reference ``nginx:bullseye`` by ``nginx:stable-bullseye`` which gets updated more often,
+  for latest security vulnerability fixes.
 
 `0.7.2 <https://github.com/Ouranosinc/CanarieAPI/tree/0.7.2>`_ (2023-04-19)
 ------------------------------------------------------------------------------------
