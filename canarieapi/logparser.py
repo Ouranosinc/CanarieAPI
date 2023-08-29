@@ -1,48 +1,19 @@
 # -- Standard lib ------------------------------------------------------------
-import logging
-import logging.handlers
-import os
 import re
-import signal
 import sqlite3
-import time
 from typing import Dict, Optional, Union
+
+# -- 3rd party ---------------------------------------------------------------
+from dateutil.parser import parse as dt_parse
 
 # -- Project specific --------------------------------------------------------
 from canarieapi.app_object import APP
 from canarieapi.utility_rest import get_db, retry_db_error_after_init
 
-LOG_BACKUP_COUNT = 150
-
 RouteStatistics = Dict[str, Dict[str, Union[str, int]]]
 
 
-def rotate_log(filename: str) -> None:
-    logger: logging.Logger = APP.logger
-    logger.info("Rotating %s", filename)
-
-    # Base on a rotation every 10 minutes, if we want to keep 1 day worth of logs we have to keep about 150 of them
-    rfh = logging.handlers.RotatingFileHandler(filename, backupCount=LOG_BACKUP_COUNT)
-    rfh.doRollover()
-
-    pid_file = APP.config["DATABASE"]["log_pid"]
-    logger.info("Asking nginx to reload log file (using pid file : %s", pid_file)
-    try:
-        with open(pid_file, "rb") as pid_f:
-            pid = pid_f.read()
-            logger.info("nginx pid is %s", int(pid))
-    except IOError:
-        # If nginx is not running no needs to force the log reload
-        logger.warning("No pid found!")
-        return
-
-    # Send SIGUSR1 to nginx to force the log reload
-    logger.info("Sending USR1 (to reload log) signal to nginx process")
-    os.kill(int(pid), signal.SIGUSR1)
-    time.sleep(1)
-
-
-def parse_log(filename: str) -> RouteStatistics:
+def parse_log(filename: str, database: Optional[sqlite3.Connection] = None) -> RouteStatistics:
     # Load config
     logger = APP.logger
     logger.info("Loading configuration")
@@ -66,6 +37,17 @@ def parse_log(filename: str) -> RouteStatistics:
             logger.error("Exception occurs while trying to compile regex of %s", route)
             raise
 
+    # get the last entry from the logs in order to not duplicate entries if the same log file is read multiple times
+    with APP.app_context():
+        db = database or get_db()
+        cur = db.cursor()
+        cur.execute("select last_access from stats order by last_access desc limit 1")
+        records = cur.fetchone()
+        if records:
+            last_access = dt_parse(records[0][0])
+        else:
+            last_access = None
+
     # Load access log
     logger.info("Loading log file : %s", filename)
     log_regex = re.compile(r".*\[(?P<datetime>.*)\] \"(?P<method>[A-Z]+) (?P<route>/.*) .*")  # pylint: disable=C4001
@@ -74,7 +56,9 @@ def parse_log(filename: str) -> RouteStatistics:
         for line in f:
             match = log_regex.match(line)
             if match:
-                log_records.append(match.groupdict())
+                records = match.groupdict()
+                if last_access is None or dt_parse(records["datetime"]) > last_access:
+                    log_records.append(records)
 
     # Compile stats
     logger.info("Compiling stats from %s records", len(log_records))
@@ -119,12 +103,12 @@ def update_db(route_stats: RouteStatistics, database: Optional[sqlite3.Connectio
 
 
 def cron_job() -> None:
-    logger = APP.logger
-    logger.info("Cron job for parsing server log")
-    access_log_fn = APP.config["DATABASE"]["access_log"]
-    rotate_log(access_log_fn)
-    update_db(parse_log(access_log_fn + ".1"))
-    logger.info("Done")
+    if APP.config.get("PARSE_LOGS", True):
+        logger = APP.logger
+        logger.info("Cron job for parsing server log")
+        access_log_fn = APP.config["DATABASE"]["access_log"]
+        update_db(parse_log(access_log_fn))
+        logger.info("Done")
 
 
 if __name__ == "__main__":

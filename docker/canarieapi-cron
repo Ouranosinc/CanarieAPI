@@ -1,0 +1,2 @@
+* * * * * root /usr/local/bin/python3 -c 'from canarieapi import logparser; logparser.cron_job()' >/proc/1/fd/1 2>/proc/1/fd/2
+* * * * * root /usr/local/bin/python3 -c 'from canarieapi import monitoring; monitoring.cron_job()' >/proc/1/fd/1 2>/proc/1/fd/2

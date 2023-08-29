@@ -447,11 +447,13 @@ docker-stop:
 	@echo "Stopping test docker container: $(APP_DOCKER_TEST)"
 	-docker container stop -t 5 "$(APP_DOCKER_TEST)" 2>/dev/null || true
 	-docker rm $(APP_DOCKER_TEST) 2>/dev/null || true
+	-docker volume rm "$(APP_DOCKER_TEST)"-data 2>/dev/null || true
 
 .PHONY: docker-test
 docker-test: docker-build docker-stop docker-clean
 	@echo "Smoke test of docker image: $(DOCKER_TAG)"
-	docker run --pull never --name "$(APP_DOCKER_TEST)" -p 2000:2000 -d "$(APP_DOCKER_TAG)"
+	docker run --pull never --name "$(APP_DOCKER_TEST)" -v "$(APP_DOCKER_TEST)"-data:/data -p 2000:2000 -d \
+	    "$(APP_DOCKER_TAG)"
 	@sleep 2
 	@echo "Testing docker image package installation..."
 	(docker exec "$(APP_DOCKER_TEST)" \

@@ -7,13 +7,15 @@ found in this file, you need to set the environment variable named
 "CANARIE_API_CONFIG_FN" to the path of your own copy before launching the program.
 """
 
-MY_SERVER_NAME = "http://localhost:5000"
+MY_SERVER_NAME = "http://localhost:2000"
 SERVER_MAIN_TITLE = "Canarie API"
 
+# If this is True, canarie-api will parse the nginx logs in DATABASE["access_log"] and report statistics
+PARSE_LOGS = True
+
 DATABASE = {
-    "filename": "/opt/local/src/CanarieAPI/stats.db",
-    "access_log": "/var/log/nginx/access_file.log",
-    "log_pid": "/var/run/nginx.pid"
+    "filename": "/data/stats.db",
+    "access_log": "/logs/nginx-access.log"
 }
 
 SERVICES = {

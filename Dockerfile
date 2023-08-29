@@ -1,4 +1,4 @@
-FROM nginx:stable-bullseye
+FROM python:3.11
 LABEL description="CanarieAPI: Self describing REST service for Canarie registry."
 LABEL maintainer="David Byrns <david.byrns@crim.ca>, Francis Charette-Migneault <francis.charette-migneault@crim.ca>"
 LABEL vendor="Ouranosinc, CRIM"
@@ -8,7 +8,7 @@ ENV PKG_DIR=/opt/local/src/CanarieAPI
 WORKDIR ${PKG_DIR}
 
 # Add logparser cron job in the cron directory
-ADD canarieapi-cron /etc/cron.d/canarieapi-cron
+ADD docker/canarieapi-cron /etc/cron.d/canarieapi-cron
 RUN chmod 0644 /etc/cron.d/canarieapi-cron
 
 # Install dependencies
@@ -17,12 +17,8 @@ COPY requirements.txt setup.* README.rst CHANGES.rst ${PKG_DIR}/
 RUN apt-get update \
     && apt-get install -y \
         build-essential \
-        python3-dev \
-        python3-pip \
         cron \
         sqlite3 \
-    && ln -s $(which pip3) /usr/local/bin/pip \
-    && ln -s $(which python3) /usr/bin/python \
     && pip install --no-cache-dir --upgrade pip setuptools gunicorn gevent \
     && pip install --no-cache-dir --upgrade -r ${PKG_DIR}/requirements.txt \
     && pip install --no-cache-dir -e ${PKG_DIR}
@@ -31,19 +27,11 @@ RUN apt-get update \
 COPY ./ ${PKG_DIR}/
 RUN pip install --no-dependencies ${PKG_DIR}
 
-# cron job will inherit the current user environment
-# start cron service
-# start nginx service
 # start gunicorn
-CMD env >> /etc/environment \
-    && cron \
-    && gunicorn \
-        -b 0.0.0.0:2000 \
-        --workers 1 \
-        --log-level=DEBUG \
-        --timeout 30 \
-        --daemon \
-        -k gevent \
-        canarieapi.wsgi \
-    && nginx \
-        -g "daemon off;"
+CMD gunicorn \
+    -b 0.0.0.0:2000 \
+    --workers 1 \
+    --log-level=DEBUG \
+    --timeout 30 \
+    -k gevent \
+    canarieapi.wsgi

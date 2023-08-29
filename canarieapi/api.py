@@ -62,7 +62,7 @@ if str(os.getenv("CANARIE_API_SKIP_CHECK")).lower() != "true":  # pragma: no cov
         get_db()
 
 CronAccessStats = TypedDict("CronAccessStats", {
-    "invocations": int,
+    "invocations": int,  # count | Not monitored
     "last_access": str,  # ISO datetime | Never
     "last_log_update": str,  # ISO datetime | Never
     "last_status_update": str,  # ISO datetime | Never
@@ -329,6 +329,11 @@ def stats(route_name: str, api_type: APIType) -> ResponseReturnValue:
 
     db = get_db()
 
+    service_stats = [
+        (api_type, route_name),
+        ("lastReset", START_UTC_TIME.isoformat() + "Z"),
+    ]
+
     # Gather service(s) status
     all_status = collect_monitoring_statuses(route_name, database=db)
 
@@ -338,7 +343,8 @@ def stats(route_name: str, api_type: APIType) -> ResponseReturnValue:
         error_info = collections.OrderedDict([
             (svc_monitor, {
                 "status": Status.pretty_msg(svc_info["status"]),
-                "message": svc_info["message"] or (msg_ok if svc_info["status"] == Status.ok else "Undefined Error"),
+                "message": svc_info["message"] or (
+                    msg_ok if svc_info["status"] == Status.ok else "Undefined Error"),
             })
             for svc_monitor, svc_info in all_status.items()
         ])
@@ -356,25 +362,22 @@ def stats(route_name: str, api_type: APIType) -> ResponseReturnValue:
         )
         return error_html, 503
 
-    # Gather route stats
+    monitor_info = []
     cron_info = collect_cron_access_stats(route_name, database=db)
 
-    monitor_info = [
-        ("lastAccess", cron_info["last_access"]),
-        ("lastInvocationsUpdate", cron_info["last_log_update"]),
-        ("lastStatusUpdate", cron_info["last_status_update"])
-    ]
+    if APP.config.get("PARSE_LOGS", True):
+        service_stats.append(("invocations", cron_info["invocations"]))
+        monitor_info.append(("lastInvocationsUpdate", cron_info["last_log_update"]))
+        monitor_info.append(("lastAccess", cron_info["last_access"]))
+
+    monitor_info.append(("lastStatusUpdate", cron_info["last_status_update"]))
+
     for service, svc_info in all_status.items():
         monitor_info.append((service, Status.pretty_msg(svc_info["status"])))
 
     monitor_info = collections.OrderedDict(monitor_info)
+    service_stats.append(("monitoring", monitor_info))
 
-    service_stats = [
-        (api_type, route_name),
-        ("lastReset", START_UTC_TIME.isoformat() + "Z"),
-        ("invocations", cron_info["invocations"]),
-        ("monitoring", monitor_info)
-    ]
     service_stats = collections.OrderedDict(service_stats)
 
     if request_wants_json():
@@ -457,4 +460,4 @@ def close_connection(_: Exception) -> None:
 
 if __name__ == "__main__":
     APP.debug = False
-    APP.run(port=5000)
+    APP.run(port=2000)

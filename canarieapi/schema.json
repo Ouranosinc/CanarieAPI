@@ -13,7 +13,7 @@
         "DATABASE": {
             "description": "Parameters about database and its data source",
             "type": "object",
-            "required": ["filename", "access_log", "log_pid"],
+            "required": ["filename", "access_log"],
             "additionalProperties": false,
             "properties": {
                 "filename": {
@@ -22,10 +22,6 @@
                 },
                 "access_log": {
                     "description": "NGINX log file location",
-                    "type": "string"
-                },
-                "log_pid": {
-                    "description": "NGINX pid file location",
                     "type": "string"
                 }
             }
@@ -51,7 +47,8 @@
         "service_description_schema": {
             "description": "Describe a service",
             "type": "object",
-            "required": ["info", "stats", "redirect", "monitoring"],
+            "$comment": "When the PARSE_LOG configuration option is True, \"stats\" will be dynamically added to the list of required properties",
+            "required": ["info", "redirect", "monitoring"],
             "additionalProperties": false,
             "properties": {
                 "info": {"$ref": "#/definitions/service_info_schema"},
@@ -63,7 +60,8 @@
         "platform_description_schema": {
             "description": "Describe a platform",
             "type": "object",
-            "required": ["info", "stats", "redirect", "monitoring"],
+            "$comment": "When the PARSE_LOG configuration option is True, \"stats\" will be dynamically added to the list of required properties",
+            "required": ["info", "redirect", "monitoring"],
             "additionalProperties": false,
             "properties": {
                 "info": {"$ref": "#/definitions/platform_info_schema"},
