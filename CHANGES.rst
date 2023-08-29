@@ -6,6 +6,13 @@ CHANGES
 `Unreleased <https://github.com/Ouranosinc/CanarieAPI/tree/master>`_ (latest)
 ------------------------------------------------------------------------------------
 
+.. **ADD LIST ITEMS WITH NEW CHANGES AND REMOVE THIS COMMENT**
+
+* No changes yet.
+
+`1.0.0 <https://github.com/Ouranosinc/CanarieAPI/tree/1.0.0>`_ (2023-08-29)
+------------------------------------------------------------------------------------
+
 * Separate the application, cron job, and proxy (nginx) into separate containers so that they can be run independently.
 * Add option to independently enable/disable the ``parse_logs`` cron job by setting the ``PARSE_LOGS`` configuration
   option to ``True``.
