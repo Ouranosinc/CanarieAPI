@@ -45,7 +45,6 @@ from canarieapi import __meta__  # isort: skip  # noqa  # pylint: disable=C0413
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosectionlabel",  # help make cross-references to title/sections
-    "cloud_sptheme.ext.autodoc_sections",  # allow sections in docstrings code
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
     "sphinx.ext.intersphinx",
