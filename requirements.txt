@@ -3,7 +3,7 @@ gevent
 gunicorn
 jsonschema
 python-dateutil
-requests>=2.20.0
+requests>=2.32.0
 setuptools>=65.5.1
 typing_extensions
 wheel>=0.37.1
