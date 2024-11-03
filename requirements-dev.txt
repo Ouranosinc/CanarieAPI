@@ -22,4 +22,5 @@ responses
 safety
 tox
 unify
-werkzeug>=3.0.3 # not directly required, pinned by Snyk to avoid a vulnerability
+werkzeug>=3.0.6 # not directly required, pinned by Snyk to avoid a vulnerability
+waitress>=3.0.1 # not directly required, pinned by Snyk to avoid a vulnerability
