@@ -23,3 +23,4 @@ safety
 tox
 unify
 werkzeug>=3.0.3 # not directly required, pinned by Snyk to avoid a vulnerability
+setuptools>=78.1.1 # not directly required, pinned by Snyk to avoid a vulnerability
