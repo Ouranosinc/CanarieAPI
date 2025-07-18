@@ -6,6 +6,13 @@ CHANGES
 `Unreleased <https://github.com/Ouranosinc/CanarieAPI/tree/master>`_ (latest)
 ------------------------------------------------------------------------------------
 
+.. **ADD LIST ITEMS WITH NEW CHANGES AND REMOVE THIS COMMENT**
+
+* No changes yet.
+
+`1.0.1 <https://github.com/Ouranosinc/CanarieAPI/tree/1.0.1>`_ (2025-07-17)
+------------------------------------------------------------------------------------
+
 * Add support of Python 3.12.
 * Drop support of Python 3.7.
 * Fix security issue for ``werkzeug`` (fixes
