@@ -13,6 +13,7 @@ CHANGES
   `#28 <https://github.com/Ouranosinc/CanarieAPI/pull/28>`_,
   `#29 <https://github.com/Ouranosinc/CanarieAPI/pull/29>`_,
   `#30 <https://github.com/Ouranosinc/CanarieAPI/pull/30>`_).
+* Fix ``PARSE_LOGS`` incorrectly resolved when performing schema validation.
 
 `1.0.0 <https://github.com/Ouranosinc/CanarieAPI/tree/1.0.0>`_ (2023-08-29)
 ------------------------------------------------------------------------------------

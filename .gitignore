@@ -11,6 +11,8 @@ reports/
 build/
 dist/
 docs/_build
+docs/canarieapi.rst
+docs/modules.rst
 env/
 node_modules
 package-lock.json
