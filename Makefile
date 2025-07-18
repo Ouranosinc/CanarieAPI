@@ -321,7 +321,7 @@ fix-css-only: mkdir-reports install-npm		## fix CSS styles problems automaticall
 
 .PHONY: test-only
 test-only:  ## run tests without dependencies pre-installation
-	python setup.py test
+	pytest "$(APP_ROOT)/tests"
 
 .PHONY: test
 test: install-req install-dev test-only  ## run tests quickly with the default Python
