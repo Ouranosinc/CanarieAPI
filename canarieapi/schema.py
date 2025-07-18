@@ -24,7 +24,7 @@ def validate_config_schema(update_db: bool, run_jobs: bool = True) -> None:
     logger.info("Testing configuration...")
 
     configuration_schema = copy.deepcopy(CONFIGURATION_SCHEMA)
-    if config.get("PARSE_LOG", True):
+    if config.get("PARSE_LOGS", True):
         configuration_schema["definitions"]["service_description_schema"]["required"].append("stats")
         configuration_schema["definitions"]["platform_description_schema"]["required"].append("stats")
     try:
@@ -35,7 +35,7 @@ def validate_config_schema(update_db: bool, run_jobs: bool = True) -> None:
     if run_jobs:
         monitor(update_db=update_db)
 
-        if config.get("PARSE_LOG", True):
+        if config.get("PARSE_LOGS", True):
             access_log_fn = config["DATABASE"]["access_log"]
             route_invocations = {}
             file_checked = 0

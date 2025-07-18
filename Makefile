@@ -321,7 +321,7 @@ fix-css-only: mkdir-reports install-npm		## fix CSS styles problems automaticall
 
 .PHONY: test-only
 test-only:  ## run tests without dependencies pre-installation
-	python setup.py test
+	pytest "$(APP_ROOT)/tests"
 
 .PHONY: test
 test: install-req install-dev test-only  ## run tests quickly with the default Python
@@ -341,10 +341,11 @@ COVERAGE_HTML_IDX := $(COVERAGE_HTML_DIR)/index.html
 
 .PHONY: coverage-only
 coverage-only:  ## check code coverage without dependencies pre-installation
-	coverage run --source "$(APP_NAME)" setup.py test
-	coverage xml -i -o "$(REPORTS_DIR)/coverage.xml"
-	coverage report -m
-	coverage html -d "$(COVERAGE_HTML_DIR)"
+	coverage run --rcfile="$(APP_ROOT)/setup.cfg" \
+		"$$(which pytest)" "$(APP_ROOT)/tests" --junitxml="$(REPORTS_DIR)/coverage-junit.xml"
+	coverage xml --rcfile="$(APP_ROOT)/setup.cfg" -i -o "$(REPORTS_DIR)/coverage.xml"
+	coverage report --rcfile="$(APP_ROOT)/setup.cfg" -m
+	coverage html --rcfile="$(APP_ROOT)/setup.cfg" -d "$(COVERAGE_HTML_DIR)"
 
 .PHONY: coverage-show
 coverage-show: coverage-only  ## display coverage HTML report after analysis

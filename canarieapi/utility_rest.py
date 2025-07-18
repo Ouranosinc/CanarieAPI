@@ -29,7 +29,7 @@ from werkzeug.routing import BaseConverter, Map
 from canarieapi.app_object import APP
 
 APIType = Literal["platform", "service"]
-_JSON: TypeAlias = "JSON"
+_JSON: TypeAlias = "JSON"  # pylint: disable=C0103
 JSON = Union[  # pylint: disable=C0103
     Dict[
         str,
