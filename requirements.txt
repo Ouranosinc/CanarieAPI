@@ -1,13 +1,13 @@
 flask>=3
-gevent
-gunicorn
+gevent>=25.5.1
+gunicorn>=23.0.0
 jsonschema
 packaging>=23.2
 python-dateutil
-requests>=2.32.4 # not directly required, pinned by Snyk to avoid a vulnerability
-setuptools>=70.0.0
+requests>=2.32.4
+setuptools>=78.1.1
 typing_extensions
-urllib3>=2.2.2 # not directly required, pinned by Snyk to avoid a vulnerability
+urllib3>=2.5.0
 wheel>=0.37.1
 werkzeug>=3.0.1
 zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
