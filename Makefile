@@ -20,7 +20,7 @@ MAKEFILE_NAME := $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
 APP_ROOT := $(abspath $(lastword $(MAKEFILE_NAME))/..)
 APP_NAME := canarieapi
 # NOTE: don't change this manually, use the make bump command to update everywhere
-APP_VERSION ?= 1.0.1
+APP_VERSION ?= 1.0.2
 
 # docker
 APP_DOCKER_REPO := pavics/canarieapi

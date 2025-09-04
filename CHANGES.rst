@@ -6,6 +6,13 @@ CHANGES
 `Unreleased <https://github.com/Ouranosinc/CanarieAPI/tree/master>`_ (latest)
 ------------------------------------------------------------------------------------
 
+.. **ADD LIST ITEMS WITH NEW CHANGES AND REMOVE THIS COMMENT**
+
+* No changes yet.
+
+`1.0.2 <https://github.com/Ouranosinc/CanarieAPI/tree/1.0.2>`_ (2025-09-04)
+------------------------------------------------------------------------------------
+
 * Drop support of Python 3.8.
 * Fix security issues for `gevent`, `gunicorn`, `setuptools`, `requests` and `urllib3`.
 
