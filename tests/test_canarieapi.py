@@ -57,7 +57,8 @@ class TestCanarieAPI(unittest.TestCase):
     def setUp(self) -> None:
         # trigger cron updates immediately to generate status update entries
         # these should end up calling the above monitored apps
-        with open(self.config.DATABASE["access_log"], "w", encoding="utf-8") as f:
+        os.makedirs(os.path.basename(self.config.DATABASE["access_log"]), exist_ok=True)
+        with open(self.config.DATABASE["access_log"], mode="w", encoding="utf-8") as f:
             # create a new empty access log before each test
             # file must exist but the content doesn't matter for these tests)
             os.utime(f.name, None)
@@ -261,7 +262,8 @@ class TestDatabaseErrorHandling(unittest.TestCase):
     def setUp(self) -> None:
         # trigger cron updates immediately to generate status update entries
         # these should end up calling the above monitored apps
-        with open(self.config.DATABASE["access_log"], "w", encoding="utf-8") as f:
+        os.makedirs(os.path.basename(self.config.DATABASE["access_log"]), exist_ok=True)
+        with open(self.config.DATABASE["access_log"], mode="w", encoding="utf-8") as f:
             # create a new empty access log before each test
             # file must exist but the content doesn't matter for these tests)
             os.utime(f.name, None)
