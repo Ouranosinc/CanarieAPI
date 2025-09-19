@@ -4,8 +4,8 @@
 import os
 import sqlite3
 
-from canarieapi.utility_rest import init_db
 from canarieapi.logparser import parse_log
+from canarieapi.utility_rest import init_db
 
 
 class DummyLogger:
@@ -44,12 +44,12 @@ def test_parse_log_datetime_tz(tmp_path, tmp_config):
 
     # Create a log file with a mix of tz-aware and tz-naive datetimes for both services
     log_content = "".join([
-        '[2023-09-18T13:00:00+00:00] "GET /api/test HTTP/1.1" 200 1234\n',  # tz-aware, test-service
-        '[2023-09-18T14:00:00] "GET /api/test HTTP/1.1" 200 1234\n',         # tz-naive, test-service
-        '[2023-09-18T15:00:00+00:00] "POST /api/other HTTP/1.1" 200 5678\n', # tz-aware, other-service
-        '[2023-09-18T16:00:00] "POST /api/other HTTP/1.1" 200 5678\n',        # tz-naive, other-service
-        '[2023-09-18T17:00:00+00:00] "GET /api/test HTTP/1.1" 200 1234\n',   # tz-aware, test-service (latest)
-        '[2023-09-18T18:00:00] "POST /api/other HTTP/1.1" 200 5678\n',        # tz-naive, other-service (latest)
+        "[2023-09-18T13:00:00+00:00] \"GET /api/test HTTP/1.1\" 200 1234\n",    # tz-aware, test-service
+        "[2023-09-18T14:00:00] \"GET /api/test HTTP/1.1\" 200 1234\n",          # tz-naive, test-service
+        "[2023-09-18T15:00:00+00:00] \"POST /api/other HTTP/1.1\" 200 5678\n",  # tz-aware, other-service
+        "[2023-09-18T16:00:00] \"POST /api/other HTTP/1.1\" 200 5678\n",        # tz-naive, other-service
+        "[2023-09-18T17:00:00+00:00] \"GET /api/test HTTP/1.1\" 200 1234\n",    # tz-aware, test-service (latest)
+        "[2023-09-18T18:00:00] \"POST /api/other HTTP/1.1\" 200 5678\n",        # tz-naive, other-service (latest)
     ])
     log_file = tmp_path / "access.log"
     log_file.write_text(log_content)
