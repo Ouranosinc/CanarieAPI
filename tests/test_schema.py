@@ -1,27 +1,11 @@
-import os
-import shutil
 
 import jsonschema
 import pytest
 
 from canarieapi.schema import validate_config_schema
-from tests import config as test_config
 
 
-@pytest.fixture(autouse=True)
-def tmp_config():
-    from canarieapi.api import APP
-
-    APP.config.from_object(test_config)
-
-    yield
-
-    tmp_dir = os.path.dirname(test_config.DATABASE["filename"])
-    if "tmp" in tmp_dir and os.path.isdir(tmp_dir):
-        shutil.rmtree(tmp_dir)
-
-
-def test_validate_error_wrong_schema():
+def test_validate_error_wrong_schema(tmp_config):
     """
     Ensure the configuration schema is used to validate the application configuration at startup.
     """
@@ -36,7 +20,7 @@ def test_validate_error_wrong_schema():
         validate_config_schema(False, run_jobs=False)
 
 
-def test_validate_schema_no_parse_logs():
+def test_validate_schema_no_parse_logs(tmp_config):
     """
     Ensure the configuration schema is valid when PARSE_LOGS is False and stats are not set.
     """

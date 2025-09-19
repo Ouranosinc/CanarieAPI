@@ -6,9 +6,9 @@ CHANGES
 `Unreleased <https://github.com/Ouranosinc/CanarieAPI/tree/master>`_ (latest)
 ------------------------------------------------------------------------------------
 
-.. **ADD LIST ITEMS WITH NEW CHANGES AND REMOVE THIS COMMENT**
-
-* No changes yet.
+* Fix time-zone aware datetime parsing for log/db entries comparison
+  (fixes `#21 <https://github.com/Ouranosinc/CanarieAPI/issues/21>`_).
+* Fix log record doing an additional index leading to invalid DB datetime extraction.
 
 `1.0.2 <https://github.com/Ouranosinc/CanarieAPI/tree/1.0.2>`_ (2025-09-04)
 ------------------------------------------------------------------------------------
