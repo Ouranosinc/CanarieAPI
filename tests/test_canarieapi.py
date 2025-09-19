@@ -6,9 +6,11 @@ Tests for `canarieapi` module.
 import os
 import shutil
 import unittest
+from datetime import datetime, timezone
 
 import mock
 import responses
+from dateutil.parser import isoparse
 from flask_webtest import TestApp
 
 from canarieapi.logparser import cron_job as cron_job_logparse
@@ -150,12 +152,32 @@ class TestCanarieAPI(unittest.TestCase):
 
     def test_service_stats_json_service_success(self):
         name = list(self.app.config["SERVICES"])[0]
+        log_path = self.config.DATABASE["access_log"]
+
+        # setup log with some access entries
+        dt1 = datetime(2025, 9, 19, 12, 0, 0, tzinfo=timezone.utc)
+        dt2 = datetime(2025, 9, 19, 13, 0, 0)  # naive
+        with open(log_path, "w", encoding="utf-8") as f:
+            f.write(f"[{dt1.isoformat()}] \"GET /{name}/test HTTP/1.1\" 200 1234\n")
+            f.write(f"[{dt2.isoformat()}] \"GET /{name}/test HTTP/1.1\" 200 1234\n")
+        cron_job_logparse()
+
+        # test status
         resp = self.web.get(f"/{name}/service/stats", params={"f": "json"})
         assert resp.status_code == 200
         assert all(
             field in resp.json
             for field in ["invocations", "lastReset", "monitoring"]
         )
+
+        # validate results
+        assert resp.json["invocations"] == 2
+        last_access = resp.json["monitoring"].get("lastAccess")
+        assert last_access != "Never"
+        try:
+            isoparse(last_access)
+        except Exception:
+            assert False, f"lastAccess is not a valid datetime: {last_access}"
 
     def test_service_stats_page_service_error(self):
         name = list(self.app.config["SERVICES"])[0]

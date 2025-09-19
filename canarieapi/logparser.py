@@ -75,8 +75,7 @@ def parse_log(filename: str, database: Optional[sqlite3.Connection] = None) -> R
     logger.info("Compiling stats from %s records", len(log_records))
     for record in log_records:
         for route, value in route_stats.items():
-            if value["route_regex"].match(record["route"]) and \
-               value["method_regex"].match(record["method"]):
+            if value["route_regex"].match(record["route"]) and value["method_regex"].match(record["method"]):
                 value["count"] = value["count"] + 1
                 value["last_access"] = record["datetime"]
                 break
