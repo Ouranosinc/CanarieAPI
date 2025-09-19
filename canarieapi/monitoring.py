@@ -6,7 +6,7 @@ from typing_extensions import Literal, NotRequired, Required, TypedDict
 
 # -- 3rd party modules -------------------------------------------------------
 import requests
-from requests.exceptions import ConnectionError  # pylint: disable=W0622
+from requests.exceptions import ConnectionError, Timeout  # pylint: disable=W0622
 
 # -- Project specific --------------------------------------------------------
 from canarieapi.app_object import APP
@@ -97,7 +97,7 @@ def check_service(request: RequestConfig, response: ResponseConfig) -> Tuple[Sta
     logger = APP.logger
     try:
         resp = requests.request(**default_request)
-    except ConnectionError as exc:
+    except (ConnectionError, Timeout) as exc:
         url = default_request["url"]
         message = f"Cannot reach {url} : {exc!s}"
         logger.warning(message)

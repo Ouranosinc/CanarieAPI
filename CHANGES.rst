@@ -9,6 +9,7 @@ CHANGES
 * Fix time-zone aware datetime parsing for log/db entries comparison
   (fixes `#21 <https://github.com/Ouranosinc/CanarieAPI/issues/21>`_).
 * Fix log record doing an additional index leading to invalid DB datetime extraction.
+* Fix ``ReadTimeout`` not handled as ``ConnectionError`` during service check.
 
 `1.0.2 <https://github.com/Ouranosinc/CanarieAPI/tree/1.0.2>`_ (2025-09-04)
 ------------------------------------------------------------------------------------
