@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding:utf-8
 
-# N.B. : Some of these docstrings are written in reSTructuredText format so that
+# N.B. : Some of these docstrings are written in reStructuredText format so that
 # Sphinx can use them directly with fancy formatting.
 
 # In the context of a REST application, this module must be loaded first as it
@@ -260,10 +260,10 @@ def collect_cron_access_stats(route_name: str, *, database: Optional[sqlite3.Con
     cur = db.cursor()
     try:
         cur.execute(query, [route_name])
-        records = cur.fetchone()
-        if records:
-            invocations = records[0][0]
-            last_access = dt_parse(records[0][1]).replace(tzinfo=None).isoformat() + "Z"
+        record = cur.fetchone()
+        if record:
+            invocations = record[0]
+            last_access = dt_parse(record[1]).replace(tzinfo=None).isoformat() + "Z"
     except Exception as exc:  # pragma: no cover
         APP.logger.error(str(exc))
 
@@ -306,9 +306,9 @@ def collect_cron_last_status(*, database: Optional[sqlite3.Connection] = None) -
     cur = db.cursor()
     try:
         cur.execute(query)
-        records = cur.fetchone()
-        if records:
-            last_status_update = dt_parse(records[0][0]).isoformat() + "Z"
+        record = cur.fetchone()
+        if record:
+            last_status_update = dt_parse(record[0]).isoformat() + "Z"
     except Exception as exc:  # pragma: no cover
         APP.logger.error(str(exc))
 
