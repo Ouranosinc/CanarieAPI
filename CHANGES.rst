@@ -6,6 +6,13 @@ CHANGES
 `Unreleased <https://github.com/Ouranosinc/CanarieAPI/tree/master>`_ (latest)
 ------------------------------------------------------------------------------------
 
+.. **ADD LIST ITEMS WITH NEW CHANGES AND REMOVE THIS COMMENT**
+
+* No changes yet.
+
+`1.0.3 <https://github.com/Ouranosinc/CanarieAPI/tree/1.0.3>`_ (2025-09-22)
+------------------------------------------------------------------------------------
+
 * Bump Docker base image to Python 3.12.
 * Fix time-zone aware datetime parsing for log/db entries comparison
   (fixes `#21 <https://github.com/Ouranosinc/CanarieAPI/issues/21>`_).
