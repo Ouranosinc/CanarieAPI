@@ -36,12 +36,6 @@ def test_parse_log_datetime_tz(tmp_path, tmp_config):
     })
     APP.logger = DummyLogger()
 
-    with APP.app_context():
-        conn = sqlite3.connect(db_path)
-        init_db(conn)
-        conn.execute("INSERT INTO stats (last_access) VALUES (?)", ("2023-09-18T12:00:00",))
-        conn.commit()
-
     # Create a log file with a mix of tz-aware and tz-naive datetimes for both services
     log_content = "".join([
         "[2023-09-18T13:00:00+00:00] \"GET /api/test HTTP/1.1\" 200 1234\n",    # tz-aware, test-service
@@ -54,13 +48,18 @@ def test_parse_log_datetime_tz(tmp_path, tmp_config):
     log_file = tmp_path / "access.log"
     log_file.write_text(log_content)
 
+    try:
+        with APP.app_context():
+            conn = sqlite3.connect(db_path)
+            init_db(conn)
+            conn.execute("INSERT INTO stats (last_access) VALUES (?)", ("2023-09-18T12:00:00",))
+            conn.commit()
+        stats = parse_log(str(log_file), database=conn)
+    finally:
+        conn.close()
+
     # Run parse_log and check that the log entries are counted for both services
-    stats = parse_log(str(log_file), database=conn)
     assert stats["test-service"]["count"] == 3
     assert stats["test-service"]["last_access"] == "2023-09-18T17:00:00+00:00"
     assert stats["other-service"]["count"] == 3
     assert stats["other-service"]["last_access"] == "2023-09-18T18:00:00"
-
-    conn.close()
-    os.remove(db_path)
-    os.remove(log_file)
