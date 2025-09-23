@@ -19,6 +19,7 @@ SERVICES.update({
 })
 for name, svc in SERVICES.items():
     svc["info"]["name"] = name
+    svc["stats"]["route"] = f"/{name}/.*"
 
 # avoid errors triggered by sample config during tests
 PLATFORMS.clear()

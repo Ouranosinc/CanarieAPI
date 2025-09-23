@@ -1,4 +1,4 @@
-FROM python:3.11
+FROM python:3.12
 LABEL description="CanarieAPI: Self describing REST service for Canarie registry."
 LABEL maintainer="David Byrns <david.byrns@crim.ca>, Francis Charette-Migneault <francis.charette-migneault@crim.ca>"
 LABEL vendor="Ouranosinc, CRIM"

@@ -414,7 +414,7 @@ function-naming-style=snake_case
 #function-rgx=
 
 # Good variable names which should always be accepted, separated by a comma.
-good-names=i,j,k,v,kv,ex,fn,x,y,z,f,fd,h,db,kw,ns,qs,_
+good-names=i,j,k,v,kv,ex,fn,x,y,z,f,fd,h,db,dt,kw,ns,qs,_
 
 # Include a hint for the correct naming format with invalid-name.
 include-naming-hint=yes

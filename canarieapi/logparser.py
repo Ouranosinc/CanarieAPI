@@ -1,6 +1,7 @@
 # -- Standard lib ------------------------------------------------------------
 import re
 import sqlite3
+from datetime import datetime, timezone
 from typing import Dict, Optional, Union
 
 # -- 3rd party ---------------------------------------------------------------
@@ -11,6 +12,16 @@ from canarieapi.app_object import APP
 from canarieapi.utility_rest import get_db, retry_db_error_after_init
 
 RouteStatistics = Dict[str, Dict[str, Union[str, int]]]
+
+
+def parse_datetime(dt_str: str) -> datetime:
+    """
+    Parse datetime string from log and return it with TimeZone awareness.
+    """
+    dt = dt_parse(dt_str)
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt
 
 
 def parse_log(filename: str, database: Optional[sqlite3.Connection] = None) -> RouteStatistics:
@@ -44,7 +55,7 @@ def parse_log(filename: str, database: Optional[sqlite3.Connection] = None) -> R
         cur.execute("select last_access from stats order by last_access desc limit 1")
         records = cur.fetchone()
         if records:
-            last_access = dt_parse(records[0][0])
+            last_access = parse_datetime(records[0])
         else:
             last_access = None
 
@@ -57,15 +68,14 @@ def parse_log(filename: str, database: Optional[sqlite3.Connection] = None) -> R
             match = log_regex.match(line)
             if match:
                 records = match.groupdict()
-                if last_access is None or dt_parse(records["datetime"]) > last_access:
+                if last_access is None or parse_datetime(records["datetime"]) > last_access:
                     log_records.append(records)
 
     # Compile stats
     logger.info("Compiling stats from %s records", len(log_records))
     for record in log_records:
         for route, value in route_stats.items():
-            if value["route_regex"].match(record["route"]) and \
-               value["method_regex"].match(record["method"]):
+            if value["route_regex"].match(record["route"]) and value["method_regex"].match(record["method"]):
                 value["count"] = value["count"] + 1
                 value["last_access"] = record["datetime"]
                 break
