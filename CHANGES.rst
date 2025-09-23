@@ -6,6 +6,7 @@ CHANGES
 `Unreleased <https://github.com/Ouranosinc/CanarieAPI/tree/master>`_ (latest)
 ------------------------------------------------------------------------------------
 
+* Bump Docker base image to Python 3.12.
 * Fix time-zone aware datetime parsing for log/db entries comparison
   (fixes `#21 <https://github.com/Ouranosinc/CanarieAPI/issues/21>`_).
 * Fix multiple log record lookup doing an additional index leading to invalid DB extraction,
