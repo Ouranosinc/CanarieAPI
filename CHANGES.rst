@@ -6,9 +6,8 @@ CHANGES
 `Unreleased <https://github.com/Ouranosinc/CanarieAPI/tree/master>`_ (latest)
 ------------------------------------------------------------------------------------
 
-.. **ADD LIST ITEMS WITH NEW CHANGES AND REMOVE THIS COMMENT**
-
-* No changes yet.
+* Replace Docker image to ``python:3.12-slim``.
+* Update Docker ``CMD`` with JSON execution form.
 
 `1.0.3 <https://github.com/Ouranosinc/CanarieAPI/tree/1.0.3>`_ (2025-09-22)
 ------------------------------------------------------------------------------------
