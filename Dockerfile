@@ -1,4 +1,4 @@
-FROM python:3.12
+FROM python:3.12-slim
 LABEL description="CanarieAPI: Self describing REST service for Canarie registry."
 LABEL maintainer="David Byrns <david.byrns@crim.ca>, Francis Charette-Migneault <francis.charette-migneault@crim.ca>"
 LABEL vendor="Ouranosinc, CRIM"
@@ -28,10 +28,12 @@ COPY ./ ${PKG_DIR}/
 RUN pip install --no-dependencies ${PKG_DIR}
 
 # start gunicorn
-CMD gunicorn \
-    -b 0.0.0.0:2000 \
-    --workers 1 \
-    --log-level=DEBUG \
-    --timeout 30 \
-    -k gevent \
-    canarieapi.wsgi
+CMD [ \
+    "gunicorn", \
+    "-b", "0.0.0.0:2000", \
+    "--workers", "1", \
+    "--log-level", "DEBUG", \
+    "--timeout", "30", \
+    "-k", "gevent", \
+    "canarieapi.wsgi" \
+]
