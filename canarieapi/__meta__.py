@@ -2,7 +2,7 @@
 General meta information on the canarieapi package.
 """
 
-__version__ = "1.0.3"
+__version__ = "1.1.0"
 __author__ = "David Byrns, Francis Charette-Migneault"
 __email__ = "francis.charette-migneault@crim.ca"
 __title__ = "Canarie API"
