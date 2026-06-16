@@ -438,6 +438,7 @@ docker-build:  ## build the docker image
 .PHONY: docker-push
 docker-push: docker-build  ## push the built docker image
 	docker push "$(APP_DOCKER_TAG)"
+	docker push "$(APP_LATEST_TAG)"
 
 .PHONY: docker-clean
 docker-clean: 	## remove any leftover images from docker target operations
