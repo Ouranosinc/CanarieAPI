@@ -8,6 +8,7 @@ CHANGES
 
 * Move docker build to GitHub Actions CI (DockerHub auto-build deprecated).
 * Refresh dependencies to latest versions to resolve known security issues.
+* Adjust ``make docker-push`` to push both latest and tagged version, as used by CI.
 
 `1.1.0 <https://github.com/Ouranosinc/CanarieAPI/tree/1.1.0>`_ (2026-03-02)
 ------------------------------------------------------------------------------------
@@ -29,7 +30,7 @@ CHANGES
 ------------------------------------------------------------------------------------
 
 * Drop support of Python 3.8.
-* Fix security issues for `gevent`, `gunicorn`, `setuptools`, `requests` and `urllib3`.
+* Fix security issues for ``gevent``, ``gunicorn``, ``setuptools``, ``requests`` and ``urllib3``.
 
 `1.0.1 <https://github.com/Ouranosinc/CanarieAPI/tree/1.0.1>`_ (2025-07-17)
 ------------------------------------------------------------------------------------
