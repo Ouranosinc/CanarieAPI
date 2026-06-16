@@ -1,0 +1,56 @@
+name: deploy.yml
+
+on:
+  # This will run the workflow on pushes to main and version tags.
+  # Adjust to match your branching and tagging strategy.
+  push:
+    branches:
+      - master
+      - main
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+-*"
+      - "[0-9]+.[0-9]+.[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+-*"
+
+jobs:
+
+  deploy-docker:
+    if: >-
+      ${{
+        success() &&
+        (contains(github.ref, 'refs/tags') ||
+         github.ref == 'refs/heads/master' ||
+         github.ref == 'refs/heads/main')
+      }}
+    runs-on: ubuntu-latest
+    env:
+      # enabled provenance attestation during build/push (see Makefile for details)
+      DOCKER_PROV: "true"
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6.0.3
+        with:
+          fetch-depth: "0"
+      - name: Get Tag Version
+        id: version
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF}" == "refs/heads/master" ]]; then
+            echo "::set-output name=TAG_VERSION::latest"
+          else
+            echo "::set-output name=TAG_VERSION::${GITHUB_REF##*/}"
+          fi
+      - name: Login to DockerHub
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee  # v4.2.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build Docker
+        run: |
+          make APP_VERSION=${{ steps.version.outputs.TAG_VERSION }} docker-info docker-build
+      - name: Push to DockerHub
+        # push does not apply if built with provenance since the build itself already pushes the layers
+        # the referenced repository and tagged version will not be available locally for push
+        if: ${{ env.DOCKER_PROV != 'true' }}
+        run: |
+          make APP_VERSION=${{ steps.version.outputs.TAG_VERSION }} docker-push

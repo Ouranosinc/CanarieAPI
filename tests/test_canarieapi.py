@@ -159,8 +159,8 @@ class TestCanarieAPI(unittest.TestCase):
         dt1 = datetime(2025, 9, 19, 12, 0, 0, tzinfo=timezone.utc)
         dt2 = datetime(2025, 9, 19, 13, 0, 0)  # naive
         with open(log_path, "w", encoding="utf-8") as f:
-            f.write(f"[{dt1.isoformat()}] \"GET /{name}/test HTTP/1.1\" 200 1234\n")
-            f.write(f"[{dt2.isoformat()}] \"GET /{name}/test HTTP/1.1\" 200 1234\n")
+            f.write(f'[{dt1.isoformat()}] "GET /{name}/test HTTP/1.1" 200 1234\n')
+            f.write(f'[{dt2.isoformat()}] "GET /{name}/test HTTP/1.1" 200 1234\n')
         cron_job_logparse()
 
         # test status

@@ -30,7 +30,6 @@ limit-inference-results=100
 # usually to register additional checkers.
 load-plugins=
     pylint_flask,
-    pylint_quotes
 
 string-quote=double
 triple-quote=double
@@ -312,12 +311,6 @@ logging-modules=logging
 # generate a warning on implicit string concatenation in sequences defined over
 # several lines.
 check-str-concat-over-line-jumps=no
-
-# plugin:
-#   https://pypi.python.org/pypi/pylint-quotes
-string-quote=double
-triple-quote=double
-docstring-quote=double
 
 
 [FORMAT]
