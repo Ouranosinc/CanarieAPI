@@ -47,7 +47,7 @@ class TestCanarieAPI(unittest.TestCase):
             cfg["monitoring"]["Component"]["request"]["url"] = url
             responses.get(url, json={}, status=200)  # mock their response
             for req in cfg["redirect"]:
-                cfg["redirect"][req] = f"{url.rstrip("/")}/{req}"  # not called, just set for compare
+                cfg["redirect"][req] = f"{url.rstrip('/')}/{req}"  # not called, just set for compare
 
         cls.app = APP
         cls.web = TestApp(cls.app)
@@ -159,8 +159,8 @@ class TestCanarieAPI(unittest.TestCase):
         dt1 = datetime(2025, 9, 19, 12, 0, 0, tzinfo=timezone.utc)
         dt2 = datetime(2025, 9, 19, 13, 0, 0)  # naive
         with open(log_path, "w", encoding="utf-8") as f:
-            f.write(f"[{dt1.isoformat()}] \"GET /{name}/test HTTP/1.1\" 200 1234\n")
-            f.write(f"[{dt2.isoformat()}] \"GET /{name}/test HTTP/1.1\" 200 1234\n")
+            f.write(f'[{dt1.isoformat()}] "GET /{name}/test HTTP/1.1" 200 1234\n')
+            f.write(f'[{dt2.isoformat()}] "GET /{name}/test HTTP/1.1" 200 1234\n')
         cron_job_logparse()
 
         # test status
@@ -220,7 +220,7 @@ class TestCanarieAPI(unittest.TestCase):
         url = cfg["monitoring"]["Component"]["request"]["url"]
         resp = self.web.get(f"/{name}/service/doc", params={"f": "json"})
         assert resp.status_code == 302, "Expect redirect request to the service's doc redirect endpoint"
-        assert resp.location == f"{url.rstrip("/")}/doc"
+        assert resp.location == f"{url.rstrip('/')}/doc"
 
 
 class TestDatabaseErrorHandling(unittest.TestCase):
@@ -252,7 +252,7 @@ class TestDatabaseErrorHandling(unittest.TestCase):
             cfg["monitoring"]["Component"]["request"]["url"] = url
             responses.get(url, json={}, status=200)  # mock their response
             for req in cfg["redirect"]:
-                cfg["redirect"][req] = f"{url.rstrip("/")}/{req}"  # not called, just set for compare
+                cfg["redirect"][req] = f"{url.rstrip('/')}/{req}"  # not called, just set for compare
 
         cls.app = APP
         cls.web = TestApp(cls.app)

@@ -159,15 +159,16 @@ check-lint-only: mkdir-reports		## run linting code style checks
 			"$(APP_ROOT)/$(APP_NAME)" "$(APP_ROOT)/docs" "$(APP_ROOT)/tests" \
 		1> >(tee "$(REPORTS_DIR)/check-lint.txt")'
 
+# Keep in sync with minimum supported Python version for quote checks/fixes
+RUFF_QUOTES_TARGET := py311
 .PHONY: check-quotes-only
 check-quotes-only: mkdir-reports	## run quotes style checks
 	@echo "Running quotes style checks..."
 	@-rm -fr "$(REPORTS_DIR)/check-quotes.txt"
 	@bash -c '$(CONDA_CMD) \
-		unify \
-			--check-only \
-			--recursive \
-			--quote \" \
+		ruff check \
+			--select Q \
+			--target-version "$(RUFF_QUOTES_TARGET)" \
 			"$(APP_ROOT)/$(APP_NAME)" "$(APP_ROOT)/docs" "$(APP_ROOT)/tests" \
 		1> >(tee "$(REPORTS_DIR)/check-quotes.txt")'
 
@@ -284,10 +285,11 @@ fix-quotes-only: mkdir-reports	## fix quotes style problems automatically
 	@echo "Fixing quotes style problems..."
 	@-rm -fr "$(REPORTS_DIR)/fixed-quotes.txt"
 	@bash -c '$(CONDA_CMD) \
-		unify \
-			--in-place \
-			--recursive \
-			--quote \" \
+		ruff check \
+			--fix \
+			--select Q \
+			--unsafe-fixes \
+			--target-version "$(RUFF_QUOTES_TARGET)" \
 			"$(APP_ROOT)/$(APP_NAME)" "$(APP_ROOT)/docs" "$(APP_ROOT)/tests" \
 		1> >(tee "$(REPORTS_DIR)/fixed-quotes.txt")'
 
