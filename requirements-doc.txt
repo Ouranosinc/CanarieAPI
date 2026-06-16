@@ -4,8 +4,8 @@
 astroid
 jinja2
 pycodestyle>=2.6.0,<3
-sphinx>=6,<7
-sphinx-autoapi>=1.7.0
+sphinx>=8
+sphinx-autoapi>=3.8.0
 sphinx-autodoc-typehints
 sphinx-paramlinks>=0.4.1
 sphinxcontrib-redoc>=1.6.0

@@ -47,7 +47,7 @@ class TestCanarieAPI(unittest.TestCase):
             cfg["monitoring"]["Component"]["request"]["url"] = url
             responses.get(url, json={}, status=200)  # mock their response
             for req in cfg["redirect"]:
-                cfg["redirect"][req] = f"{url.rstrip('/')}/{req}"  # not called, just set for compare
+                cfg["redirect"][req] = f"{url.rstrip("/")}/{req}"  # not called, just set for compare
 
         cls.app = APP
         cls.web = TestApp(cls.app)
@@ -220,7 +220,7 @@ class TestCanarieAPI(unittest.TestCase):
         url = cfg["monitoring"]["Component"]["request"]["url"]
         resp = self.web.get(f"/{name}/service/doc", params={"f": "json"})
         assert resp.status_code == 302, "Expect redirect request to the service's doc redirect endpoint"
-        assert resp.location == f"{url.rstrip('/')}/doc"
+        assert resp.location == f"{url.rstrip("/")}/doc"
 
 
 class TestDatabaseErrorHandling(unittest.TestCase):
@@ -252,7 +252,7 @@ class TestDatabaseErrorHandling(unittest.TestCase):
             cfg["monitoring"]["Component"]["request"]["url"] = url
             responses.get(url, json={}, status=200)  # mock their response
             for req in cfg["redirect"]:
-                cfg["redirect"][req] = f"{url.rstrip('/')}/{req}"  # not called, just set for compare
+                cfg["redirect"][req] = f"{url.rstrip("/")}/{req}"  # not called, just set for compare
 
         cls.app = APP
         cls.web = TestApp(cls.app)

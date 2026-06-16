@@ -347,4 +347,4 @@ class AnyIntConverter(BaseConverter):
     def __init__(self, mapping: Map, *items: Union[int, str]) -> None:
         BaseConverter.__init__(self, mapping)
         # Start by enforcing that x is an integer then convert it to string
-        self.regex = f"(?:{'|'.join([str(int(x)) for x in items])})"
+        self.regex = f"(?:{"|".join([str(int(x)) for x in items])})"
