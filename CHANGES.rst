@@ -6,6 +6,13 @@ CHANGES
 `Unreleased <https://github.com/Ouranosinc/CanarieAPI/tree/master>`_ (latest)
 ------------------------------------------------------------------------------------
 
+.. **ADD LIST ITEMS WITH NEW CHANGES AND REMOVE THIS COMMENT**
+
+* No changes yet.
+
+`1.2.0 <https://github.com/Ouranosinc/CanarieAPI/tree/1.2.0>`_ (2026-06-16)
+------------------------------------------------------------------------------------
+
 * Move docker build to GitHub Actions CI (DockerHub auto-build deprecated).
 * Refresh dependencies to latest versions to resolve known security issues.
 * Adjust ``make docker-push`` to push both latest and tagged version, as used by CI.
