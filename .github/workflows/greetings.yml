@@ -6,13 +6,12 @@ jobs:
   greeting:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/first-interaction@v1
+    - uses: actions/first-interaction@1c4688942c71f71d4f5502a26ea67c331730fa4d # v3.1.0
       with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        issue-message: >
+        issue-message: |
           Thanks for submitting an issue. Make sure you have checked for similar issues.
           Also, provide enough details for us to be able to replicate the problem.
-        pr-message: >
+        pr-message: |
           Thanks for submitting a PR. Make sure you have looked at the contribution guidelines.
           Also, look for quick check/tests operations that you can run locally for early verification of errors.
           Travis will be happier if it doesn't need to run too many times with problematic code.
