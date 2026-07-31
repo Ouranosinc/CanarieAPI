@@ -1,0 +1,6 @@
+default_language_version.python = "3.12"
+
+[[repos]]
+repo = "https://github.com/gitleaks/gitleaks"
+rev = "v8.30.1"
+hooks = [{ id = "gitleaks", args = ["--config=.github/.gitleaks.toml"] }]

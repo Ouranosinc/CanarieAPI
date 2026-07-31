@@ -14,6 +14,7 @@ flake8-quotes
 flask_webtest
 isort>5.5
 mock
+prek
 pylint>=3,<4
 pylint-flask
 pylint-quotes
