@@ -63,7 +63,7 @@ ifeq ($(filter dry, $(MAKECMDGOALS)), dry)
 endif
 
 .PHONY: dry
-dry: setup.cfg	## run 'bump' target without applying changes (dry-run)
+dry: .bumpversion.toml	## run 'bump' target without applying changes (dry-run)
 ifeq ($(findstring bump, $(MAKECMDGOALS)),)
 	$(error Target 'dry' must be combined with a 'bump' target)
 endif
@@ -72,8 +72,8 @@ endif
 bump:	## bump version using VERSION specified as user input
 	@-echo "Updating package version ..."
 	@[ "${VERSION}" ] || ( echo ">> 'VERSION' is not set"; exit 1 )
-	@-bash -c '$(CONDA_CMD) test -f "$(CONDA_ENV_PATH)/bin/bump2version || pip install bump2version'
-	@-bash -c '$(CONDA_CMD) bump2version $(BUMP_XARGS) --new-version "${VERSION}" patch;'
+	@-bash -c '$(CONDA_CMD) test -f "$(CONDA_ENV_PATH)/bin/bump-my-version || pip install bump-my-version'
+	@-bash -c '$(CONDA_CMD) bump-my-version bump $(BUMP_XARGS) --new-version "${VERSION}" patch;'
 
 .PHONY: version
 version:	## display current version
