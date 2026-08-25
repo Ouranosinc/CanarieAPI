@@ -5,7 +5,7 @@ LABEL org.opencontainers.image.authors="David Byrns <david.byrns@crim.ca>, Franc
 LABEL org.opencontainers.image.description="CanarieAPI: Self describing REST service for Canarie registry."
 LABEL org.opencontainers.image.source="https://github.com/Ouranosinc/CanarieAPI"
 LABEL org.opencontainers.image.title="CanarieAPI"
-LABEL org.opencontainers.image.vendor="Ouranosinc, CRIM"
+LABEL org.opencontainers.image.vendor="Ouranosinc and CRIM"
 LABEL org.opencontainers.image.version="1.2.0"
 
 ENV PKG_DIR=/opt/local/src/CanarieAPI
