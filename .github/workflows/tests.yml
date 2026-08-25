@@ -54,35 +54,41 @@ jobs:
     strategy:
       matrix:
         # os: [ubuntu-latest, windows-latest]
-        os: [ubuntu-latest]
-        python-version: ["3.11", "3.12", "3.13"]
-        allow-failure: [false]
-        test-case: [test]
+        os: [ 'ubuntu-latest' ]
+        python-version: [ "3.11", "3.12", "3.13" ]
+        allow-failure: [ false ]
+        test-case: [ 'test' ]
         # can use below option to set environment variables or makefile settings applied during test execution
-        test-option: [""]
+        test-option: [ "" ]
         include:
           # linter tests
-          - os: ubuntu-latest
+          - os: 'ubuntu-latest'
             python-version: "3.12"
             allow-failure: false
             test-case: check
           # coverage test
-          - os: ubuntu-latest
+          - os: 'ubuntu-latest'
             python-version: "3.12"
             allow-failure: false
             test-case: coverage
           # smoke test of Docker image
-          - os: ubuntu-latest
+          - os: 'ubuntu-latest'
             python-version: none
             allow-failure: true
             test-case: test-docker
           # test allowed failing for recent versions
-          - os: ubuntu-latest
-            python-version: 3.14
+          - os: 'ubuntu-latest'
+            python-version: "3.14"
             allow-failure: true
             test-case: test
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Harden Runner
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          disable-sudo: true
+          egress-policy: audit
+      - name: Check out Repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: "0"
           persist-credentials: false
