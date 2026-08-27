@@ -1,20 +1,29 @@
 name: Docker Hub Publishing
 
 on:
-  # This will run the workflow on pushes to main and version tags.
-  # Adjust to match your branching and tagging strategy.
   push:
     branches:
-      - "master"
-      - "main"
+      - master
+    paths:
+      - ".bumpversion.toml"
+      - "Dockerfile"
     tags:
       - "[0-9]+.[0-9]+.[0-9]+"
-      - "[0-9]+.[0-9]+.[0-9]+-*"
+
+concurrency:
+  # For a given workflow, if we push to the same branch, cancel all previous builds on that branch except on master.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref == 'refs/heads/master' }}
+
+permissions:
+  contents: read
 
 jobs:
-  build-publish:
-    name: Build and publish image
+  build-publish-magpie:
+    name: Build and publish
     runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: pavics/canarieapi
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
@@ -22,22 +31,16 @@ jobs:
           disable-sudo: true
           egress-policy: audit
 
-      - name: Checkout Repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check out Repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
-          fetch-depth: "0"
           persist-credentials: false
 
       - name: Gather Docker metadata
         id: meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
-          images: pavics/canarieapi
-          labels: |
-            org.opencontainers.image.authors=David Byrns <david.byrns@crim.ca>, Francis Charette-Migneault <francis.charette-migneault@crim.ca>
-            org.opencontainers.image.description=CanarieAPI: Self describing REST service for Canarie registry.
-            org.opencontainers.image.title=CanarieAPI
-            org.opencontainers.image.vendor=Ouranosinc and CRIM
+          images: ${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=ref,event=tag
@@ -55,6 +58,12 @@ jobs:
       - name: Build Docker image and publish to Docker Hub
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
+          file: Dockerfile
           labels: ${{ steps.meta.outputs.labels }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
+
+      - name: Inspect labels
+        run: |
+          docker inspect --format='{{json .Config.Labels}}' ${{ env.IMAGE_NAME }}:latest
+
