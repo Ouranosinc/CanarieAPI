@@ -78,7 +78,7 @@ MonitorStatus = TypedDict("MonitorStatus", {
 }, total=True)
 MonitorInfo = Dict[str, MonitorStatus]
 
-START_UTC_TIME = datetime.datetime.utcnow().replace(microsecond=0)
+START_UTC_TIME = datetime.datetime.now(datetime.UTC).replace(microsecond=0)
 
 # REST requests required by CANARIE
 CANARIE_API_TYPE = ["service", "platform"]
