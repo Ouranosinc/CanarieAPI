@@ -3,6 +3,7 @@
 """
 Tests for `canarieapi` module.
 """
+
 import os
 import shutil
 import unittest

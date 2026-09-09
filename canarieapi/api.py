@@ -16,6 +16,7 @@ the CANARIE API specification.
 .. seealso::
     https://www.canarie.ca/software/support/documentation-guides/
 """
+
 # -- Standard lib ------------------------------------------------------------
 import collections
 import datetime
