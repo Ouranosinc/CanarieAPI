@@ -1,6 +1,12 @@
 # doc deps required because of linkchecks
 -r requirements.txt
 -r requirements-doc.txt
+# relates to:
+# - https://github.com/pyupio/safety/issues/822
+# - https://github.com/pyupio/safety/issues/853
+# - https://github.com/authlib/authlib/pull/909
+# - https://github.com/pydantic/httpx2/issues/1162
+authlib<1.8.0
 autopep8
 bandit
 bump-my-version==1.4.1
