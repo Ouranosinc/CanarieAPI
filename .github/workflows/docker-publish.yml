@@ -55,15 +55,26 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
 
-      - name: Build Docker image and publish to Docker Hub
+      - name: Build Docker image
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
+          cache-to: type=gha,mode=max
           file: Dockerfile
           labels: ${{ steps.meta.outputs.labels }}
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          load: true
+          push: false
+          tags: ${{ env.IMAGE_NAME }}:test
 
       - name: Inspect labels
         run: |
-          docker inspect --format='{{json .Config.Labels}}' ${{ env.IMAGE_NAME }}:latest
+          docker inspect --format='{{json .Config.Labels}}' ${{ env.IMAGE_NAME }}:test
 
+      - name: Publish image to Docker Hub
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          cache-from: type=gha
+          file: Dockerfile
+          labels: ${{ steps.meta.outputs.labels }}
+          load: false
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
