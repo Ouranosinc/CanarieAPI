@@ -16,6 +16,7 @@ the CANARIE API specification.
 .. seealso::
     https://www.canarie.ca/software/support/documentation-guides/
 """
+
 # -- Standard lib ------------------------------------------------------------
 import collections
 import datetime
@@ -78,7 +79,7 @@ MonitorStatus = TypedDict("MonitorStatus", {
 }, total=True)
 MonitorInfo = Dict[str, MonitorStatus]
 
-START_UTC_TIME = datetime.datetime.utcnow().replace(microsecond=0)
+START_UTC_TIME = datetime.datetime.now(datetime.UTC).replace(microsecond=0)
 
 # REST requests required by CANARIE
 CANARIE_API_TYPE = ["service", "platform"]
@@ -106,10 +107,11 @@ HANDLED_HTML_ERRORS_STR = ", ".join(map(str, HANDLED_HTML_ERRORS))
 APP.error_handler_spec.setdefault(None, {})
 for status_code in HANDLED_HTML_ERRORS:
     APP.error_handler_spec[None].setdefault(status_code, {})
-    APP.error_handler_spec[None][status_code][Exception] = \
-        lambda more_info, status_code_copy = status_code: \
-        make_error_response(http_status=status_code_copy,
-                            http_status_response=str(more_info))
+    APP.error_handler_spec[None][status_code][Exception] = (
+        lambda more_info, status_code_copy=status_code: (
+            make_error_response(http_status=status_code_copy, http_status_response=str(more_info))
+        )
+    )
 
 
 # avoid error on missing None key for Exception in Flask>2

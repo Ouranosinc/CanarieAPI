@@ -54,7 +54,7 @@ Ready to contribute? Here's how to set up `CanarieAPI` for local development.
 2. Install your local copy and use a virtualenv. Assuming you have
    virtualenv installed, this is how you set up your fork for local
    development::
-    
+
     $ cd CanarieAPI/
     $ virtualenv -p python 3.5 env
     $ source env/bin/activate.csh

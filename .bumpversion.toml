@@ -11,8 +11,8 @@ replace = "__version__ = \"{new_version}\""
 
 [[tool.bumpversion.files]]
 filename = "Dockerfile"
-search = "LABEL version=\"{current_version}\""
-replace = "LABEL version=\"{new_version}\""
+search = "LABEL org.opencontainers.image.version=\"{current_version}\""
+replace = "LABEL org.opencontainers.image.version=\"{new_version}\""
 
 [[tool.bumpversion.files]]
 filename = "Makefile"

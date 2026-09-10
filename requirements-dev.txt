@@ -1,13 +1,19 @@
 # doc deps required because of linkchecks
 -r requirements.txt
 -r requirements-doc.txt
+# relates to:
+# - https://github.com/pyupio/safety/issues/822
+# - https://github.com/pyupio/safety/issues/853
+# - https://github.com/authlib/authlib/pull/909
+# - https://github.com/pydantic/httpx2/issues/1162
+authlib<1.8.0
 autopep8
 bandit
 bump-my-version==1.4.1
 codacy-coverage>=1.3.11
 coverage>=5.5
 doc8>=0.8
-docformatter==1.7.7
+docformatter>=1.7.8
 flake8
 flake8-docstrings
 flake8-quotes

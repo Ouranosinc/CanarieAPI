@@ -290,6 +290,7 @@ def retry_db_error_after_init(func: DatabaseRetryFunction) -> DatabaseRetryFunct
     """
     Decorator that will retry a failing operation if an error related to database initialization occurred.
     """
+
     @functools.wraps(func)
     def retry(*args: Any, database: sqlite3.Connection = None, **kwargs: Any) -> ReturnType:
         db_param = inspect.signature(func).parameters.get("database")

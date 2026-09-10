@@ -1,8 +1,12 @@
 FROM python:3.12-slim
-LABEL description="CanarieAPI: Self describing REST service for Canarie registry."
-LABEL maintainer="David Byrns <david.byrns@crim.ca>, Francis Charette-Migneault <francis.charette-migneault@crim.ca>"
-LABEL vendor="Ouranosinc, CRIM"
-LABEL version="1.2.0"
+ARG DEBIAN_FRONTEND=noninteractive
+ENV PIP_ROOT_USER_ACTION=ignore
+LABEL org.opencontainers.image.authors="David Byrns <david.byrns@crim.ca>, Francis Charette-Migneault <francis.charette-migneault@crim.ca>"
+LABEL org.opencontainers.image.description="CanarieAPI: Self describing REST service for Canarie registry."
+LABEL org.opencontainers.image.source="https://github.com/Ouranosinc/CanarieAPI"
+LABEL org.opencontainers.image.title="CanarieAPI"
+LABEL org.opencontainers.image.vendor="Ouranosinc and CRIM"
+LABEL org.opencontainers.image.version="1.2.0"
 
 ENV PKG_DIR=/opt/local/src/CanarieAPI
 WORKDIR ${PKG_DIR}
