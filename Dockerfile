@@ -6,7 +6,7 @@ LABEL org.opencontainers.image.description="CanarieAPI: Self describing REST ser
 LABEL org.opencontainers.image.source="https://github.com/Ouranosinc/CanarieAPI"
 LABEL org.opencontainers.image.title="CanarieAPI"
 LABEL org.opencontainers.image.vendor="Ouranosinc and CRIM"
-LABEL org.opencontainers.image.version="1.2.0"
+LABEL org.opencontainers.image.version="1.2.1"
 
 ENV PKG_DIR=/opt/local/src/CanarieAPI
 WORKDIR ${PKG_DIR}

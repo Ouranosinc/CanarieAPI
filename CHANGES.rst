@@ -8,6 +8,13 @@ CHANGES
 
 .. **ADD LIST ITEMS WITH NEW CHANGES AND REMOVE THIS COMMENT**
 
+* No changes yet.
+
+`1.2.1 <https://github.com/Ouranosinc/CanarieAPI/tree/1.2.1>`_ (%Y-%m-%d)
+------------------------------------------------------------------------------------
+
+.. **ADD LIST ITEMS WITH NEW CHANGES AND REMOVE THIS COMMENT**
+
 * Dependency updates for security fixes.
 * Update GitHub CI to deploy Dockers.
 
